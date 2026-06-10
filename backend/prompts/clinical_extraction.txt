@@ -1,0 +1,4 @@
+# PLACEHOLDER — Milestone 3
+# Purpose: Extract structured ClinicalFact objects from a raw doctor-patient transcript.
+# Will include: task description, input schema, output JSON schema, safety constraints, one worked example.
+# Calls Gemini with response_mime_type="application/json".

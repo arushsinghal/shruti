@@ -1,0 +1,5 @@
+# PLACEHOLDER — Milestone 5
+# Purpose: Generate a structured SOAPNote (Subjective / Objective / Assessment / Plan)
+#          from active clinical facts in a resolved MemoryState.
+# Will include: task description, input schema, output JSON schema, safety constraints, one worked example.
+# Calls Gemini with response_mime_type="application/json".

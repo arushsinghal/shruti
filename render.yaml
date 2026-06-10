@@ -1,0 +1,21 @@
+services:
+  - type: web
+    name: shruti
+    runtime: docker
+    plan: free
+    region: singapore
+    branch: master
+    healthCheckPath: /health
+    envVars:
+      - key: DATA_DIR
+        value: /tmp/shruti
+      - key: SQLITE_DB
+        value: sessions.db
+      - key: ASR_MODE
+        value: cloud
+      - key: SHRUTI_ADMIN_USER
+        value: demo
+      - key: SHRUTI_ADMIN_PASSWORD
+        sync: false
+      - key: SARVAM_API_KEY
+        sync: false

@@ -1,0 +1,5 @@
+Doctor: What's the problem today?
+Patient: Sore throat and mild fever since yesterday.
+Doctor: Any allergies?
+Patient: None that I know of.
+Doctor: I'll prescribe amoxicillin 250mg three times a day for 5 days. If it doesn't improve, come back.

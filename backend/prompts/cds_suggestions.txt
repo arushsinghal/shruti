@@ -1,0 +1,6 @@
+# PLACEHOLDER — Milestone 6
+# Purpose: Generate urgency-sorted CDSSuggestion objects from a SOAPNote.
+#          Every suggestion must carry safety_label="doctor_review_required".
+#          Allergy-medication conflicts must be urgency="critical".
+# Will include: task description, input schema, output JSON schema, safety constraints, one worked example.
+# Calls Gemini with response_mime_type="application/json".

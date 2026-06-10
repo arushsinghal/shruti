@@ -1,0 +1,11 @@
+Doctor: Good morning. What brings you in today?
+Patient: I've had a bad headache for the past three days, and I've also been running a fever since yesterday.
+Doctor: How high is the fever?
+Patient: Around 38.5 degrees Celsius.
+Doctor: Any nausea or vomiting?
+Patient: Yes, I felt nauseous this morning but didn't vomit.
+Doctor: Any known allergies?
+Patient: I'm allergic to penicillin.
+Doctor: Current medications?
+Patient: I take metformin 500mg twice daily for diabetes.
+Doctor: Alright. Based on what you've described, this looks like a viral infection. I'll prescribe paracetamol 500mg every 6 hours for the fever and headache. Drink plenty of fluids and rest. Come back if the fever goes above 39.5 or if symptoms worsen after 3 days.

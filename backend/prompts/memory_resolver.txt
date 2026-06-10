@@ -1,0 +1,5 @@
+# PLACEHOLDER — Milestone 4
+# Purpose: Resolve indirect references, detect supersessions, preserve uncertainty/negation,
+#          and produce a MemoryState with full audit trail from a list of ClinicalFacts.
+# Will include: task description, input schema, output JSON schema, safety constraints, one worked example.
+# Calls Gemini with response_mime_type="application/json".
