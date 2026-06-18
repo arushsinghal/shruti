@@ -40,14 +40,27 @@ class CDSEngineService:
                         "safety_label": "doctor_review_required"
                     })
 
+        investigations_str = " ".join(state.get("investigations", [])).lower()
+        diagnoses_str = " ".join(state.get("diagnoses", [])).lower()
+
         # 2. Symptom-based Suggestions
         if "fever" in symptoms_str or "bukhar" in symptoms_str:
-            suggestions.append({
-                "suggestion": "Consider ordering CBC or Malaria/Dengue panel",
-                "rationale": "Fever present; if duration > 3 days, blood tests are recommended.",
-                "urgency": "low",
-                "safety_label": "doctor_review_required"
-            })
+            if "cbc" not in investigations_str and "blood test" not in investigations_str:
+                suggestions.append({
+                    "suggestion": "Consider ordering CBC or Malaria/Dengue panel",
+                    "rationale": "Fever present; if duration > 3 days, blood tests are recommended.",
+                    "urgency": "low",
+                    "safety_label": "infectious_workup",
+                })
+
+        if "diabetes" in diagnoses_str or "diabetic" in diagnoses_str:
+            if "hba1c" not in investigations_str:
+                suggestions.append({
+                    "suggestion": "Order HbA1c if not done recently",
+                    "rationale": "Diabetes documented; glycaemic control monitoring is essential.",
+                    "urgency": "medium",
+                    "safety_label": "chronic_disease_monitoring",
+                })
             
         if ("headache" in symptoms_str or "dard" in symptoms_str) and "nausea" in symptoms_str:
             suggestions.append({

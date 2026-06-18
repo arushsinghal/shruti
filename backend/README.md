@@ -1,13 +1,13 @@
-# SHRUTI
+# Lipi
 Assisting rural clinicians with safe, multilingual documentation at the point of care.
 
 > Research Prototype | Not a certified medical device
 
 ## Research Motivation
-In rural India, the doctor-to-patient ratio stands at 1:1,457. Clinicians in high-throughput settings spend 30-40% of each consultation on manual documentation, directly reducing time available for patient care. Existing clinical NLP tools do not support Hindi, Hinglish, or low-connectivity offline environments. SHRUTI is a research prototype exploring whether safe, structured clinical documentation can be achieved at the edge, in the languages clinicians actually speak.
+In rural India, the doctor-to-patient ratio stands at 1:1,457. Clinicians in high-throughput settings spend 30-40% of each consultation on manual documentation, directly reducing time available for patient care. Existing clinical NLP tools do not support Hindi, Hinglish, or low-connectivity offline environments. Lipi is a research prototype exploring whether safe, structured clinical documentation can be achieved at the edge, in the languages clinicians actually speak.
 
 ## What This System Does
-SHRUTI processes oral consultations to generate structured clinical records through a multi-stage pipeline:
+Lipi processes oral consultations to generate structured clinical records through a multi-stage pipeline:
 - **Multilingual Speech Ingestion**: Captures live microphone streaming or audio file uploads and utilizes speech-to-text models (such as the Sarvam API or edge-safe Whisper models) to transcribe consultations spoken in English, Hindi, or mixed Hinglish.
 - **Local PHI De-identification**: Scrubs Protected Health Information (including patient names, phone numbers, email addresses, dates, and locations) locally for privacy-preserving review and export.
 - **Rule-Based Clinical Extraction**: Runs a local, deterministic NLP engine using spaCy and negation-aware regular expressions to identify symptoms, vitals, allergies, investigations, and medications.

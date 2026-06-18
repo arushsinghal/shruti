@@ -25,6 +25,29 @@ except OSError:
 _PHONE_REGEX = re.compile(r'\b(?:\+\d{1,2}\s)?\(?\d{3}\)?[\s.-]\d{3}[\s.-]\d{4}\b')
 _EMAIL_REGEX = re.compile(r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b')
 _TITLE_NAME_REGEX = re.compile(r'\b(?:Patient|Dr\.?|Doctor)\s+([A-Z][a-z]+(?:\s+[A-Z][a-z]+){0,2})\b')
+_DATE_REGEX = re.compile(
+    r'\b(?:'
+    r'\d{1,2}[/-]\d{1,2}[/-]\d{2,4}'
+    r'|\d{4}[/-]\d{1,2}[/-]\d{1,2}'
+    r'|(?:Jan(?:uary)?|Feb(?:ruary)?|Mar(?:ch)?|Apr(?:il)?|May|Jun(?:e)?|Jul(?:y)?|Aug(?:ust)?|Sep(?:tember)?|Oct(?:ober)?|Nov(?:ember)?|Dec(?:ember)?)\s+\d{1,2}(?:st|nd|rd|th)?(?:,\s+\d{4})?'
+    r'|\d{1,2}(?:st|nd|rd|th)?\s+(?:Jan(?:uary)?|Feb(?:ruary)?|Mar(?:ch)?|Apr(?:il)?|May|Jun(?:e)?|Jul(?:y)?|Aug(?:ust)?|Sep(?:tember)?|Oct(?:ober)?|Nov(?:ember)?|Dec(?:ember)?)(?:\s+\d{4})?'
+    r')\b',
+    re.IGNORECASE
+)
+
+# Relative clinical durations are NOT PHI — "fever for 3 days" must survive scrubbing.
+# Absolute calendar dates ("March 4, 2024", "12/05/1985") are still scrubbed.
+_CLINICAL_DURATION_RE = re.compile(
+    r'^(?:'
+    r'\d+\s*(?:day|week|month|year|hour|minute|hr|min)s?'         # "3 days", "2 weeks", "4 hours"
+    r'|a\s+(?:day|week|month|year|hour)'                           # "a week"
+    r'|(?:few|several|many|couple\s+of)\s+(?:day|week|month|year|hour)s?'  # "few days"
+    r'|yesterday'                                                  # "yesterday"
+    r'|(?:(?:since|this)\s+)?(?:morning|evening|night|afternoon|noon)'  # "morning", "this morning", "since morning"
+    r'|last\s+(?:night|week|month|year)'                               # "last night", "last week"
+    r')$',
+    re.IGNORECASE,
+)
 
 
 class PHIScrubberService:
@@ -34,37 +57,13 @@ class PHIScrubberService:
         if not text:
             return ""
 
-        # 1. Regex Replacements (Phones, Emails)
+        # Regex-only: phones, emails, "Dr./Patient [Name]" patterns.
+        # spaCy NER disabled — English model produces false positives on
+        # Hindi/Hinglish clinical text (tags BP values, Hindi words, lab
+        # names like CBC as PHI). Regex catches real identifying info only.
         text = _PHONE_REGEX.sub("[REDACTED_PHONE]", text)
         text = _EMAIL_REGEX.sub("[REDACTED_EMAIL]", text)
+        text = _DATE_REGEX.sub("[REDACTED_DATE]", text)
         text = _TITLE_NAME_REGEX.sub(lambda m: m.group(0).replace(m.group(1), "[REDACTED_NAME]"), text)
+        return text
 
-        if not HAS_NER:
-            return text
-
-        # 2. spaCy NER Replacements
-        doc = nlp(text)
-        
-        # Build a list of replacements from the end to the start so offsets don't change
-        replacements = []
-        for ent in doc.ents:
-            if ent.label_ == "PERSON":
-                replacements.append((ent.start_char, ent.end_char, "[REDACTED_NAME]"))
-            elif ent.label_ in ("DATE", "TIME"):
-                # We often want to keep clinical duration (e.g., "for 3 days"), 
-                # but scrub birthdates. For strict PHI, we scrub all exact dates.
-                # To be safe but clinical, we scrub exact dates but might leave durations.
-                # For this prototype, we'll aggressively scrub DATE.
-                replacements.append((ent.start_char, ent.end_char, "[REDACTED_DATE]"))
-            elif ent.label_ in ("GPE", "LOC"):
-                replacements.append((ent.start_char, ent.end_char, "[REDACTED_LOCATION]"))
-            elif ent.label_ == "ORG":
-                replacements.append((ent.start_char, ent.end_char, "[REDACTED_ORG]"))
-
-        # Apply replacements in reverse order
-        replacements.sort(key=lambda x: x[0], reverse=True)
-        scrubbed = text
-        for start, end, label in replacements:
-            scrubbed = scrubbed[:start] + label + scrubbed[end:]
-
-        return scrubbed

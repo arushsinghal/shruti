@@ -1,6 +1,6 @@
 services:
   - type: web
-    name: shruti
+    name: lipi
     runtime: docker
     plan: free
     region: singapore
@@ -8,14 +8,14 @@ services:
     healthCheckPath: /health
     envVars:
       - key: DATA_DIR
-        value: /tmp/shruti
+        value: /tmp/lipi
       - key: SQLITE_DB
         value: sessions.db
       - key: ASR_MODE
         value: cloud
-      - key: SHRUTI_ADMIN_USER
+      - key: LIPI_ADMIN_USER
         value: demo
-      - key: SHRUTI_ADMIN_PASSWORD
+      - key: LIPI_ADMIN_PASSWORD
         sync: false
       - key: SARVAM_API_KEY
         sync: false

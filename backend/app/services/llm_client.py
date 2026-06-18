@@ -1,4 +1,4 @@
-"""Optional Google Gemini 2.0 formatting client for SHRUTI.
+"""Optional Google Gemini 2.0 formatting client for Lipi.
 
 Clinical extraction, memory resolution, and CDS are intentionally local-only.
 This client is retained only for optional structured SOAP wording from already
@@ -109,17 +109,34 @@ class LLMClientService:
         Do not infer diagnoses, dosages, follow-up instructions, or clinical facts.
         If a field is not present, write "not specified".
         The note requires physician review before clinical use.
-        
+
         Patient State:
         {json.dumps(memory_state, indent=2)}
         """
         result = self._generate_structured(prompt, SoapNoteSchema)
-        return {
-            "S": result.S,
-            "O": result.O,
-            "A": result.A,
-            "P": result.P
-        }
+        return {"S": result.S, "O": result.O, "A": result.A, "P": result.P}
+
+    def generate_soap_from_transcript(self, transcript: str) -> dict:
+        """Generate SOAP directly from raw transcript (Hindi/Hinglish/English).
+        Used when local regex extraction returns empty results."""
+        prompt = f"""You are a clinical scribe assistant for Indian doctors.
+Extract a SOAP note from this doctor-patient consultation transcript.
+The transcript may be in Hindi, Hinglish, or English.
+
+Rules:
+- S (Subjective): Patient's symptoms, complaints, duration in English
+- O (Objective): Vitals, measurements, exam findings in English
+- A (Assessment): Likely diagnosis or differential — physician must confirm
+- P (Plan): Medications, investigations, follow-up mentioned in transcript
+
+Only include what was explicitly said. Do not invent facts.
+Write in English. This draft requires physician review before clinical use.
+
+Transcript:
+{transcript}
+"""
+        result = self._generate_structured(prompt, SoapNoteSchema)
+        return {"S": result.S, "O": result.O, "A": result.A, "P": result.P}
 
     def generate_cds(self, memory_state: dict) -> list[dict]:
         raise RuntimeError("Gemini CDS generation is disabled by safety policy; use local CDS.")

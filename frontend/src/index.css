@@ -1,8 +1,9 @@
 @import "tailwindcss";
 
 html {
-  scroll-behavior: smooth;
   overflow-x: hidden;
+  scroll-behavior: smooth;
+  scroll-padding-top: 80px;
 }
 
 @theme {
@@ -22,120 +23,24 @@ body {
   font-feature-settings: "cv02", "cv03", "cv04", "cv11";
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background-color: var(--color-bg-warm);
+  background-color: #05070b;
   color: var(--color-text-dark);
   overflow-x: hidden;
 }
 
-/* ============================================================
-   Scroll-reveal animations
-   ============================================================ */
-
-.reveal {
-  opacity: 0;
-  transform: translateY(28px);
-  transition: opacity 0.65s cubic-bezier(0.22, 1, 0.36, 1),
-              transform 0.65s cubic-bezier(0.22, 1, 0.36, 1);
-}
-
-.reveal.visible {
-  opacity: 1;
-  transform: translateY(0);
-}
-
-.reveal-left {
-  opacity: 0;
-  transform: translateX(-28px);
-  transition: opacity 0.65s cubic-bezier(0.22, 1, 0.36, 1),
-              transform 0.65s cubic-bezier(0.22, 1, 0.36, 1);
-}
-
-.reveal-left.visible {
-  opacity: 1;
-  transform: translateX(0);
-}
-
-.reveal-right {
-  opacity: 0;
-  transform: translateX(28px);
-  transition: opacity 0.65s cubic-bezier(0.22, 1, 0.36, 1),
-              transform 0.65s cubic-bezier(0.22, 1, 0.36, 1);
-}
-
-.reveal-right.visible {
-  opacity: 1;
-  transform: translateX(0);
-}
-
-.reveal-delay-1 { transition-delay: 0.1s; }
-.reveal-delay-2 { transition-delay: 0.2s; }
-.reveal-delay-3 { transition-delay: 0.3s; }
-.reveal-delay-4 { transition-delay: 0.4s; }
-
-/* ============================================================
-   Animated waveform bars (hero audio indicator)
-   ============================================================ */
-
-.wave-bar {
-  display: inline-block;
-  width: 3px;
-  border-radius: 3px;
-  background: currentColor;
-  animation: wave 1.2s ease-in-out infinite;
-}
-
-.wave-bar:nth-child(1) { animation-delay: 0s;    height: 8px; }
-.wave-bar:nth-child(2) { animation-delay: 0.1s;  height: 16px; }
-.wave-bar:nth-child(3) { animation-delay: 0.2s;  height: 24px; }
-.wave-bar:nth-child(4) { animation-delay: 0.3s;  height: 14px; }
-.wave-bar:nth-child(5) { animation-delay: 0.4s;  height: 20px; }
-.wave-bar:nth-child(6) { animation-delay: 0.5s;  height: 10px; }
-.wave-bar:nth-child(7) { animation-delay: 0.6s;  height: 18px; }
-.wave-bar:nth-child(8) { animation-delay: 0.7s;  height: 12px; }
-
-@keyframes wave {
-  0%, 100% { transform: scaleY(1); }
-  50%       { transform: scaleY(0.3); }
-}
-
-/* ============================================================
-   Stat counter shimmer
-   ============================================================ */
-
-.stat-number {
-  background: linear-gradient(90deg, #1B5E3B 0%, #2E8B57 50%, #1B5E3B 100%);
-  background-size: 200% auto;
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
-
-/* ============================================================
-   Hero gradient mesh background
-   ============================================================ */
-
-.hero-mesh {
-  background-color: #ffffff;
-  background-image:
-    radial-gradient(ellipse at 20% 50%, rgba(27, 94, 59, 0.05) 0%, transparent 60%),
-    radial-gradient(ellipse at 80% 20%, rgba(244, 164, 53, 0.06) 0%, transparent 50%),
-    radial-gradient(ellipse at 60% 80%, rgba(27, 94, 59, 0.04) 0%, transparent 50%);
-}
-
-/* ============================================================
-   Ticker / marquee strip
-   ============================================================ */
-
-@keyframes ticker {
-  0%   { transform: translateX(0); }
-  100% { transform: translateX(-50%); }
-}
-
-.ticker-track {
-  animation: ticker 25s linear infinite;
-  will-change: transform;
-}
-
-.ticker-track:hover {
-  animation-play-state: paused;
+@layer utilities {
+  .bg-glow-primary {
+    background: radial-gradient(circle at center, rgba(27, 94, 59, 0.15) 0%, rgba(5, 7, 11, 0) 70%);
+  }
+  .bg-glow-slate {
+    background: radial-gradient(circle at top center, rgba(255, 255, 255, 0.05) 0%, rgba(5, 7, 11, 0) 70%);
+  }
+  .border-glow {
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.05), 0 0 0 1px rgba(255, 255, 255, 0.05);
+  }
+  .glass-panel {
+    background: rgba(255, 255, 255, 0.02);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+  }
 }

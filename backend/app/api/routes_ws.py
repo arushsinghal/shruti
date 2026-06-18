@@ -5,12 +5,18 @@ import uuid
 import logging
 from pathlib import Path
 
-from fastapi import APIRouter, WebSocket, WebSocketDisconnect
+from fastapi import APIRouter, WebSocket, WebSocketDisconnect, Query
+from jose import JWTError, jwt
+import aiosqlite
 from app.utils.config import settings
+from app.storage.db import get_db_path
+from app.api.routes_auth import get_user
+from app.storage.repository import SessionRepository
 
 logger = logging.getLogger(__name__)
 
 router = APIRouter()
+repo = SessionRepository()
 
 _DATA_DIR = Path(settings.data_dir) if settings.data_dir else Path(".")
 AUDIO_DIR = _DATA_DIR / "audio_uploads"
@@ -18,13 +24,35 @@ AUDIO_DIR.mkdir(parents=True, exist_ok=True)
 
 
 @router.websocket("/ws/audio/{session_id}")
-async def stream_audio_ws(websocket: WebSocket, session_id: str):
+async def stream_audio_ws(websocket: WebSocket, session_id: str, token: str = Query(None)):
     """
     Accepts raw audio chunks from the browser's MediaRecorder via WebSocket.
     Chunks are appended to a single .webm file on disk in real-time for research evaluation.
     Research prototype only — output requires physician review.
     """
     await websocket.accept()
+    
+    try:
+        if not token:
+            raise ValueError("No token provided")
+        payload = jwt.decode(token, settings.secret_key, algorithms=[settings.algorithm])
+        username: str = payload.get("sub")
+        if username is None:
+            raise ValueError("No sub in token")
+            
+        async with aiosqlite.connect(get_db_path()) as db:
+            user = await get_user(db, username)
+        if not user:
+            raise ValueError("User not found")
+            
+        session = await repo.get_session(session_id, str(user["id"]))
+        if not session:
+            raise ValueError("Session not found or not owned by user")
+    except Exception as e:
+        logger.warning("WS auth failed for session %s: %s", session_id, e)
+        await websocket.close(code=4008)
+        return
+
     logger.info("WS connected for session: %s", session_id)
 
     audio_path = AUDIO_DIR / f"{session_id}_live.webm"
@@ -62,4 +90,7 @@ async def stream_audio_ws(websocket: WebSocket, session_id: str):
         except Exception:
             pass
     finally:
-        await websocket.close()
+        try:
+            await websocket.close()
+        except Exception:
+            pass

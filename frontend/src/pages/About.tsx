@@ -4,110 +4,105 @@ export default function About() {
   const navigate = useNavigate();
 
   return (
-    <div className="min-h-screen bg-bg-warm font-sans text-text-dark pb-20">
-      {/* Navigation */}
-      <nav className="w-full px-6 py-4 border-b border-slate-200/80 flex items-center justify-between bg-white/80 backdrop-blur-md sticky top-0 z-50">
+    <div className="min-h-screen bg-[#05070b] font-sans text-slate-100 pb-20">
+      <nav className="w-full px-6 py-4 border-b border-white/10 flex items-center justify-between bg-[#05070b]/88 backdrop-blur-xl sticky top-0 z-50">
         <div className="flex items-center gap-3">
-          <div className="w-8 h-8 bg-primary rounded flex items-center justify-center shadow-sm">
-            <span className="text-white font-serif font-bold text-lg">श</span>
+          <div className="w-8 h-8 bg-primary rounded-md flex items-center justify-center shadow-[0_0_24px_rgba(27,94,59,0.45)]">
+            <span className="text-white font-bold text-lg">श</span>
           </div>
           <div className="flex flex-col">
-            <span className="text-base font-bold text-text-dark tracking-tight leading-none mb-1">SHRUTI Health</span>
-            <span className="text-[10px] text-slate-500 font-medium">Clinic-deployed documentation infrastructure</span>
+            <span className="text-base font-bold text-white tracking-tight leading-none mb-1">Lipi Health</span>
+            <span className="text-[10px] text-slate-400 font-medium">Clinical AI infrastructure company</span>
           </div>
         </div>
-        <div className="flex items-center gap-4">
-          <button
-            onClick={() => navigate('/dashboard')}
-            className="text-xs font-semibold bg-primary hover:bg-primary-dark text-white px-3.5 py-1.5 rounded transition-all shadow-sm cursor-pointer"
-          >
-            Launch Console
-          </button>
-        </div>
+        <button
+          onClick={() => navigate('/dashboard')}
+          className="text-xs font-semibold bg-white hover:bg-slate-200 text-slate-950 px-3.5 py-1.5 rounded-md transition-all cursor-pointer"
+        >
+          Launch Console
+        </button>
       </nav>
 
-      <main className="max-w-3xl mx-auto px-6 pt-12 space-y-12">
-        {/* Back Button */}
+      <main className="max-w-4xl mx-auto px-6 pt-12 space-y-12">
         <button
           onClick={() => navigate(-1)}
-          className="text-xs font-bold text-slate-500 hover:text-primary transition-colors flex items-center gap-1 cursor-pointer"
+          className="text-xs font-bold text-slate-500 hover:text-white transition-colors flex items-center gap-1 cursor-pointer"
         >
-          <svg className="w-4 h-4 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <svg className="w-4 h-4 text-accent" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
           </svg>
           Back
         </button>
 
-        {/* Project About Section */}
-        <section className="space-y-4">
-          <h1 className="text-3xl font-serif font-bold text-text-dark">About the SHRUTI Venture</h1>
-          <div className="h-1 w-20 bg-accent rounded"></div>
+        <section className="space-y-6">
+          <div className="space-y-3">
+            <p className="text-xs font-bold text-accent uppercase tracking-widest">Company</p>
+            <h1 className="text-4xl md:text-6xl font-bold tracking-tight text-white leading-[0.95]">
+              About Lipi Health
+            </h1>
+          </div>
 
-          {/* Contextual Camp Photo */}
-          <div className="relative rounded-xl overflow-hidden shadow-lg border border-slate-200 my-6">
+          <div className="relative rounded-xl overflow-hidden shadow-2xl border border-white/10 bg-white/[0.04]">
             <img
-              src="/rural_doctor_hero.png"
-              alt="Indian physician examining a patient at a rural health camp"
-              className="w-full object-cover"
-              style={{ maxHeight: '300px' }}
+              src="/lipi_app_mockup.png"
+              alt="Lipi clinician console showing SOAP documentation workflow"
+              className="w-full object-cover object-left-top"
+              style={{ maxHeight: '360px' }}
             />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
-            <div className="absolute bottom-0 left-0 right-0 p-3">
-              <p className="text-white text-[11px] font-medium drop-shadow-sm">
-                Rural health camps and small clinics — where SHRUTI is built to make clinical documentation usable.
+            <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent" />
+            <div className="absolute bottom-0 left-0 right-0 p-4">
+              <p className="text-white text-[11px] font-bold uppercase tracking-wider drop-shadow-sm">
+                Voice2SOAP is live. The broader clinical AI platform is in build.
               </p>
             </div>
           </div>
 
-          <p className="text-slate-600 leading-relaxed font-light mt-4">
-            SHRUTI is a field-deployed social venture addressing the documentation burden in rural, low-resource clinics across India. In high-throughput settings where one physician may consult dozens of patients in a session, the platform turns Hindi, English, and Hinglish conversations into structured, doctor-reviewed SOAP documentation.
+          <p className="text-slate-300 leading-relaxed">
+            Lipi Health is building clinical AI infrastructure for India. Voice2SOAP is the first live product: multilingual consultations become physician-reviewed SOAP records, CDS alerts, printable reports, and FHIR exports.
           </p>
-          <p className="text-slate-600 leading-relaxed font-light">
-            The product combines a clinician console, audio ingestion, local clinical extraction, safety alerts, editable SOAP notes, printable reports, and HL7 FHIR export. It is built around a non-negotiable human-in-the-loop workflow: SHRUTI assists documentation, but the physician remains the final clinical authority.
+          <p className="text-slate-400 leading-relaxed">
+            The bigger company is not a documentation wrapper. Lipi is building toward private clinical speech models, domain-specific documentation LLMs, local safety engines, and operating intelligence for clinics, hospitals, and provider networks.
           </p>
-          <div className="rounded-lg border border-accent/30 bg-accent/10 p-4 text-xs text-slate-700 leading-relaxed">
-            <p className="font-bold uppercase tracking-wider text-accent-dark mb-1">Deployment & Partnerships</p>
+          <div className="rounded-lg border border-primary/30 bg-primary/10 p-4 text-xs text-slate-300 leading-relaxed">
+            <p className="font-bold uppercase tracking-wider text-emerald-300 mb-1">Current access</p>
             <p>
-              SHRUTI is deployed in clinical workflows and available for clinic, NGO, and public-health partnerships. Public pages keep partner identities private unless a partner chooses to be named.
+              Lipi is available for clinical teams and platform partners evaluating Voice2SOAP today and the broader clinical AI stack as it develops.
             </p>
           </div>
         </section>
 
-        {/* Why This Exists */}
-        <section className="space-y-4 border-t border-slate-200 pt-8">
-          <h2 className="text-xl font-serif font-bold text-text-dark">Why This Exists: The Rural Healthcare Crisis</h2>
-          <p className="text-slate-600 leading-relaxed font-light">
-            In rural India, the healthcare ecosystem operates under severe resource constraints, with a doctor-to-patient ratio standing at an alarming <strong>1 to 1,457</strong>. Under such demanding conditions, overloaded clinical practitioners at temporary health camps routinely consult with 80 to 100 patients daily.
+        <section className="space-y-4 border-t border-white/10 pt-8">
+          <h2 className="text-2xl font-bold tracking-tight text-white">Why documentation is the wedge</h2>
+          <p className="text-slate-400 leading-relaxed">
+            Documentation is the highest-frequency workflow in outpatient care. Every consultation creates clinical notes, medication decisions, follow-up instructions, and interoperability needs. Owning this workflow creates the record layer that makes later products possible.
           </p>
-          <p className="text-slate-600 leading-relaxed font-light">
-            Studies show that clinicians spend <strong>30% to 40% of their total consultation time</strong> manually typing or writing clinical notes. SHRUTI starts with this urgent wedge: returning clinician attention to patients while creating structured records that can later support follow-up, referrals, and public-health visibility.
+          <p className="text-slate-400 leading-relaxed">
+            The expansion path is clinical memory, referrals, coding, population analytics, and private model infrastructure for provider networks. Voice2SOAP earns the workflow; the platform compounds around it.
           </p>
         </section>
 
-        {/* Our Approach to Deployment Safety & Challenges */}
-        <section className="space-y-4 border-t border-slate-200 pt-8">
-          <h2 className="text-xl font-serif font-bold text-text-dark">Our Approach to Safety, Scale & Field Challenges</h2>
-          <p className="text-slate-600 leading-relaxed font-light">
-            Deploying AI systems in remote healthcare environments involves addressing several unique challenges. Our technical team works continuously on these core engineering pillars:
-          </p>
-          <ul className="list-disc list-inside space-y-2.5 text-sm text-slate-600 pl-2">
-            <li>
-              <strong className="text-text-dark">Linguistic Diversity & Hinglish Support:</strong> Standard NLP tools struggle when clinicians code-switch mid-sentence. SHRUTI uses local entity mapping and transcript evidence to keep Hindi, English, and Hinglish documentation reviewable.
+        <section className="space-y-4 border-t border-white/10 pt-8">
+          <h2 className="text-2xl font-bold tracking-tight text-white">Operating principles</h2>
+          <ul className="grid md:grid-cols-3 gap-4 text-sm">
+            <li className="rounded-lg border border-white/10 bg-white/[0.035] p-4">
+              <strong className="text-white block mb-2">Workflow first</strong>
+              <span className="text-slate-400">Products must fit real clinical throughput before they can become intelligent systems.</span>
             </li>
-            <li>
-              <strong className="text-text-dark">Clinical Safety & Physician Control:</strong> The system is doctor-assistive, not autonomous. It flags risks and drafts notes, but every output requires physician review before use.
+            <li className="rounded-lg border border-white/10 bg-white/[0.035] p-4">
+              <strong className="text-white block mb-2">Local by default</strong>
+              <span className="text-slate-400">Clinical extraction, memory resolution, and conflict detection run locally before optional formatting.</span>
             </li>
-            <li>
-              <strong className="text-text-dark">Scalable Social Venture Path:</strong> SHRUTI is designed to grow through clinics, NGO health camps, and public-health partners while keeping privacy and field usability at the center.
+            <li className="rounded-lg border border-white/10 bg-white/[0.035] p-4">
+              <strong className="text-white block mb-2">Models with accountability</strong>
+              <span className="text-slate-400">Lipi's model roadmap keeps physicians in control and links every clinical fact back to source evidence.</span>
             </li>
           </ul>
         </section>
 
-        {/* Clinical Safety Disclaimer Banner */}
-        <div className="rounded bg-accent/10 border border-accent/30 text-slate-800 p-4 text-xs space-y-1 shadow-sm">
-          <p className="font-bold uppercase tracking-wider text-accent-dark">Clinical Safety & Interoperability Protocol</p>
-          <p className="leading-relaxed text-slate-700">
-            SHRUTI is an assistive documentation platform. It is not a certified medical device and does not replace professional clinical evaluation. All diagnostics, prescriptions, and notes remain under the sole signature and authority of the attending licensed provider. Standardized outputs align with HL7 FHIR standards for public health registry synchronization.
+        <div className="rounded-md bg-red-950/25 border border-red-400/25 text-slate-300 p-4 text-xs space-y-1">
+          <p className="font-bold uppercase tracking-wider text-red-300">Clinical Safety Notice</p>
+          <p className="leading-relaxed">
+            Lipi is an assistive clinical AI platform. It is not a certified medical device and does not replace professional clinical evaluation. All diagnostics, prescriptions, and notes remain under the sole signature and authority of the attending licensed provider.
           </p>
         </div>
       </main>

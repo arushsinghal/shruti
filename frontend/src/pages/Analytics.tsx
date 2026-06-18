@@ -37,7 +37,7 @@ export default function Analytics() {
   }, []);
 
   const aiSplitData = data ? [
-    { name: 'Legacy Cloud Consent Recorded', value: data.overview.cloud_ai_sessions },
+    { name: 'Optional Cloud Formatting Logged', value: data.overview.cloud_ai_sessions },
     { name: 'Local Clinical Processing', value: data.overview.edge_sessions },
   ] : [];
 
@@ -57,13 +57,13 @@ export default function Analytics() {
             </button>
             <div className="h-4 w-px bg-slate-200" />
             <div className="flex items-center gap-2">
-              <span className="font-serif font-bold text-primary text-base">श</span>
-              <span className="text-sm font-bold text-text-dark tracking-tight">SHRUTI</span>
+              <span className="font-bold text-primary text-base">श</span>
+              <span className="text-sm font-bold text-text-dark tracking-tight">Lipi</span>
             </div>
             <div className="h-4 w-px bg-slate-200" />
-            <h1 className="text-sm font-bold text-text-dark">Field Impact Dashboard</h1>
+            <h1 className="text-sm font-bold text-text-dark">Clinical Ops Dashboard</h1>
           </div>
-          <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Venture Ingestion Overview</span>
+          <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Clinical AI Telemetry</span>
         </div>
       </header>
 
@@ -73,7 +73,7 @@ export default function Analytics() {
           <svg className="w-4.5 h-4.5 shrink-0 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
           </svg>
-          <span className="font-semibold">Clinical extraction, documentation drafting, and CDS alerts run through the local SHRUTI engine for privacy-preserving field use.</span>
+          <span className="font-semibold">Clinical extraction, documentation drafting, and CDS alerts run through the local Lipi engine for privacy-preserving clinic use.</span>
         </div>
 
         {loading && (
@@ -89,13 +89,13 @@ export default function Analytics() {
           <>
             {/* Overview Cards */}
             <section>
-              <h2 className="text-xs font-bold text-slate-500 uppercase tracking-widest mb-4">Venture Telemetry</h2>
+              <h2 className="text-xs font-bold text-slate-500 uppercase tracking-widest mb-4">Clinical Ops Telemetry</h2>
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
                 {[
                   { label: 'Active Consultations', value: data.overview.total_sessions, color: 'text-text-dark border-l-4 border-l-primary' },
                   { label: 'Weekly Ingestions', value: data.overview.sessions_this_week, color: 'text-primary border-l-4 border-l-primary' },
                   { label: 'Completed Records', value: data.overview.completed_sessions, color: 'text-primary border-l-4 border-l-accent' },
-                  { label: 'Legacy Cloud Consent Records', value: data.overview.cloud_ai_sessions, color: 'text-accent-dark border-l-4 border-l-purple-500' },
+                  { label: 'Optional Cloud Formatting', value: data.overview.cloud_ai_sessions, color: 'text-accent-dark border-l-4 border-l-purple-500' },
                 ].map(({ label, value, color }) => (
                   <div key={label} className={`border border-slate-200 rounded p-4 bg-white shadow-sm ${color}`}>
                     <p className="text-[10px] uppercase font-bold text-slate-500 mb-1">{label}</p>
@@ -232,7 +232,7 @@ export default function Analytics() {
 
             {data.overview.total_sessions === 0 && (
               <div className="text-center py-20 border border-dashed border-slate-200 rounded-lg bg-white shadow-sm">
-                <p className="text-slate-500 text-sm font-medium">No deployment telemetries registered</p>
+                <p className="text-slate-500 text-sm font-medium">No clinical telemetry registered</p>
                 <p className="text-slate-400 text-xs mt-1">Initiate consultation sessions to generate metadata insights.</p>
               </div>
             )}

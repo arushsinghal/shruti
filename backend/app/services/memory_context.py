@@ -6,6 +6,8 @@ class MemoryContextService:
             "vitals": [],
             "allergies": [],
             "investigations": [],
+            "diagnoses": [],
+            "follow_up": [],
             "contexts": {}
         }
 
@@ -44,7 +46,7 @@ class MemoryContextService:
                         state["medications"][name]["frequency"] = frequency
 
             # Handle list-based categories
-            for category in ["symptoms", "vitals", "allergies", "investigations"]:
+            for category in ["symptoms", "vitals", "allergies", "investigations", "diagnoses", "follow_up"]:
                 items = fact.get(category, [])
                 if isinstance(items, str):
                     items = [items]

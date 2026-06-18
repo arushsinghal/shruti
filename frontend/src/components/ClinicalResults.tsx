@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import type { ProcessClinicalResponse } from '../types/clinical';
 import { getFhirBundle } from '../lib/api';
 import PrintableReport from './PrintableReport';
@@ -8,21 +8,50 @@ interface ClinicalResultsProps {
   sessionId: string;
   patientName?: string;
   doctorName?: string;
+  timings?: { asrMs?: number; nlpMs?: number };
 }
 
-export default function ClinicalResults({ results, sessionId, patientName, doctorName }: ClinicalResultsProps) {
+export default function ClinicalResults({ results, sessionId, patientName, doctorName, timings }: ClinicalResultsProps) {
   const { state, soap, cds, source } = results;
   const [fhirData, setFhirData] = useState<any>(null);
   const [isExporting, setIsExporting] = useState(false);
-  
+
   // HITL State
   const [editableSoap, setEditableSoap] = useState({ S: '', O: '', A: '', P: '' });
   const [isSigned, setIsSigned] = useState(false);
+  const hasAnimatedRef = useRef(false);
 
+  // Typewriter animation: fills each SOAP section simultaneously over ~600ms
   useEffect(() => {
-    if (soap) {
+    if (!soap) return;
+
+    if (hasAnimatedRef.current) {
+      // Re-render after edit — set directly without animation
       setEditableSoap({ S: soap.S, O: soap.O, A: soap.A, P: soap.P });
+      return;
     }
+    hasAnimatedRef.current = true;
+
+    const DURATION_MS = 600;
+    const TICK_MS = 16; // ~60fps
+    const intervals: ReturnType<typeof setInterval>[] = [];
+
+    for (const key of ['S', 'O', 'A', 'P'] as const) {
+      const text = soap[key] || '';
+      const totalTicks = Math.ceil(DURATION_MS / TICK_MS);
+      const charsPerTick = Math.max(1, Math.ceil(text.length / totalTicks));
+      let pos = 0;
+
+      const id = setInterval(() => {
+        pos = Math.min(pos + charsPerTick, text.length);
+        setEditableSoap(prev => ({ ...prev, [key]: text.slice(0, pos) }));
+        if (pos >= text.length) clearInterval(id);
+      }, TICK_MS);
+
+      intervals.push(id);
+    }
+
+    return () => intervals.forEach(clearInterval);
   }, [soap]);
 
   async function handleExportFhir() {
@@ -42,6 +71,8 @@ export default function ClinicalResults({ results, sessionId, patientName, docto
     setIsSigned(true);
   }
 
+  const totalMs = (timings?.asrMs ?? 0) + (timings?.nlpMs ?? 0);
+
   return (
     <div className="space-y-10 animate-fade-in-up">
 
@@ -50,32 +81,54 @@ export default function ClinicalResults({ results, sessionId, patientName, docto
           <svg className="w-4.5 h-4.5 shrink-0 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
           </svg>
-          <span className="font-semibold">SHRUTI Local Engine Active — consultation processed securely at the edge.</span>
+          <span className="font-semibold">Lipi Local Engine Active — consultation processed securely at the edge.</span>
         </div>
       )}
 
       {/* SOAP Note Section */}
       <section className="bg-white border border-slate-200 rounded-lg p-6 shadow-sm">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 border-b border-slate-100 pb-4">
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-3 flex-wrap">
             <h2 className="text-base font-serif font-bold text-text-dark">SOAP Document</h2>
             {isSigned ? (
               <span className="text-[10px] font-bold bg-primary/10 text-primary border border-primary/20 px-2 py-0.5 rounded uppercase tracking-wider">Signed by Provider</span>
             ) : (
               <span className="text-[10px] font-bold bg-accent/15 text-accent-dark border border-accent/20 px-2 py-0.5 rounded uppercase tracking-wider">Draft - Verification Required</span>
             )}
+            {/* Speed timer badges */}
+            {timings?.asrMs !== undefined && (
+              <span className="text-[10px] font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded flex items-center gap-1">
+                <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                Sarvam ASR {(timings.asrMs / 1000).toFixed(1)}s
+              </span>
+            )}
+            {timings?.nlpMs !== undefined && (
+              <span className="text-[10px] font-bold text-blue-700 bg-blue-50 border border-blue-200 px-2 py-0.5 rounded flex items-center gap-1">
+                <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 3H5a2 2 0 00-2 2v4m6-6h10a2 2 0 012 2v4M9 3v18m0 0h10a2 2 0 002-2V9M9 21H5a2 2 0 01-2-2V9m0 0h18" />
+                </svg>
+                Clinical NLP {(timings.nlpMs / 1000).toFixed(1)}s
+              </span>
+            )}
+            {timings?.asrMs !== undefined && timings?.nlpMs !== undefined && (
+              <span className="text-[10px] font-bold text-slate-600 bg-slate-100 border border-slate-200 px-2 py-0.5 rounded">
+                Total {(totalMs / 1000).toFixed(1)}s
+              </span>
+            )}
           </div>
           <div className="flex items-center gap-2">
             <PrintableReport results={results} patientName={patientName} doctorName={doctorName} sessionId={sessionId} />
             {!isSigned && (
-              <button 
+              <button
                 onClick={handleSignNote}
                 className="text-xs font-semibold text-white bg-primary hover:bg-primary-dark px-3 py-1.5 rounded transition-all shadow-sm cursor-pointer"
               >
                 Sign Note
               </button>
             )}
-            <button 
+            <button
               onClick={handleExportFhir}
               disabled={isExporting}
               className="text-xs font-semibold text-slate-700 bg-slate-100 hover:bg-slate-200 px-3 py-1.5 rounded transition-colors disabled:opacity-50 cursor-pointer"
@@ -84,10 +137,15 @@ export default function ClinicalResults({ results, sessionId, patientName, docto
             </button>
           </div>
         </div>
-        
+
         <div className="space-y-6 text-sm text-slate-800 leading-relaxed">
-          {['S', 'O', 'A', 'P'].map((sectionCode) => {
-            const labels: Record<string, string> = { S: 'Subjective (Symptoms, History)', O: 'Objective (Vitals, Observations)', A: 'Assessment (Clinical Impression)', P: 'Plan (Medications, Orders, Follow-Up)' };
+          {(['S', 'O', 'A', 'P'] as const).map((sectionCode) => {
+            const labels: Record<string, string> = {
+              S: 'Subjective (Symptoms, History)',
+              O: 'Objective (Vitals, Observations)',
+              A: 'Assessment (Clinical Impression)',
+              P: 'Plan (Medications, Orders, Follow-Up)',
+            };
             const label = labels[sectionCode];
             return (
               <div key={sectionCode} className="group relative border-l-2 border-slate-100 hover:border-primary pl-4 transition-colors">
@@ -96,7 +154,7 @@ export default function ClinicalResults({ results, sessionId, patientName, docto
                   {label}
                 </h3>
                 <textarea
-                  value={editableSoap[sectionCode as keyof typeof editableSoap]}
+                  value={editableSoap[sectionCode]}
                   onChange={(e) => setEditableSoap({ ...editableSoap, [sectionCode]: e.target.value })}
                   disabled={isSigned}
                   className="w-full min-h-[60px] outline-none hover:bg-slate-50/50 focus:bg-slate-50/50 transition-all rounded p-1.5 resize-y text-slate-700 border border-transparent focus:border-slate-200/80 cursor-text disabled:bg-transparent disabled:border-transparent disabled:cursor-default"
@@ -106,7 +164,6 @@ export default function ClinicalResults({ results, sessionId, patientName, docto
           })}
         </div>
 
-        {/* Disclaimer text below editor */}
         <p className="text-[11px] text-slate-500 mt-6 pt-4 border-t border-slate-100 flex items-center gap-1.5">
           <svg className="w-4 h-4 text-slate-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
@@ -126,11 +183,11 @@ export default function ClinicalResults({ results, sessionId, patientName, docto
               const isCritical = alert.urgency === 'critical';
               const isHigh = alert.urgency === 'high';
               const isMedium = alert.urgency === 'medium';
-              
+
               let cardStyle = 'border-amber-200 bg-amber-50/40 text-amber-900';
               let badgeStyle = 'bg-amber-100 text-amber-700 border-amber-200';
               let textStyle = 'text-amber-950 font-bold';
-              
+
               if (isCritical || isHigh) {
                 cardStyle = 'border-red-200 bg-red-50/50 text-alert-critical';
                 badgeStyle = 'bg-red-100 text-alert-critical border-red-200';
@@ -140,7 +197,7 @@ export default function ClinicalResults({ results, sessionId, patientName, docto
                 badgeStyle = 'bg-orange-100 text-orange-700 border-orange-200';
                 textStyle = 'text-orange-950 font-bold';
               }
-              
+
               return (
                 <div key={idx} className={`p-4 rounded border flex flex-col sm:flex-row sm:items-start gap-3 shadow-xs ${cardStyle}`}>
                   <div className="flex-grow">
@@ -164,14 +221,14 @@ export default function ClinicalResults({ results, sessionId, patientName, docto
         </section>
       )}
 
-      {/* Resolved Facts Section */}
+      {/* Extracted Clinical Entities */}
       <section className="bg-white border border-slate-200 rounded-lg p-6 shadow-sm">
         <div className="flex items-center justify-between mb-4 border-b border-slate-100 pb-3">
           <h2 className="text-sm font-bold text-text-dark font-serif uppercase tracking-wider">Extracted Clinical Entities</h2>
           <span className="text-[10px] text-slate-400 font-bold tracking-widest uppercase">Hover for Context</span>
         </div>
         <div className="grid sm:grid-cols-2 gap-x-8 gap-y-6">
-          
+
           <div>
             <h3 className="text-xs font-bold text-slate-500 uppercase tracking-widest mb-2.5">Symptoms Detected</h3>
             {state.symptoms.length > 0 ? (
@@ -252,7 +309,7 @@ export default function ClinicalResults({ results, sessionId, patientName, docto
               </pre>
             </div>
             <div className="px-6 py-3 border-t border-slate-200 bg-slate-50 flex justify-end">
-              <button 
+              <button
                 onClick={() => {
                   navigator.clipboard.writeText(JSON.stringify(fhirData, null, 2));
                   alert('Copied FHIR bundle to clipboard!');

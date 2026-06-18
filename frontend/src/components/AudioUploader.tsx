@@ -4,7 +4,8 @@ import type { TranscribeResponse } from '../types/clinical';
 
 interface Props {
   sessionId: string;
-  onTranscript: (result: TranscribeResponse) => void;
+  onTranscript: (result: TranscribeResponse, asrMs?: number) => void;
+  onAutoProcess?: () => void;
 }
 
 type UploadStatus = 'idle' | 'uploading' | 'transcribing' | 'done' | 'error';
@@ -18,7 +19,7 @@ function isAccepted(file: File) {
   return ACCEPTED_SET.has(file.type) || ['mp3', 'wav', 'm4a', 'webm'].includes(ext);
 }
 
-export default function AudioUploader({ sessionId, onTranscript }: Props) {
+export default function AudioUploader({ sessionId, onTranscript, onAutoProcess }: Props) {
   const inputRef = useRef<HTMLInputElement>(null);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const chunksRef = useRef<Blob[]>([]);
@@ -30,7 +31,8 @@ export default function AudioUploader({ sessionId, onTranscript }: Props) {
   const [error, setError] = useState<string | null>(null);
   const [dragOver, setDragOver] = useState(false);
   const [transcriptText, setTranscriptText] = useState('');
-  
+  const [fromRecording, setFromRecording] = useState(false);
+
   // Recording State
   const [isRecording, setIsRecording] = useState(false);
   const [recordingTime, setRecordingTime] = useState(0);
@@ -46,6 +48,14 @@ export default function AudioUploader({ sessionId, onTranscript }: Props) {
     return () => clearInterval(interval);
   }, [isRecording]);
 
+  // Auto-trigger upload when recording file is ready
+  useEffect(() => {
+    if (file && fromRecording && status === 'idle') {
+      handleUpload();
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [file, fromRecording]);
+
   function formatTime(seconds: number) {
     const m = Math.floor(seconds / 60);
     const s = seconds % 60;
@@ -60,6 +70,7 @@ export default function AudioUploader({ sessionId, onTranscript }: Props) {
       setError('Unsupported file type. Please upload an mp3, wav, m4a, or webm file.');
       return;
     }
+    setFromRecording(false);
     setFile(f);
     setError(null);
   }
@@ -75,47 +86,38 @@ export default function AudioUploader({ sessionId, onTranscript }: Props) {
   // Recording Logic
   async function startRecording() {
     try {
+      setFromRecording(false);
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
       const mediaRecorder = new MediaRecorder(stream);
       mediaRecorderRef.current = mediaRecorder;
       chunksRef.current = [];
 
-      // Open WebSocket connection for real-time streaming
-      const ws = new WebSocket(`${getWebSocketBase()}/ws/audio/${sessionId}`);
-      
-      ws.onopen = () => {
-        console.log('WS: Audio stream connected');
-      };
+      const token = localStorage.getItem('token');
+      const tokenQuery = token ? `?token=${encodeURIComponent(token)}` : '';
+      const ws = new WebSocket(`${getWebSocketBase()}/ws/audio/${sessionId}${tokenQuery}`);
+      ws.onopen = () => { console.log('WS: Audio stream connected'); };
 
       mediaRecorder.ondataavailable = (e) => {
         if (e.data.size > 0) {
           chunksRef.current.push(e.data);
-          // Stream chunk to backend in real-time if WS is open
-          if (ws.readyState === WebSocket.OPEN) {
-            ws.send(e.data);
-          }
+          if (ws.readyState === WebSocket.OPEN) ws.send(e.data);
         }
       };
 
       mediaRecorder.onstop = () => {
-        // Signal end of stream to backend
-        if (ws.readyState === WebSocket.OPEN) {
-          ws.send('END');
-        }
+        if (ws.readyState === WebSocket.OPEN) ws.send('END');
         ws.close();
-        
-        // Also create a local File blob for the normal upload/transcribe flow
         const blob = new Blob(chunksRef.current, { type: 'audio/webm' });
         const recordedFile = new File([blob], 'live_recording.webm', { type: 'audio/webm' });
+        setFromRecording(true);
         setFile(recordedFile);
-        stream.getTracks().forEach(track => track.stop()); // release mic
+        stream.getTracks().forEach(track => track.stop());
       };
 
-      // timeslice: emit a chunk every 1 second so WS streams in near-real-time
       mediaRecorder.start(1000);
       setIsRecording(true);
       setError(null);
-      setFile(null); // clear old file
+      setFile(null);
     } catch (err) {
       console.error(err);
       setError('Microphone access denied or unavailable.');
@@ -133,6 +135,7 @@ export default function AudioUploader({ sessionId, onTranscript }: Props) {
   async function handleUpload() {
     if (!file) return;
     setError(null);
+    const asrStart = Date.now();
 
     try {
       setStatus('uploading');
@@ -141,9 +144,14 @@ export default function AudioUploader({ sessionId, onTranscript }: Props) {
 
       setStatus('transcribing');
       const result = await transcribeAudio(sessionId);
+      const asrMs = Date.now() - asrStart;
 
       setStatus('done');
-      onTranscript(result);
+      onTranscript(result, asrMs);
+      // Auto-trigger clinical processing for recordings
+      if (fromRecording && onAutoProcess) {
+        onAutoProcess();
+      }
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : 'Upload failed';
       setError(msg);
@@ -169,6 +177,7 @@ export default function AudioUploader({ sessionId, onTranscript }: Props) {
   }
 
   const isWorking = status === 'uploading' || status === 'transcribing';
+  const isAutoFlow = fromRecording && isWorking;
 
   return (
     <div className="space-y-4">
@@ -233,31 +242,50 @@ export default function AudioUploader({ sessionId, onTranscript }: Props) {
         </div>
       ) : (
         <div className="border border-slate-200 rounded-xl p-8 flex flex-col items-center justify-center bg-slate-50">
-          {!isRecording && !file && (
-            <button onClick={startRecording} className="w-16 h-16 rounded-full bg-red-100 flex items-center justify-center hover:bg-red-200 transition-colors">
+          {!isRecording && !file && !isWorking && (
+            <button onClick={startRecording} className="w-16 h-16 rounded-full bg-red-100 flex items-center justify-center hover:bg-red-200 transition-colors cursor-pointer">
               <div className="w-6 h-6 rounded-full bg-red-500"></div>
             </button>
           )}
           {isRecording && (
-            <button onClick={stopRecording} className="w-16 h-16 rounded-full bg-red-50 flex items-center justify-center border-2 border-red-500 animate-pulse">
+            <button onClick={stopRecording} className="w-16 h-16 rounded-full bg-red-50 flex items-center justify-center border-2 border-red-500 animate-pulse cursor-pointer">
               <div className="w-6 h-6 rounded bg-red-500"></div>
             </button>
           )}
-          {file && !isRecording && (
+          {/* Auto-flow: recording stopped, processing in progress */}
+          {!isRecording && isAutoFlow && (
+            <div className="flex flex-col items-center gap-3">
+              <div className="w-14 h-14 rounded-full border-2 border-primary/30 flex items-center justify-center">
+                <svg className="w-6 h-6 text-primary animate-spin" fill="none" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/>
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
+                </svg>
+              </div>
+            </div>
+          )}
+          {file && !isRecording && !isAutoFlow && (
             <div className="text-center">
               <div className="text-3xl mb-2">🎤</div>
               <p className="text-sm font-medium text-green-700">Recording Captured</p>
-              <button onClick={() => setFile(null)} className="text-xs text-slate-500 hover:text-red-500 mt-2 underline">Discard & Rerecord</button>
+              <button onClick={() => { setFile(null); setFromRecording(false); }} className="text-xs text-slate-500 hover:text-red-500 mt-2 underline">Discard & Re-record</button>
             </div>
           )}
           <div className="mt-4 text-sm font-medium text-slate-600">
-            {isRecording ? `Recording... ${formatTime(recordingTime)}` : file ? 'Ready to process' : 'Click to start dictation'}
+            {isRecording
+              ? `Recording... ${formatTime(recordingTime)}`
+              : isAutoFlow
+                ? status === 'uploading' ? `Uploading… ${uploadPct}%` : 'Transcribing via Sarvam AI…'
+                : file ? 'Ready to process'
+                : 'Click to start dictation'}
           </div>
+          {isAutoFlow && (
+            <p className="text-xs text-slate-400 mt-1">Generating documentation automatically</p>
+          )}
         </div>
       )}
 
-      {/* Progress / status */}
-      {status === 'uploading' && (
+      {/* Progress / status (file/upload mode) */}
+      {status === 'uploading' && !isAutoFlow && (
         <div className="space-y-1">
           <div className="flex justify-between text-xs text-slate-500">
             <span>Uploading…</span>
@@ -269,15 +297,33 @@ export default function AudioUploader({ sessionId, onTranscript }: Props) {
         </div>
       )}
 
-      {status === 'transcribing' && (
+      {status === 'transcribing' && !isAutoFlow && (
         <div className="flex items-center gap-2 text-sm text-indigo-600">
           <span className="animate-spin">⟳</span>
-          <span>{mode === 'text' ? 'Processing transcript...' : 'Transcribing audio via Sarvam ASR…'}</span>
+          <span>{mode === 'text' ? 'Processing transcript...' : 'Transcribing audio via Sarvam AI…'}</span>
         </div>
       )}
 
       {status === 'done' && (
-        <p className="text-sm text-green-600 font-medium">Transcription complete.</p>
+        <div className="space-y-1">
+          <p className="text-sm text-green-600 font-medium">Transcription complete.</p>
+          <p className="text-xs text-slate-400">Transcript identifiers scrubbed before storage.</p>
+        </div>
+      )}
+
+      {/* Sarvam trust disclosure */}
+      {mode !== 'text' && status !== 'done' && !isAutoFlow && (
+        <p className="text-[11px] text-slate-400 leading-relaxed border-t border-slate-100 pt-3">
+          Audio is processed through{' '}
+          <a href="https://sarvam.ai" target="_blank" rel="noopener noreferrer" className="underline hover:text-slate-600">
+            Sarvam AI
+          </a>{' '}
+          for speech-to-text. Transcript identifiers are scrubbed before storage. Raw audio is deleted
+          after note generation.{' '}
+          <a href="/privacy" className="underline hover:text-slate-600">
+            Privacy policy
+          </a>
+        </p>
       )}
 
       {error && (
@@ -286,8 +332,8 @@ export default function AudioUploader({ sessionId, onTranscript }: Props) {
         </p>
       )}
 
-      {/* Action button */}
-      {status !== 'done' && (
+      {/* Action button — only shown for non-auto file/text modes */}
+      {status !== 'done' && !isAutoFlow && (
         mode === 'text' ? (
           <button
             onClick={handleSubmitText}
@@ -296,7 +342,7 @@ export default function AudioUploader({ sessionId, onTranscript }: Props) {
           >
             {isWorking ? 'Saving…' : 'Submit Transcript'}
           </button>
-        ) : (
+        ) : mode === 'file' ? (
           <button
             onClick={handleUpload}
             disabled={!file || isWorking || isRecording}
@@ -304,7 +350,7 @@ export default function AudioUploader({ sessionId, onTranscript }: Props) {
           >
             {isWorking ? 'Processing…' : 'Upload & Transcribe'}
           </button>
-        )
+        ) : null
       )}
     </div>
   );

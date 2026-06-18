@@ -28,6 +28,10 @@ _STUB_TRANSCRIPT = (
 )
 
 _SARVAM_URL = "https://api.sarvam.ai/speech-to-text"
+_SARVAM_TRANSLITERATE_URL = "https://api.sarvam.ai/transliterate"
+
+import re as _re
+_DEVANAGARI_RE = _re.compile(r'[ऀ-ॿ]')
 
 try:
     from pydub import AudioSegment
@@ -132,15 +136,43 @@ class SarvamASRService:
 
             body = response.json()
             detected = body.get("language_code", language_code)
+            transcript = body.get("transcript", "")
             logger.info("Sarvam ASR OK — detected language: %s", detected)
+
+            # If Devanagari returned, transliterate to Roman so the clinical
+            # extractor (English NLP) can process it.
+            if _DEVANAGARI_RE.search(transcript):
+                transcript = await self._transliterate(transcript, detected)
+
             return {
-                "transcript": body.get("transcript", ""),
+                "transcript": transcript,
                 "language_code": detected,
                 "is_stub": False,
             }
         except Exception as e:
             logger.error("Network/parsing error: %s", e)
             return self._stub_response(language_code)
+
+    async def _transliterate(self, text: str, source_lang: str) -> str:
+        """Convert Devanagari transcript to Roman script via Sarvam transliterate API."""
+        try:
+            async with httpx.AsyncClient(timeout=15.0) as client:
+                r = await client.post(
+                    _SARVAM_TRANSLITERATE_URL,
+                    headers={"api-subscription-key": settings.sarvam_api_key},
+                    json={
+                        "input": text,
+                        "source_language_code": source_lang or "hi-IN",
+                        "target_language_code": "en-IN",
+                    },
+                )
+            if r.status_code == 200:
+                result = r.json().get("transliterated_text", text)
+                logger.info("Transliterated Devanagari → Roman")
+                return result
+        except Exception as e:
+            logger.warning("Transliteration failed, using original: %s", e)
+        return text
 
     def _chunk_audio(self, audio: "AudioSegment", chunk_length_ms: int) -> List:
         """Split audio into non-overlapping chunks of `chunk_length_ms` ms."""

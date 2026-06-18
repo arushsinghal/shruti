@@ -7,6 +7,22 @@ export type SessionStatus =
   | 'soap_ready'
   | 'complete';
 
+export type SessionMode = 'health' | 'government' | 'legal' | 'general';
+
+export const MODE_LABELS: Record<SessionMode, string> = {
+  health: 'Health — SOAP Note',
+  government: 'Government — FIR Report',
+  legal: 'Legal — Document',
+  general: 'General — Transcript',
+};
+
+export const MODE_COLORS: Record<SessionMode, string> = {
+  health:     'bg-emerald-50 text-emerald-700 border border-emerald-200',
+  government: 'bg-stone-100 text-stone-700 border border-stone-200',
+  legal:      'bg-indigo-50 text-indigo-700 border border-indigo-200',
+  general:    'bg-slate-100 text-slate-600 border border-slate-200',
+};
+
 export interface ClinicalFact {
   id: string;
   category: string;
@@ -104,18 +120,21 @@ export interface ConsultationSession {
   created_at: string;
   cloud_ai_consent: boolean;
   status: SessionStatus;
+  mode: SessionMode;
   audio_file_path?: string;
   transcript?: string;
   clinical_facts?: ClinicalFact[];
   memory_state?: MemoryState;
   soap_note?: SOAPNote;
   cds_suggestions?: CDSSuggestion[];
+  user_id?: string;
 }
 
 export interface CreateSessionRequest {
   patient_name?: string;
   doctor_name?: string;
   cloud_ai_consent?: boolean;
+  mode?: SessionMode;
 }
 
 export interface AudioUploadResponse {

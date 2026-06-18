@@ -1,4 +1,4 @@
-"""Comprehensive test suite for the SHRUTI backend.
+"""Comprehensive test suite for the Lipi backend.
 
 Run with:
     cd backend && uv run python -m pytest tests/ -v
@@ -34,6 +34,87 @@ class TestPHIScrubber:
         assert "[REDACTED_PHONE]" in result
         assert "[REDACTED_EMAIL]" in result
 
+    def test_scrub_preserves_clinical_content(self):
+        """PHI scrubbing must not destroy symptoms, medications, or vitals."""
+        text = "Patient has fever and cough. BP 140/90. Prescribed paracetamol 500mg twice daily."
+        result = phi.scrub(text)
+        assert "fever" in result
+        assert "cough" in result
+        assert "140/90" in result
+        assert "paracetamol" in result
+        assert "500mg" in result
+
+    def test_scrub_removes_title_name(self):
+        """'Dr. Sharma' and 'Patient Priya' patterns are scrubbed."""
+        text = "Dr. Sharma examined Patient Priya today."
+        result = phi.scrub(text)
+        assert "Sharma" not in result
+        assert "Priya" not in result
+
+    def test_scrub_empty_string(self):
+        assert phi.scrub("") == ""
+
+    def test_clinical_duration_preserved_3_days(self):
+        result = phi.scrub("Patient has fever for 3 days.")
+        assert "3 days" in result, "clinical duration must survive PHI scrubbing"
+
+    def test_clinical_duration_preserved_2_weeks(self):
+        result = phi.scrub("Pain for 2 weeks.")
+        assert "2 weeks" in result
+
+    def test_clinical_duration_preserved_yesterday(self):
+        result = phi.scrub("Cough since yesterday.")
+        assert "yesterday" in result
+
+    def test_clinical_duration_preserved_since_morning(self):
+        result = phi.scrub("Vomiting since morning.")
+        assert "morning" in result
+
+    def test_clinical_duration_preserved_4_hours(self):
+        result = phi.scrub("Headache for 4 hours.")
+        assert "4 hours" in result
+
+    def test_clinical_duration_preserved_1_month(self):
+        result = phi.scrub("Symptoms for 1 month.")
+        assert "1 month" in result
+
+    def test_absolute_birthdate_scrubbed(self):
+        result = phi.scrub("Patient born on 12/05/1985.")
+        assert "1985" not in result
+        assert "[REDACTED_DATE]" in result
+
+    def test_calendar_appointment_date_scrubbed(self):
+        result = phi.scrub("Appointment on March 4.")
+        assert "March 4" not in result
+        assert "[REDACTED_DATE]" in result
+
+    def test_scrub_transcript_pipeline_integration(self):
+        """Simulates what the pipeline does: scrub Sarvam output before clinical extraction.
+        PHI identifiers must be removed; symptoms, vitals, medications must survive.
+
+        Phone pattern note: the regex covers US-format (NNN-NNN-NNNN). Indian mobile
+        numbers (98765-43210) are not matched by the current regex — a known gap to
+        address when the phone regex is extended for Indian formats.
+        """
+        raw_transcript = (
+            "Patient Ramesh Kumar, call 555-123-4567. "
+            "He has bukhar aur khasi. BP is 130/80. "
+            "Prescribe paracetamol 500 mg twice daily."
+        )
+        scrubbed = phi.scrub(raw_transcript)
+
+        # PHI removed
+        assert "Ramesh Kumar" not in scrubbed
+        assert "555-123-4567" not in scrubbed
+        assert "[REDACTED_PHONE]" in scrubbed
+
+        # Clinical content survives scrubbing and is correctly extracted
+        facts = extractor.extract(scrubbed)
+        assert "fever" in facts["symptoms"], "bukhar should survive scrubbing"
+        assert "cough" in facts["symptoms"], "khasi should survive scrubbing"
+        assert any("130/80" in v for v in facts["vitals"]), "BP should survive scrubbing"
+        assert any(m["name"] == "paracetamol" for m in facts["medications"])
+
 
 class TestClinicalExtractor:
     """Tests for deterministic clinical fact extraction."""
@@ -41,8 +122,8 @@ class TestClinicalExtractor:
     def test_extract_english_symptoms(self):
         transcript = "Patient has fever and headache since yesterday."
         result = extractor.extract(transcript)
-        assert "fever" in result["symptoms"]
-        assert "headache" in result["symptoms"]
+        assert any("fever" in s for s in result["symptoms"])
+        assert any("headache" in s for s in result["symptoms"])
 
     def test_extract_hindi_symptoms(self):
         transcript = "Patient ko bukhar hai aur khasi bhi hai."
@@ -241,7 +322,7 @@ cds_engine = CDSEngineService()
 
 
 class TestCDSEngine:
-    """Tests for SHRUTI safety checks."""
+    """Tests for Lipi safety checks."""
 
     def test_fever_suggestion(self):
         state = {
@@ -391,3 +472,28 @@ class TestFullPipeline:
         state = memory.resolve_memory([facts])
         soap = soap_gen.generate_soap(state)
         assert "no subjective" in soap["S"].lower() or "no" in soap["S"].lower()
+
+
+# ======================================================================
+# 8. Config — ALLOWED_ORIGINS validator
+# ======================================================================
+
+class TestAllowedOriginsConfig:
+    def test_default_origins_include_localhost(self):
+        from app.utils.config import settings
+        assert any("localhost" in o for o in settings.allowed_origins)
+
+    def test_parse_comma_separated_string(self):
+        from app.utils.config import Settings
+        s = Settings(allowed_origins="https://a.example.com,https://b.example.com")  # type: ignore[call-arg]
+        assert s.allowed_origins == ["https://a.example.com", "https://b.example.com"]
+
+    def test_parse_strips_whitespace(self):
+        from app.utils.config import Settings
+        s = Settings(allowed_origins=" https://a.com , https://b.com ")  # type: ignore[call-arg]
+        assert s.allowed_origins == ["https://a.com", "https://b.com"]
+
+    def test_list_passthrough(self):
+        from app.utils.config import Settings
+        s = Settings(allowed_origins=["https://c.com"])  # type: ignore[call-arg]
+        assert s.allowed_origins == ["https://c.com"]

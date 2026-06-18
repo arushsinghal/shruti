@@ -52,8 +52,7 @@ export default function TranscriptViewer({ transcript, languageDetected, isStub,
         <div className="flex items-start gap-2 rounded-lg bg-amber-50 border border-amber-200 px-4 py-3 text-sm text-amber-800">
           <span className="mt-0.5 shrink-0">⚠</span>
           <span>
-            <strong>Demo transcript</strong> — no SARVAM_API_KEY is set. This is a pre-loaded stub
-            for development. Add your key to use real speech-to-text.
+            Audio could not be transcribed — using a sample transcript for demonstration. For best results, speak clearly and ensure microphone access is granted.
           </span>
         </div>
       )}

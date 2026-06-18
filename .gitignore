@@ -40,3 +40,4 @@ frontend/.vite/
 *.swp
 *.swo
 .DS_Store
+.claude/
