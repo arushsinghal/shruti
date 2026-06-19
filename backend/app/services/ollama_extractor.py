@@ -58,16 +58,19 @@ Transcript:
 
 
 def _get_available_model() -> str | None:
-    """Return first available Ollama model from preferred list, or None."""
+    """Return first available Ollama model from preferred list, or None.
+    Returns the actual installed model name (e.g. 'llama3.2:latest'), not the preferred alias."""
     try:
         import requests
         r = requests.get(f"{_OLLAMA_BASE}/api/tags", timeout=2)
         if r.status_code != 200:
             return None
-        installed = {m.get("name", "").split(":")[0] for m in r.json().get("models", [])}
+        installed_models = [m.get("name", "") for m in r.json().get("models", [])]
+        installed_bases = {name.split(":")[0]: name for name in installed_models}
         for model in _PREFERRED_MODELS:
-            if model.split(":")[0] in installed:
-                return model
+            base = model.split(":")[0]
+            if base in installed_bases:
+                return installed_bases[base]  # return actual tag e.g. llama3.2:latest
         return None
     except Exception:
         return None

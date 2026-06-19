@@ -199,8 +199,6 @@ _SYMPTOM_MAP: dict[str, str] = {
     "yellowish urine": "dark urine",
     "hair loss": "hair loss",
     "alopecia": "hair loss",
-    "pain": "pain",
-    "dard": "pain",
     "cavity": "cavity",
     # ── Hinglish transliterations ─────────────────────────────────────────
     # Note: bare "dard" and "pain" intentionally excluded — too generic.

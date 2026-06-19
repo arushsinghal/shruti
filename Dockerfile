@@ -38,7 +38,7 @@ COPY backend/app ./app
 COPY backend/main.py ./
 
 # Copy compiled frontend assets from Stage 1 into the backend's dist folder
-COPY --from=frontend-builder /frontend/dist ./dist
+COPY --from=frontend-builder /backend/dist ./dist
 
 # Create persistent data directories (for SQLite & uploads)
 RUN mkdir -p /app/data /app/uploads /app/audio_uploads
