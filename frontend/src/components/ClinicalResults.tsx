@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import type { ProcessClinicalResponse } from '../types/clinical';
 import { getFhirBundle } from '../lib/api';
 import PrintableReport from './PrintableReport';
+import PrescriptionPrint from './PrescriptionPrint';
 
 interface ClinicalResultsProps {
   results: ProcessClinicalResponse;
@@ -53,6 +54,26 @@ export default function ClinicalResults({ results, sessionId, patientName, docto
 
     return () => intervals.forEach(clearInterval);
   }, [soap]);
+
+  function handleWhatsAppShare() {
+    const meds = results.facts?.medications ?? [];
+    const followUp = (results.facts as any)?.follow_up ?? [];
+    const lines = [
+      `*Prescription — ${patientName ?? 'Patient'}*`,
+      `_${new Date().toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}_`,
+      '',
+      '*Medicines:*',
+      ...meds.map((m: { name: string; dosage: string; frequency: string }) =>
+        `• ${m.name.charAt(0).toUpperCase() + m.name.slice(1)} ${m.dosage} — ${m.frequency}`
+      ),
+      '',
+      followUp.length > 0 ? `*Follow up:* ${followUp.join(', ')}` : '',
+      '',
+      '_Reviewed by physician · Lipi Health_',
+    ].filter((l): l is string => l !== '');
+    const text = encodeURIComponent(lines.join('\n'));
+    window.open(`https://wa.me/?text=${text}`, '_blank');
+  }
 
   async function handleExportFhir() {
     setIsExporting(true);
@@ -118,7 +139,19 @@ export default function ClinicalResults({ results, sessionId, patientName, docto
               </span>
             )}
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 flex-wrap">
+            <PrescriptionPrint results={results} patientName={patientName} doctorName={doctorName} />
+            <button
+              onClick={handleWhatsAppShare}
+              className="flex items-center gap-1.5 text-xs font-medium text-emerald-700 hover:text-emerald-900 border border-emerald-200 hover:border-emerald-400 bg-emerald-50 hover:bg-emerald-100 rounded px-3 py-1.5 transition-all"
+              title="Share prescription via WhatsApp"
+            >
+              <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/>
+                <path d="M12 0C5.373 0 0 5.373 0 12c0 2.123.554 4.112 1.528 5.834L0 24l6.336-1.503A11.956 11.956 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.818a9.818 9.818 0 01-5.002-1.371l-.36-.213-3.732.885.937-3.632-.234-.373A9.818 9.818 0 1112 21.818z"/>
+              </svg>
+              WhatsApp
+            </button>
             <PrintableReport results={results} patientName={patientName} doctorName={doctorName} sessionId={sessionId} />
             {!isSigned && (
               <button

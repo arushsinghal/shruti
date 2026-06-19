@@ -58,4 +58,19 @@ class MemoryContextService:
                 for k, v in fact["contexts"].items():
                     state["contexts"][k] = v
 
+        # Evaluate Symptom Supersession based on context sentences
+        superseded_symptoms = set()
+        for ctx_str in set(state["contexts"].values()):
+            lower_ctx = ctx_str.lower()
+            if "initially" in lower_ctx and ("but" in lower_ctx or "actually" in lower_ctx):
+                # Find all symptoms in this context
+                syms_in_ctx = [s for s in state["symptoms"] if state["contexts"].get(s) == ctx_str]
+                if len(syms_in_ctx) >= 2:
+                    # In a correction sentence, the first symptom mentioned is superseded by the second
+                    superseded_symptoms.add(syms_in_ctx[0])
+                    
+        if superseded_symptoms:
+            state["symptoms"] = [s for s in state["symptoms"] if s not in superseded_symptoms]
+            state["superseded_symptoms"] = list(superseded_symptoms)
+
         return state

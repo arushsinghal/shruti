@@ -246,7 +246,7 @@ _SYMPTOM_MAP: dict[str, str] = {
     "sardi": "cold",
     "nazla": "cold",
     "naak beh rahi": "runny nose",
-    "naak beh": "runny nose",
+    "naak beh raha": "runny nose",
     "naak band": "blocked nose",
     "gala kharab": "sore throat",
     "gale mein dard": "sore throat",
@@ -892,9 +892,18 @@ class ClinicalExtractorService:
         for keyword, canonical in _SYMPTOM_MAP.items():
             m = re.search(rf'(?:^|\b){re.escape(keyword)}(?:\b|$)', lower)
             if m and not _is_negated(lower, m.start(), m.end()):
-                if canonical not in result["symptoms"]:
-                    result["symptoms"].append(canonical)
-                    result["contexts"][canonical] = sent_text
+                original_word = m.group(0).strip()
+                if original_word != canonical and original_word not in canonical:
+                    display_sym = f"{canonical} ('{original_word}')"
+                else:
+                    display_sym = canonical
+                    
+                if display_sym not in result["symptoms"]:
+                    # Remove plain canonical if it was added, to upgrade it
+                    if canonical in result["symptoms"]:
+                        result["symptoms"].remove(canonical)
+                    result["symptoms"].append(display_sym)
+                    result["contexts"][display_sym] = sent_text
 
     @staticmethod
     def _extract_vitals(sent_text: str, result: dict) -> None:

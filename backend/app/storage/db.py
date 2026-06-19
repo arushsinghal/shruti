@@ -62,6 +62,20 @@ async def init_db() -> None:
             except aiosqlite.OperationalError as e:
                 if "duplicate column name" not in str(e):
                     raise
+        
+        # Initialize admin user if credentials are provided
+        if settings.shruti_admin_user and settings.shruti_admin_password:
+            # Check if admin already exists
+            async with db.execute("SELECT id FROM users WHERE username = ?", (settings.shruti_admin_user,)) as cursor:
+                row = await cursor.fetchone()
+                if not row:
+                    from app.utils.security import get_password_hash
+                    hashed_pw = get_password_hash(settings.shruti_admin_password)
+                    await db.execute(
+                        "INSERT INTO users (username, email, hashed_password, full_name) VALUES (?, ?, ?, ?)",
+                        (settings.shruti_admin_user, f"{settings.shruti_admin_user}@example.com", hashed_pw, "Administrator")
+                    )
+        
         await db.commit()
 
 

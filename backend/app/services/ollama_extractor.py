@@ -157,11 +157,26 @@ def merge_with_keywords(keyword_result: dict, ollama_result: dict) -> dict:
               for k, v in keyword_result.items()}
 
     # ── Symptoms ─────────────────────────────────────────────────────────
+    from app.services.clinical_extractor import _SYMPTOM_MAP
+    
     existing_symptoms = {s.split(" (")[0].lower() for s in merged["symptoms"]}
-    for sym in ollama_result.get("symptoms", []):
-        if sym.lower() not in existing_symptoms:
-            merged["symptoms"].append(sym)
-            existing_symptoms.add(sym.lower())
+    for raw_sym in ollama_result.get("symptoms", []):
+        sym_lower = raw_sym.lower()
+        # Map Hinglish to English if Ollama failed to translate
+        mapped_sym = _SYMPTOM_MAP.get(sym_lower, raw_sym)
+        
+        # Keep original word for compliance
+        if mapped_sym != raw_sym and raw_sym not in mapped_sym:
+            display_sym = f"{mapped_sym} ('{raw_sym}')"
+        else:
+            display_sym = mapped_sym
+        
+        # Don't add if it's already in our exact-matched keywords
+        if mapped_sym.lower() not in existing_symptoms:
+            # Prevent adding known Hindi words that weren't an exact match but are close
+            if not any(k in sym_lower for k in ["dard", "bukhar", "khasi", "chakkar"]):
+                merged["symptoms"].append(display_sym)
+                existing_symptoms.add(mapped_sym.lower())
 
     # ── Diagnoses ─────────────────────────────────────────────────────────
     existing_dx = {d.lower() for d in merged["diagnoses"]}

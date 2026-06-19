@@ -12,6 +12,7 @@ import {
   Network
 } from 'lucide-react';
 import { InteractiveDemo } from '../components/InteractiveDemo';
+import SupportModal from '../components/SupportModal';
 
 interface DialectSample {
   speech: string;
@@ -119,8 +120,11 @@ export default function Landing() {
     setDepRole('Clinician / Doctor');
   };
 
+  const [showSupportModal, setShowSupportModal] = useState(false);
+
   return (
     <div className="min-h-screen bg-[#05070b] selection:bg-primary/30 font-sans text-slate-100 antialiased overflow-x-hidden">
+      <SupportModal isOpen={showSupportModal} onClose={() => setShowSupportModal(false)} />
       {/* Navigation */}
       <nav className="w-full px-6 py-4 border-b border-white/5 flex flex-col md:flex-row items-center justify-between glass-panel sticky top-0 z-[100] gap-4">
         <div className="flex items-center gap-3 cursor-pointer" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>
@@ -138,12 +142,12 @@ export default function Landing() {
         </div>
 
         <div className="flex items-center gap-3">
-          <a
-            href={demoMailto}
-            className="text-sm font-medium text-slate-300 hover:text-white hidden md:block px-3 py-2 transition-colors"
+          <button
+            onClick={() => setShowSupportModal(true)}
+            className="text-sm font-medium text-slate-300 hover:text-white hidden md:block px-3 py-2 transition-colors cursor-pointer"
           >
-            Contact Sales
-          </a>
+            Contact Support
+          </button>
           <button
             onClick={() => navigate('/dashboard')}
             className="text-sm font-semibold bg-white hover:bg-slate-200 text-slate-950 px-4 py-2 rounded-md transition-transform active:scale-95 flex items-center gap-2 cursor-pointer"

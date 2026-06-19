@@ -3,6 +3,35 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { getSession } from '../lib/api';
 import type { ConsultationSession } from '../types/clinical';
 import { MODE_LABELS, MODE_COLORS } from '../types/clinical';
+import { motion } from 'framer-motion';
+
+function TypewriterText({ text }: { text?: string }) {
+  if (!text) return null;
+  const letters = Array.from(text);
+  
+  const container = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: { staggerChildren: 0.005 },
+    },
+  };
+  
+  const child = {
+    visible: { opacity: 1 },
+    hidden: { opacity: 0 },
+  };
+
+  return (
+    <motion.span variants={container} initial="hidden" animate="visible">
+      {letters.map((char, index) => (
+        <motion.span variants={child} key={index}>
+          {char}
+        </motion.span>
+      ))}
+    </motion.span>
+  );
+}
 
 // ─── Shared helpers ───────────────────────────────────────────────────────────
 
@@ -62,23 +91,23 @@ function SOAPView({ soap, cds, session }: { soap: any; cds: any[]; session: Cons
       {simpleSOAP ? (
         <>
           <Section title="S — Subjective">
-            <p className="text-sm text-slate-700 leading-relaxed">{soap.S}</p>
+            <p className="text-sm text-slate-700 leading-relaxed"><TypewriterText text={soap.S} /></p>
           </Section>
           <Section title="O — Objective">
-            <p className="text-sm text-slate-700 leading-relaxed">{soap.O}</p>
+            <p className="text-sm text-slate-700 leading-relaxed"><TypewriterText text={soap.O} /></p>
           </Section>
           <Section title="A — Assessment">
-            <p className="text-sm text-slate-700 leading-relaxed">{soap.A}</p>
+            <p className="text-sm text-slate-700 leading-relaxed"><TypewriterText text={soap.A} /></p>
           </Section>
           <Section title="P — Plan">
-            <p className="text-sm text-slate-700 leading-relaxed">{soap.P}</p>
+            <p className="text-sm text-slate-700 leading-relaxed"><TypewriterText text={soap.P} /></p>
           </Section>
         </>
       ) : soap ? (
         <>
           <Section title="S — Subjective">
-            {soap.subjective?.chief_complaint && <Field label="Chief Complaint" value={soap.subjective.chief_complaint} />}
-            {soap.subjective?.hpi && <Field label="History" value={soap.subjective.hpi} />}
+            {soap.subjective?.chief_complaint && <Field label="Chief Complaint" value={<TypewriterText text={soap.subjective.chief_complaint} />} />}
+            {soap.subjective?.hpi && <Field label="History" value={<TypewriterText text={soap.subjective.hpi} />} />}
             {soap.subjective?.symptoms?.length > 0 && (
               <Field label="Symptoms" value={
                 <div className="flex flex-wrap">{soap.subjective.symptoms.map((s: string) => <Badge key={s} label={s} color="bg-red-50 text-red-700 border-red-200" />)}</div>
@@ -107,10 +136,10 @@ function SOAPView({ soap, cds, session }: { soap: any; cds: any[]; session: Cons
             )}
           </Section>
           <Section title="A — Assessment">
-            {soap.assessment?.diagnosis && <Field label="Diagnosis" value={soap.assessment.diagnosis} />}
-            {soap.assessment?.impression && <Field label="Impression" value={soap.assessment.impression} />}
+            {soap.assessment?.diagnosis && <Field label="Diagnosis" value={<TypewriterText text={soap.assessment.diagnosis} />} />}
+            {soap.assessment?.impression && <Field label="Impression" value={<TypewriterText text={soap.assessment.impression} />} />}
             {soap.assessment?.differentials?.length > 0 && (
-              <Field label="Differentials" value={soap.assessment.differentials.join('; ')} />
+              <Field label="Differentials" value={<TypewriterText text={soap.assessment.differentials.join('; ')} />} />
             )}
           </Section>
           <Section title="P — Plan">
@@ -118,14 +147,16 @@ function SOAPView({ soap, cds, session }: { soap: any; cds: any[]; session: Cons
               <Field label="Medications" value={
                 <div className="space-y-1">
                   {soap.plan.medications.map((m: any, i: number) => (
-                    <p key={i} className="text-sm text-slate-700">{m.name} {m.dose || m.dosage || ''} {m.frequency || ''}</p>
+                    <p key={i} className="text-sm text-slate-700">
+                      <TypewriterText text={`${m.name} ${m.dose || m.dosage || ''} ${m.frequency || ''}`} />
+                    </p>
                   ))}
                 </div>
               } />
             )}
-            {soap.plan?.investigations?.length > 0 && <Field label="Investigations" value={soap.plan.investigations.join(', ')} />}
-            {soap.plan?.follow_up && <Field label="Follow-up" value={soap.plan.follow_up} />}
-            {soap.plan?.red_flags?.length > 0 && <Field label="Red Flags" value={soap.plan.red_flags.join('; ')} />}
+            {soap.plan?.investigations?.length > 0 && <Field label="Investigations" value={<TypewriterText text={soap.plan.investigations.join(', ')} />} />}
+            {soap.plan?.follow_up && <Field label="Follow-up" value={<TypewriterText text={soap.plan.follow_up} />} />}
+            {soap.plan?.red_flags?.length > 0 && <Field label="Red Flags" value={<TypewriterText text={soap.plan.red_flags.join('; ')} />} />}
           </Section>
         </>
       ) : (
@@ -203,33 +234,33 @@ function FIRView({ fir, session: _session }: { fir: any; session: ConsultationSe
       </Section>
 
       <Section title="Incident Details">
-        <Field label="Date of Incident" value={fir.date_of_incident} />
-        <Field label="Place" value={fir.place_of_incident} />
-        <Field label="Property Involved" value={fir.property_involved} />
+        <Field label="Date of Incident" value={<TypewriterText text={fir.date_of_incident} />} />
+        <Field label="Place" value={<TypewriterText text={fir.place_of_incident} />} />
+        <Field label="Property Involved" value={<TypewriterText text={fir.property_involved} />} />
       </Section>
 
       <Section title="Offences Alleged">
         <div className="space-y-1">
           {(fir.offences_alleged || []).map((o: string, i: number) => (
-            <p key={i} className="text-sm text-slate-700 font-medium">{o}</p>
+            <p key={i} className="text-sm text-slate-700 font-medium"><TypewriterText text={o} /></p>
           ))}
         </div>
       </Section>
 
       <Section title="Complainant's Statement">
-        <p className="text-sm text-slate-700 leading-relaxed whitespace-pre-wrap">{fir.incident_summary}</p>
+        <p className="text-sm text-slate-700 leading-relaxed whitespace-pre-wrap"><TypewriterText text={fir.incident_summary} /></p>
       </Section>
 
       <Section title="Witnesses">
         <div className="space-y-1">
           {(fir.witnesses || []).map((w: string, i: number) => (
-            <p key={i} className="text-sm text-slate-700">{i + 1}. {w}</p>
+            <p key={i} className="text-sm text-slate-700">{i + 1}. <TypewriterText text={w} /></p>
           ))}
         </div>
       </Section>
 
       <Section title="Action Taken">
-        <p className="text-sm text-slate-700">{fir.action_taken}</p>
+        <p className="text-sm text-slate-700"><TypewriterText text={fir.action_taken} /></p>
       </Section>
 
       <div className="border border-slate-200 rounded-lg bg-white p-5 shadow-sm">

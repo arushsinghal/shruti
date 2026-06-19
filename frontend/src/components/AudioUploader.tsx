@@ -248,8 +248,27 @@ export default function AudioUploader({ sessionId, onTranscript, onAutoProcess }
             </button>
           )}
           {isRecording && (
-            <button onClick={stopRecording} className="w-16 h-16 rounded-full bg-red-50 flex items-center justify-center border-2 border-red-500 animate-pulse cursor-pointer">
-              <div className="w-6 h-6 rounded bg-red-500"></div>
+            <button onClick={stopRecording} className="group relative w-24 h-24 rounded-full bg-red-50 flex flex-col items-center justify-center border-2 border-red-500 shadow-[0_0_20px_rgba(239,68,68,0.2)] cursor-pointer hover:bg-red-100 transition-colors">
+              <div className="flex items-center gap-1 h-8 px-2">
+                {[1, 2, 3, 4, 5].map((i) => (
+                  <div 
+                    key={i} 
+                    className="w-1.5 bg-red-500 rounded-full"
+                    style={{
+                      animation: `waveform 1s ease-in-out infinite`,
+                      animationDelay: `${i * 0.15}s`,
+                      height: '40%'
+                    }}
+                  />
+                ))}
+              </div>
+              <div className="absolute inset-0 rounded-full border-2 border-red-500 opacity-50 animate-ping"></div>
+              <style>{`
+                @keyframes waveform {
+                  0%, 100% { height: 30%; }
+                  50% { height: 100%; }
+                }
+              `}</style>
             </button>
           )}
           {/* Auto-flow: recording stopped, processing in progress */}

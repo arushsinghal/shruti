@@ -16,8 +16,8 @@ class Settings(BaseSettings):
     data_dir: str = ""
     app_version: str = "0.1.0"
     asr_mode: str = "cloud"  # 'cloud' (Sarvam) or 'edge' (Local Whisper)
-    lipi_admin_user: str = "demo"
-    lipi_admin_password: str = ""
+    shruti_admin_user: str = "demo"
+    shruti_admin_password: str = ""
     secret_key: str
     algorithm: str = "HS256"
     access_token_expire_minutes: int = 1440  # 24 hours
