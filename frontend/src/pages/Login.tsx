@@ -23,8 +23,14 @@ export default function Login() {
       
       login(response.data.access_token);
       navigate('/dashboard');
-    } catch (err) {
-      setError('Invalid username or password');
+    } catch (err: any) {
+      if (err.response?.data?.detail) {
+        setError(err.response.data.detail);
+      } else if (err.message) {
+        setError("Network error: " + err.message);
+      } else {
+        setError('Invalid username or password');
+      }
     }
   };
 
