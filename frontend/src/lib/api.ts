@@ -5,7 +5,6 @@ import type {
   CreateSessionRequest,
   TranscribeResponse,
   ProcessClinicalResponse,
-  SessionMode,
 } from '../types/clinical';
 
 const baseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000';
