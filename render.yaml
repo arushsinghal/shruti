@@ -2,15 +2,19 @@ services:
   - type: web
     name: lipi
     runtime: docker
-    plan: free
+    plan: starter
     region: singapore
     branch: master
     healthCheckPath: /health
+    disk:
+      name: lipi-data
+      mountPath: /app/data
+      sizeGB: 1
     envVars:
       - key: DATA_DIR
-        value: /tmp/lipi
+        value: /app/data
       - key: SQLITE_DB
-        value: sessions.db
+        value: /app/data/lipi.db
       - key: ASR_MODE
         value: cloud
       - key: LIPI_ADMIN_USER
@@ -19,3 +23,9 @@ services:
         sync: false
       - key: SARVAM_API_KEY
         sync: false
+      - key: GEMINI_API_KEY
+        sync: false
+      - key: SECRET_KEY
+        sync: false
+      - key: CORS_ORIGINS
+        value: "http://localhost:5173,http://127.0.0.1:5173"
