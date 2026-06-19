@@ -58,8 +58,6 @@ const DIALECT_SAMPLES: Record<'hinglish' | 'hindi' | 'english', DialectSample> =
   }
 };
 
-const demoMailto = 'mailto:arushsinghal98@gmail.com?subject=Lipi Demo Request';
-
 // Animation Variants
 const fadeUp = {
   hidden: { opacity: 0, y: 20 },
