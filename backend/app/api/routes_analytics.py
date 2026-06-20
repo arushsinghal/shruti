@@ -3,10 +3,8 @@
 import json
 from datetime import datetime, timedelta
 
-import aiosqlite
 from fastapi import APIRouter
-
-from app.storage.db import get_db_path
+from app.storage.db import db_connect
 
 router = APIRouter()
 
@@ -15,9 +13,8 @@ router = APIRouter()
 async def get_analytics_dashboard():
     """Retrieves aggregated telemetry and documentation insights from deployment sessions. Research prototype only — output requires physician review."""
     
-    db_path = get_db_path()
-    async with aiosqlite.connect(db_path) as db:
-        db.row_factory = aiosqlite.Row
+    async with db_connect() as db:
+        db.row_factory = None
         
         # 1. Total consultations
         async with db.execute("SELECT COUNT(*) AS total FROM sessions") as cur:

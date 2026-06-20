@@ -7,9 +7,8 @@ from pathlib import Path
 
 from fastapi import APIRouter, WebSocket, WebSocketDisconnect, Query
 from jose import JWTError, jwt
-import aiosqlite
+from app.storage.db import db_connect
 from app.utils.config import settings
-from app.storage.db import get_db_path
 from app.api.routes_auth import get_user
 from app.storage.repository import SessionRepository
 
@@ -40,7 +39,7 @@ async def stream_audio_ws(websocket: WebSocket, session_id: str, token: str = Qu
         if username is None:
             raise ValueError("No sub in token")
             
-        async with aiosqlite.connect(get_db_path()) as db:
+        async with db_connect() as db:
             user = await get_user(db, username)
         if not user:
             raise ValueError("User not found")

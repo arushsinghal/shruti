@@ -1,18 +1,17 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from jose import JWTError, jwt
-import aiosqlite
-from typing import Optional
+from typing import Optional, Any
 
 from app.schemas.user import UserCreate, UserResponse, Token, TokenData
 from app.utils.config import settings
 from app.utils.security import get_password_hash, verify_password, create_access_token
-from app.storage.db import get_db_path
+from app.storage.db import db_connect
 
 router = APIRouter()
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/auth/token")
 
-async def get_user(db: aiosqlite.Connection, username: str):
+async def get_user(db: Any, username: str):
     async with db.execute("SELECT id, username, email, full_name, hashed_password, is_active FROM users WHERE username = ?", (username,)) as cursor:
         row = await cursor.fetchone()
         if row:
@@ -41,7 +40,7 @@ async def get_current_user(token: str = Depends(oauth2_scheme)):
     except JWTError:
         raise credentials_exception
 
-    async with aiosqlite.connect(get_db_path()) as db:
+    async with db_connect() as db:
         user = await get_user(db, username=token_data.username)
         if user is None:
             raise credentials_exception
@@ -49,7 +48,7 @@ async def get_current_user(token: str = Depends(oauth2_scheme)):
 
 @router.post("/auth/register", response_model=UserResponse)
 async def register_user(user: UserCreate):
-    async with aiosqlite.connect(get_db_path()) as db:
+    async with db_connect() as db:
         existing_user = await get_user(db, user.username)
         if existing_user:
             raise HTTPException(status_code=400, detail="Username already registered")
@@ -75,7 +74,7 @@ async def register_user(user: UserCreate):
 
 @router.post("/auth/token", response_model=Token)
 async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends()):
-    async with aiosqlite.connect(get_db_path()) as db:
+    async with db_connect() as db:
         user = await get_user(db, form_data.username)
         if not user or not verify_password(form_data.password, user["hashed_password"]):
             raise HTTPException(

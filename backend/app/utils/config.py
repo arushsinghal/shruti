@@ -13,6 +13,11 @@ class Settings(BaseSettings):
     sarvam_api_key: str = ""
     # Named distinctly to avoid collision with DATABASE_URL in any existing .env
     sqlite_db: str = "./lipi.db"
+    database_url: str = ""
+    seed_demo_user: bool = False
+    demo_username: str = "arush"
+    demo_password: str = "1234"
+    demo_full_name: str = "Dr. Arush"
     data_dir: str = ""
     app_version: str = "0.1.0"
     asr_mode: str = "cloud"  # 'cloud' (Sarvam) or 'edge' (Local Whisper)

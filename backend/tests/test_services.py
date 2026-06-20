@@ -132,9 +132,9 @@ class TestClinicalExtractor:
         assert "cough" in result["symptoms"], "khasi should map to cough"
 
     def test_extract_hinglish_mixed(self):
-        transcript = "Dard ho raha hai. Also nausea and vomiting."
+        transcript = "Badan mein dard ho raha hai. Also nausea and vomiting."
         result = extractor.extract(transcript)
-        assert "pain" in result["symptoms"]
+        assert "body ache" in result["symptoms"]
         assert "nausea" in result["symptoms"]
         assert "vomiting" in result["symptoms"]
 
@@ -497,3 +497,102 @@ class TestAllowedOriginsConfig:
         from app.utils.config import Settings
         s = Settings(allowed_origins=["https://c.com"])  # type: ignore[call-arg]
         assert s.allowed_origins == ["https://c.com"]
+
+
+# ======================================================================
+# 9. Eval Harness Tests
+# ======================================================================
+
+class TestEvalHarness:
+    def test_eval_normalise(self):
+        from eval.run_eval import _normalise
+        assert _normalise("Fever (3 days)") == "fever"
+        assert _normalise("Paracetamol ('bukhar')") == "paracetamol"
+        assert _normalise("  cough  ") == "cough"
+
+    def test_eval_score_set_field(self):
+        from eval.run_eval import _score_set_field
+        ext = ["fever", "cough"]
+        gt = ["fever", "headache"]
+        res = _score_set_field(ext, gt)
+        assert res["tp"] == 1
+        assert res["fp"] == 1
+        assert res["fn"] == 1
+        assert res["precision"] == 0.5
+        assert res["recall"] == 0.5
+        assert res["f1"] == 0.5
+
+    def test_eval_score_medications(self):
+        from eval.run_eval import _score_medications
+        ext = [{"name": "paracetamol", "dosage": "500mg", "frequency": "BD"}]
+        gt = [{"name": "paracetamol", "dosage": "650mg", "frequency": "BD"}]
+        res = _score_medications(ext, gt)
+        assert res["tp"] == 1
+        assert res["precision"] == 1.0
+        assert res["recall"] == 1.0
+        assert len(res["warnings"]) == 1
+        assert "dosage mismatch" in res["warnings"][0]
+
+    def test_eval_score_vitals_or_labs(self):
+        from eval.run_eval import _score_vitals_or_labs
+        ext = ["BP 120/80", "Temp 98.6"]
+        gt = ["BP 130/80", "Temp 98.6"]
+        res = _score_vitals_or_labs(ext, gt)
+        assert res["tp"] == 2
+        assert len(res["warnings"]) == 1
+        assert "value mismatch" in res["warnings"][0]
+
+
+# ======================================================================
+# 10. Database Support / PG Tests
+# ======================================================================
+
+import app.storage.db as db_module
+
+class TestPostgreSQLDatabase:
+    def test_is_postgresql_detection(self):
+        from app.storage.db import is_postgresql
+        from app.utils.config import settings
+        
+        original_url = settings.database_url
+        original_db = db_module._DB_PATH
+        try:
+            # PostgreSQL URL active and not in tests
+            settings.database_url = "postgresql://user:pass@localhost/dbname"
+            db_module._DB_PATH = "lipi.db"
+            assert is_postgresql() is True
+
+            # postgres:// prefix
+            settings.database_url = "postgres://user:pass@localhost/dbname"
+            assert is_postgresql() is True
+            
+            # Empty database url should be SQLite
+            settings.database_url = ""
+            assert is_postgresql() is False
+
+            # Pytest running (containing "test") should force SQLite
+            settings.database_url = "postgresql://user:pass@localhost/dbname"
+            db_module._DB_PATH = "/tmp/test_routes.db"
+            assert is_postgresql() is False
+        finally:
+            settings.database_url = original_url
+            db_module._DB_PATH = original_db
+
+    @pytest.mark.anyio
+    async def test_db_connection_query_translation(self):
+        from app.storage.db import DBConnection
+        from unittest.mock import AsyncMock
+
+        # Mock asyncpg connection
+        mock_conn = AsyncMock()
+        mock_conn.fetch.return_value = []
+        
+        db_conn = DBConnection(mock_conn, is_pg=True)
+        # Execute query with placeholders
+        wrapper = db_conn.execute("SELECT * FROM users WHERE username = ? AND email = ?", ("test", "test@test.com"))
+        cursor = await wrapper
+        
+        # Verify query was translated to use $1, $2 and fetch was called
+        mock_conn.fetch.assert_called_once_with("SELECT * FROM users WHERE username = $1 AND email = $2", "test", "test@test.com")
+
+

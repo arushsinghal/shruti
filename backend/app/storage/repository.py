@@ -2,15 +2,13 @@ import json
 from datetime import datetime
 from typing import Optional, Any
 
-import aiosqlite
-
 from app.schemas.consultation import ConsultationSession, StatusEnum, ModeEnum
-from app.storage.db import get_db_path
+from app.storage.db import db_connect
 
 _SELECT = (
     "SELECT id, patient_name, doctor_name, created_at, status, "
     "audio_file_path, transcript, clinical_facts, memory_state, soap_note, cds_suggestions, "
-    "cloud_ai_consent, diarized_transcript, mode, user_id "
+    "cloud_ai_consent, diarized_transcript, mode, user_id, abha_number, pmjay_beneficiary "
     "FROM sessions"
 )
 
@@ -37,7 +35,7 @@ def safe_json_loads_dict(data: str) -> Any:
     except json.JSONDecodeError:
         return {"value": data}
 
-def _row_to_session(row: aiosqlite.Row) -> ConsultationSession:
+def _row_to_session(row: Any) -> ConsultationSession:
     return ConsultationSession(
         id=row[0],
         patient_name=row[1],
@@ -54,6 +52,8 @@ def _row_to_session(row: aiosqlite.Row) -> ConsultationSession:
         diarized_transcript=safe_json_loads_list(row[12]) if len(row) > 12 else None,
         mode=ModeEnum(row[13]) if (len(row) > 13 and row[13]) else ModeEnum.health,
         user_id=row[14] if len(row) > 14 else None,
+        abha_number=row[15] if len(row) > 15 else None,
+        pmjay_beneficiary=bool(row[16]) if len(row) > 16 else False,
     )
 
 
@@ -63,32 +63,36 @@ class SessionRepository:
         user_id: str,
         patient_name: Optional[str] = None,
         doctor_name: Optional[str] = None,
+        abha_number: Optional[str] = None,
+        pmjay_beneficiary: bool = False,
         cloud_ai_consent: bool = False,
         mode: ModeEnum = ModeEnum.health,
     ) -> ConsultationSession:
         session = ConsultationSession(
             patient_name=patient_name,
             doctor_name=doctor_name,
+            abha_number=abha_number,
+            pmjay_beneficiary=pmjay_beneficiary,
             cloud_ai_consent=cloud_ai_consent,
             mode=mode,
             user_id=user_id,
         )
-        async with aiosqlite.connect(get_db_path()) as db:
+        async with db_connect() as db:
             await db.execute(
-                "INSERT INTO sessions (id, patient_name, doctor_name, created_at, status, cloud_ai_consent, mode, user_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
-                (session.id, session.patient_name, session.doctor_name, session.created_at.isoformat(), session.status.value, 1 if session.cloud_ai_consent else 0, session.mode.value, session.user_id),
+                "INSERT INTO sessions (id, patient_name, doctor_name, created_at, status, cloud_ai_consent, mode, user_id, abha_number, pmjay_beneficiary) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                (session.id, session.patient_name, session.doctor_name, session.created_at.isoformat(), session.status.value, 1 if session.cloud_ai_consent else 0, session.mode.value, session.user_id, session.abha_number, 1 if session.pmjay_beneficiary else 0),
             )
             await db.commit()
         return session
 
     async def get_session(self, session_id: str, user_id: str) -> Optional[ConsultationSession]:
-        async with aiosqlite.connect(get_db_path()) as db:
+        async with db_connect() as db:
             async with db.execute(f"{_SELECT} WHERE id = ? AND user_id = ?", (session_id, user_id)) as cursor:
                 row = await cursor.fetchone()
         return _row_to_session(row) if row else None
 
     async def update_session(self, session: ConsultationSession) -> ConsultationSession:
-        async with aiosqlite.connect(get_db_path()) as db:
+        async with db_connect() as db:
             await db.execute(
                 """
                 UPDATE sessions SET
@@ -119,7 +123,7 @@ class SessionRepository:
         return session
 
     async def get_sessions_for_user(self, user_id: str) -> list[ConsultationSession]:
-        async with aiosqlite.connect(get_db_path()) as db:
+        async with db_connect() as db:
             async with db.execute(f"{_SELECT} WHERE user_id = ? ORDER BY created_at DESC", (user_id,)) as cursor:
                 rows = await cursor.fetchall()
         return [_row_to_session(row) for row in rows]
