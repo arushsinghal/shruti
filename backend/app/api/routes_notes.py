@@ -1,9 +1,39 @@
+import json
+import difflib
+from datetime import datetime
 import logging
 from pathlib import Path
-from typing import Any
+from typing import Any, List, Optional
 from fastapi import APIRouter, HTTPException, Depends
 from pydantic import BaseModel
 from app.api.routes_auth import get_current_user
+from app.services.phi_scrubber import PHIScrubberService
+
+phi_scrubber = PHIScrubberService()
+
+class SOAPFeedbackRequest(BaseModel):
+    status: str
+    original_soap: dict
+    final_soap: dict
+    categories: List[str]
+
+class SOAPFeedbackResponse(BaseModel):
+    success: bool
+    feedback_id: int
+    status: str
+    categories: List[str]
+    timestamp: str
+
+ALLOWED_CATEGORIES = {
+    "missing_symptom",
+    "wrong_medication",
+    "wrong_dosage",
+    "formatting_issue",
+    "language_issue",
+    "diagnosis_issue",
+    "hallucinated_fact",
+    "other",
+}
 
 from app.schemas.consultation import StatusEnum, ModeEnum
 from app.storage.repository import SessionRepository
@@ -154,3 +184,68 @@ async def get_fhir_bundle(
     bundle = fhir_svc.generate_fhir_bundle(session_id, patient_name, session.memory_state)
 
     return bundle
+
+
+@router.post("/sessions/{session_id}/feedback", response_model=SOAPFeedbackResponse)
+async def post_soap_feedback(
+    session_id: str,
+    body: SOAPFeedbackRequest,
+    current_user: dict = Depends(get_current_user),
+):
+    """Submits doctor feedback and edit delta on the generated SOAP note."""
+    user_id = str(current_user["id"])
+    session = await repo.get_session(session_id, user_id)
+    if not session:
+        raise HTTPException(status_code=404, detail="Session not found")
+        
+    if body.status not in ("accept", "edit", "reject"):
+        raise HTTPException(status_code=400, detail="Invalid feedback status")
+        
+    for cat in body.categories:
+        if cat not in ALLOWED_CATEGORIES:
+            raise HTTPException(status_code=400, detail=f"Invalid category: {cat}")
+            
+    # Serialize original and final soap notes stably
+    original_str = json.dumps(body.original_soap, sort_keys=True, indent=2)
+    final_str = json.dumps(body.final_soap, sort_keys=True, indent=2)
+    
+    # Calculate unified diff
+    diff_lines = list(difflib.unified_diff(
+        original_str.splitlines(),
+        final_str.splitlines(),
+        fromfile='original_soap.json',
+        tofile='final_soap.json',
+        lineterm=''
+    ))
+    delta = "\n".join(diff_lines)
+    
+    # Scrub PHI
+    phi_scrubbed_original = phi_scrubber.scrub(original_str)
+    phi_scrubbed_final = phi_scrubber.scrub(final_str)
+    phi_scrubbed_delta = phi_scrubber.scrub(delta)
+    
+    timestamp = datetime.utcnow().isoformat()
+    
+    categories_json = json.dumps(body.categories)
+    
+    feedback_id = await repo.save_feedback(
+        session_id=session_id,
+        user_id=user_id,
+        status=body.status,
+        original_soap=original_str,
+        final_soap=final_str,
+        delta=delta,
+        phi_scrubbed_original_soap=phi_scrubbed_original,
+        phi_scrubbed_final_soap=phi_scrubbed_final,
+        phi_scrubbed_delta=phi_scrubbed_delta,
+        categories=categories_json,
+        timestamp=timestamp,
+    )
+    
+    return SOAPFeedbackResponse(
+        success=True,
+        feedback_id=feedback_id,
+        status=body.status,
+        categories=body.categories,
+        timestamp=timestamp,
+    )

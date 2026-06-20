@@ -3,16 +3,55 @@ import type { ProcessClinicalResponse } from '../types/clinical';
 import { getFhirBundle } from '../lib/api';
 import PrintableReport from './PrintableReport';
 import PrescriptionPrint from './PrescriptionPrint';
+import PatientInstructionsHindi from './PatientInstructionsHindi';
+import AudioRecap from './AudioRecap';
+import ReferralLetter from './ReferralLetter';
+import DischargeSummary from './DischargeSummary';
+
+const ICD10_MAP: Record<string, string> = {
+  'urti': 'J06.9', 'upper respiratory': 'J06.9', 'pharyngitis': 'J02.9',
+  'fever': 'R50.9', 'viral fever': 'A99',
+  'hypertension': 'I10',
+  'diabetes': 'E11.9', 'type 2 diabetes': 'E11.9',
+  'pneumonia': 'J18.9',
+  'gastroenteritis': 'A09', 'diarrhea': 'A09',
+  'uti': 'N39.0', 'urinary tract': 'N39.0',
+  'malaria': 'B54',
+  'dengue': 'A90',
+  'typhoid': 'A01.0',
+  'tuberculosis': 'A15.9', 'tb': 'A15.9',
+  'anemia': 'D64.9',
+  'asthma': 'J45.9',
+  'gerd': 'K21.9', 'acid reflux': 'K21.9',
+  'hypothyroidism': 'E03.9',
+  'common cold': 'J06.9',
+  'bronchitis': 'J40',
+  'sinusitis': 'J32.9',
+  'migraine': 'G43.9',
+  'headache': 'R51',
+  'anxiety': 'F41.9',
+  'depression': 'F32.9',
+};
+
+function getIcd10(assessmentText: string): string | null {
+  const lower = assessmentText.toLowerCase();
+  for (const [keyword, code] of Object.entries(ICD10_MAP)) {
+    if (lower.includes(keyword)) return code;
+  }
+  return null;
+}
 
 interface ClinicalResultsProps {
   results: ProcessClinicalResponse;
   sessionId: string;
   patientName?: string;
   doctorName?: string;
+  abhaNumber?: string;
+  pmjayBeneficiary?: boolean;
   timings?: { asrMs?: number; nlpMs?: number };
 }
 
-export default function ClinicalResults({ results, sessionId, patientName, doctorName, timings }: ClinicalResultsProps) {
+export default function ClinicalResults({ results, sessionId, patientName, doctorName, abhaNumber, pmjayBeneficiary, timings }: ClinicalResultsProps) {
   const { state, soap, cds, source } = results;
   const [fhirData, setFhirData] = useState<any>(null);
   const [isExporting, setIsExporting] = useState(false);
@@ -95,7 +134,9 @@ export default function ClinicalResults({ results, sessionId, patientName, docto
   const totalMs = (timings?.asrMs ?? 0) + (timings?.nlpMs ?? 0);
 
   return (
-    <div className="space-y-10 animate-fade-in-up">
+    <div className="space-y-6 animate-fade-in-up">
+
+      <AudioRecap results={results} patientName={patientName} />
 
       {source === 'fallback' && (
         <div className="flex items-center gap-2 px-3 py-2.5 rounded border border-primary/25 bg-primary/10 text-xs text-primary shadow-sm">
@@ -107,44 +148,55 @@ export default function ClinicalResults({ results, sessionId, patientName, docto
       )}
 
       {/* SOAP Note Section */}
-      <section className="bg-white border border-slate-200 rounded-lg p-6 shadow-sm">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 border-b border-slate-100 pb-4">
+      <section className="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden">
+        {/* Title row */}
+        <div className="flex items-center justify-between px-6 pt-5 pb-4 border-b border-slate-100">
           <div className="flex items-center gap-3 flex-wrap">
             <h2 className="text-base font-serif font-bold text-text-dark">SOAP Document</h2>
             {isSigned ? (
-              <span className="text-[10px] font-bold bg-primary/10 text-primary border border-primary/20 px-2 py-0.5 rounded uppercase tracking-wider">Signed by Provider</span>
+              <span className="text-[10px] font-bold bg-primary/10 text-primary border border-primary/20 px-2 py-0.5 rounded-full uppercase tracking-wider">✓ Signed</span>
             ) : (
-              <span className="text-[10px] font-bold bg-accent/15 text-accent-dark border border-accent/20 px-2 py-0.5 rounded uppercase tracking-wider">Draft - Verification Required</span>
+              <span className="text-[10px] font-bold bg-amber-50 text-amber-700 border border-amber-200 px-2 py-0.5 rounded-full uppercase tracking-wider">Draft · Needs Review</span>
             )}
-            {/* Speed timer badges */}
+          </div>
+          <div className="flex items-center gap-1.5">
             {timings?.asrMs !== undefined && (
-              <span className="text-[10px] font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded flex items-center gap-1">
-                <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-                Sarvam ASR {(timings.asrMs / 1000).toFixed(1)}s
+              <span className="text-[10px] font-semibold text-slate-500 bg-slate-50 border border-slate-200 px-2 py-0.5 rounded-full">
+                ASR {(timings.asrMs / 1000).toFixed(1)}s
               </span>
             )}
             {timings?.nlpMs !== undefined && (
-              <span className="text-[10px] font-bold text-blue-700 bg-blue-50 border border-blue-200 px-2 py-0.5 rounded flex items-center gap-1">
-                <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 3H5a2 2 0 00-2 2v4m6-6h10a2 2 0 012 2v4M9 3v18m0 0h10a2 2 0 002-2V9M9 21H5a2 2 0 01-2-2V9m0 0h18" />
-                </svg>
-                Clinical NLP {(timings.nlpMs / 1000).toFixed(1)}s
+              <span className="text-[10px] font-semibold text-slate-500 bg-slate-50 border border-slate-200 px-2 py-0.5 rounded-full">
+                NLP {(timings.nlpMs / 1000).toFixed(1)}s
               </span>
             )}
             {timings?.asrMs !== undefined && timings?.nlpMs !== undefined && (
-              <span className="text-[10px] font-bold text-slate-600 bg-slate-100 border border-slate-200 px-2 py-0.5 rounded">
-                Total {(totalMs / 1000).toFixed(1)}s
+              <span className="text-[10px] font-bold text-primary bg-primary/5 border border-primary/20 px-2 py-0.5 rounded-full">
+                {(totalMs / 1000).toFixed(1)}s total
               </span>
             )}
           </div>
-          <div className="flex items-center gap-2 flex-wrap">
+        </div>
+
+        {/* Action toolbar */}
+        <div className="px-6 py-3 bg-slate-50/70 border-b border-slate-100 flex flex-wrap gap-x-4 gap-y-2 items-center">
+          {/* Documents group */}
+          <div className="flex items-center gap-1.5 flex-wrap">
+            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mr-1">Generate</span>
             <PrescriptionPrint results={results} patientName={patientName} doctorName={doctorName} />
+            <PatientInstructionsHindi results={results} patientName={patientName} doctorName={doctorName} />
+            <ReferralLetter results={results} patientName={patientName} doctorName={doctorName} abhaNumber={abhaNumber} />
+            <DischargeSummary results={results} patientName={patientName} doctorName={doctorName} />
+          </div>
+
+          <div className="w-px h-5 bg-slate-200 hidden sm:block" />
+
+          {/* Share / sign group */}
+          <div className="flex items-center gap-1.5 flex-wrap">
+            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mr-1">Share</span>
             <button
               onClick={handleWhatsAppShare}
-              className="flex items-center gap-1.5 text-xs font-medium text-emerald-700 hover:text-emerald-900 border border-emerald-200 hover:border-emerald-400 bg-emerald-50 hover:bg-emerald-100 rounded px-3 py-1.5 transition-all"
-              title="Share prescription via WhatsApp"
+              className="flex items-center gap-1.5 text-xs font-medium text-emerald-700 hover:text-emerald-900 border border-emerald-200 hover:border-emerald-400 bg-white hover:bg-emerald-50 rounded-lg px-3 py-1.5 transition-all"
             >
               <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="currentColor">
                 <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/>
@@ -153,10 +205,16 @@ export default function ClinicalResults({ results, sessionId, patientName, docto
               WhatsApp
             </button>
             <PrintableReport results={results} patientName={patientName} doctorName={doctorName} sessionId={sessionId} />
+          </div>
+
+          <div className="w-px h-5 bg-slate-200 hidden sm:block" />
+
+          {/* Sign / export group */}
+          <div className="flex items-center gap-1.5 ml-auto flex-wrap">
             {!isSigned && (
               <button
                 onClick={handleSignNote}
-                className="text-xs font-semibold text-white bg-primary hover:bg-primary-dark px-3 py-1.5 rounded transition-all shadow-sm cursor-pointer"
+                className="text-xs font-semibold text-white bg-primary hover:bg-primary-dark px-4 py-1.5 rounded-lg transition-all shadow-sm cursor-pointer"
               >
                 Sign Note
               </button>
@@ -164,12 +222,14 @@ export default function ClinicalResults({ results, sessionId, patientName, docto
             <button
               onClick={handleExportFhir}
               disabled={isExporting}
-              className="text-xs font-semibold text-slate-700 bg-slate-100 hover:bg-slate-200 px-3 py-1.5 rounded transition-colors disabled:opacity-50 cursor-pointer"
+              className="text-xs font-medium text-slate-500 hover:text-slate-700 border border-slate-200 hover:border-slate-300 bg-white px-3 py-1.5 rounded-lg transition-colors disabled:opacity-50 cursor-pointer"
             >
-              {isExporting ? 'Exporting...' : 'Export EMR (FHIR)'}
+              {isExporting ? 'Exporting…' : 'Export EMR'}
             </button>
           </div>
         </div>
+
+        <div className="px-6 py-6">
 
         <div className="space-y-6 text-sm text-slate-800 leading-relaxed">
           {(['S', 'O', 'A', 'P'] as const).map((sectionCode) => {
@@ -180,11 +240,17 @@ export default function ClinicalResults({ results, sessionId, patientName, docto
               P: 'Plan (Medications, Orders, Follow-Up)',
             };
             const label = labels[sectionCode];
+            const icd10Code = sectionCode === 'A' && pmjayBeneficiary ? getIcd10(editableSoap.A) : null;
             return (
               <div key={sectionCode} className="group relative border-l-2 border-slate-100 hover:border-primary pl-4 transition-colors">
-                <h3 className="font-bold text-text-dark mb-1 flex items-center gap-1 font-serif text-sm">
+                <h3 className="font-bold text-text-dark mb-1 flex items-center gap-2 font-serif text-sm flex-wrap">
                   <span className="text-primary font-mono">{sectionCode}.</span>
                   {label}
+                  {icd10Code && (
+                    <span className="text-[10px] font-bold font-mono text-orange-700 bg-orange-50 border border-orange-200 px-2 py-0.5 rounded uppercase tracking-wider">
+                      PMJAY · ICD-10: {icd10Code}
+                    </span>
+                  )}
                 </h3>
                 <textarea
                   value={editableSoap[sectionCode]}
@@ -203,6 +269,7 @@ export default function ClinicalResults({ results, sessionId, patientName, docto
           </svg>
           <span className="font-medium">This draft requires physician review and signature before clinical use. All clinical decisions remain with the physician.</span>
         </p>
+        </div>
       </section>
 
       {/* CDS Suggestions Section */}

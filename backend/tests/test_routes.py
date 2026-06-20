@@ -296,3 +296,28 @@ async def test_audio_upload_accepts_small_file(ac):
     )
     # Should pass size check; may fail extension-dependent or other checks but not 413
     assert r.status_code != 413
+
+
+# ── Consent gate — text transcript submission ────────────────────────────────
+
+@pytest.mark.anyio
+async def test_text_transcript_blocked_without_consent(ac):
+    session_id = await _create_session(ac, consent=False)
+    r = await ac.post(
+        f"/api/sessions/{session_id}/transcript",
+        json={"transcript": "Patient has fever."},
+    )
+    assert r.status_code == 403
+    assert "consent" in r.json()["detail"].lower()
+
+
+@pytest.mark.anyio
+async def test_text_transcript_allowed_after_consent(ac):
+    session_id = await _create_session(ac, consent=False)
+    await ac.patch(f"/api/sessions/{session_id}/consent")
+    r = await ac.post(
+        f"/api/sessions/{session_id}/transcript",
+        json={"transcript": "Patient has fever."},
+    )
+    assert r.status_code != 403
+

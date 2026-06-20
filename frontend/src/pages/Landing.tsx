@@ -294,7 +294,7 @@ export default function Landing() {
               </div>
               <h3 className="text-xl font-semibold text-white">Structured Export</h3>
               <p className="text-slate-400 text-sm leading-relaxed">
-                Every document is printable and exportable. Health → HL7 FHIR R4, ABDM-compatible. Government → FIR PDF. Legal → court-ready draft. Nothing is locked in a proprietary format.
+                Every document is printable and exportable. Health → HL7 FHIR R4 JSON. Government → FIR PDF. Legal → court-ready draft. Nothing is locked in a proprietary format.
               </p>
             </motion.div>
 

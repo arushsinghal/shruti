@@ -2,7 +2,7 @@ import json
 from datetime import datetime
 from typing import Optional, Any
 
-from app.schemas.consultation import ConsultationSession, StatusEnum, ModeEnum
+from app.schemas.consultation import ConsultationSession, StatusEnum, ModeEnum, ConsentLogResponse
 from app.storage.db import db_connect
 
 _SELECT = (
@@ -89,7 +89,42 @@ class SessionRepository:
         async with db_connect() as db:
             async with db.execute(f"{_SELECT} WHERE id = ? AND user_id = ?", (session_id, user_id)) as cursor:
                 row = await cursor.fetchone()
-        return _row_to_session(row) if row else None
+            if not row:
+                return None
+            session = _row_to_session(row)
+            async with db.execute(
+                "SELECT consent_mode, consent_text_version, consent_hash, timestamp FROM consent_logs WHERE session_id = ? ORDER BY id DESC LIMIT 1",
+                (session_id,)
+            ) as cursor:
+                log_row = await cursor.fetchone()
+                if log_row:
+                    session.consent_log = ConsentLogResponse(
+                        consent_mode=log_row[0],
+                        consent_text_version=log_row[1],
+                        consent_hash=log_row[2],
+                        timestamp=log_row[3]
+                    )
+        return session
+
+    async def log_consent(
+        self,
+        session_id: str,
+        user_id: str,
+        consent_mode: str,
+        consent_text_version: str,
+        consent_payload_json: str,
+        consent_hash: str,
+        timestamp: str,
+        user_agent: Optional[str] = None,
+        ip_address: Optional[str] = None,
+    ) -> None:
+        async with db_connect() as db:
+            await db.execute(
+                "INSERT INTO consent_logs (session_id, user_id, consent_mode, consent_text_version, consent_payload_json, consent_hash, timestamp, user_agent, ip_address) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                (session_id, user_id, consent_mode, consent_text_version, consent_payload_json, consent_hash, timestamp, user_agent, ip_address),
+            )
+            await db.commit()
+
 
     async def update_session(self, session: ConsultationSession) -> ConsultationSession:
         async with db_connect() as db:
@@ -127,3 +162,36 @@ class SessionRepository:
             async with db.execute(f"{_SELECT} WHERE user_id = ? ORDER BY created_at DESC", (user_id,)) as cursor:
                 rows = await cursor.fetchall()
         return [_row_to_session(row) for row in rows]
+
+    async def save_feedback(
+        self,
+        session_id: str,
+        user_id: str,
+        status: str,
+        original_soap: str,
+        final_soap: str,
+        delta: str,
+        phi_scrubbed_original_soap: Optional[str],
+        phi_scrubbed_final_soap: Optional[str],
+        phi_scrubbed_delta: Optional[str],
+        categories: str,
+        timestamp: str,
+    ) -> int:
+        async with db_connect() as db:
+            cursor = await db.execute(
+                """
+                INSERT INTO soap_feedback (
+                    session_id, user_id, status, original_soap, final_soap, delta,
+                    phi_scrubbed_original_soap, phi_scrubbed_final_soap, phi_scrubbed_delta,
+                    categories, timestamp
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                """,
+                (
+                    session_id, user_id, status, original_soap, final_soap, delta,
+                    phi_scrubbed_original_soap, phi_scrubbed_final_soap, phi_scrubbed_delta,
+                    categories, timestamp
+                ),
+            )
+            await db.commit()
+            return cursor.lastrowid or 0
+

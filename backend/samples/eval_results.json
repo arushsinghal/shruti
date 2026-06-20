@@ -1,0 +1,124 @@
+[
+  {
+    "case_id": "transcript_demo",
+    "scores": {
+      "symptoms": {
+        "precision": 0.75,
+        "recall": 1.0,
+        "f1": 0.8571,
+        "tp": 3,
+        "fp": 1,
+        "fn": 0,
+        "false_positives": [
+          "vomiting"
+        ],
+        "missed": []
+      },
+      "diagnoses": {
+        "precision": 0.5,
+        "recall": 1.0,
+        "f1": 0.6667,
+        "tp": 1,
+        "fp": 1,
+        "fn": 0,
+        "false_positives": [
+          "diabetes mellitus"
+        ],
+        "missed": []
+      },
+      "allergies": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "tp": 1,
+        "fp": 0,
+        "fn": 0,
+        "false_positives": [],
+        "missed": []
+      },
+      "investigations": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "tp": 0,
+        "fp": 0,
+        "fn": 0,
+        "false_positives": [],
+        "missed": []
+      },
+      "advice": {
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0,
+        "tp": 0,
+        "fp": 0,
+        "fn": 2,
+        "false_positives": [],
+        "missed": [
+          "drink plenty of fluids",
+          "rest"
+        ]
+      },
+      "follow_up": {
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0,
+        "tp": 0,
+        "fp": 1,
+        "fn": 2,
+        "false_positives": [
+          "if the fever goes above 39"
+        ],
+        "missed": [
+          "if fever goes above 39.5",
+          "if symptoms worsen after 3 days"
+        ]
+      },
+      "red_flags": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "tp": 0,
+        "fp": 0,
+        "fn": 0,
+        "false_positives": [],
+        "missed": []
+      },
+      "medications": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "tp": 2,
+        "fp": 0,
+        "fn": 0,
+        "false_positives": [],
+        "missed": [],
+        "warnings": []
+      },
+      "vitals": {
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0,
+        "tp": 0,
+        "fp": 0,
+        "fn": 1,
+        "false_positives": [],
+        "missed": [
+          "temp 38.5 c"
+        ],
+        "warnings": []
+      },
+      "labs": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "tp": 0,
+        "fp": 0,
+        "fn": 0,
+        "false_positives": [],
+        "missed": [],
+        "warnings": []
+      }
+    }
+  }
+]

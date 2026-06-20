@@ -1,0 +1,3 @@
+case_id,date,consultation_number,patient_gender,patient_age,primary_language,sarvam_duration_sec,status,nlp_processing_time_ms,comments
+ex_01,2026-06-20,1,M,32,Hinglish,45.2,complete,120,ASR clear; normalisation worked
+ex_02,2026-06-20,2,F,45,Hindi,30.1,complete,95,Noise from ceiling fan caused partial ASR errors

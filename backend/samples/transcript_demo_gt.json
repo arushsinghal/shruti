@@ -1,0 +1,18 @@
+{
+  "case_id": "transcript_demo",
+  "doctor": "unnamed",
+  "date": "not specified",
+  "symptoms": ["headache", "fever", "nausea"],
+  "medications": [
+    {"name": "paracetamol", "dosage": "500mg", "frequency": "every 6 hours"},
+    {"name": "metformin", "dosage": "500mg", "frequency": "twice daily"}
+  ],
+  "vitals": ["Temp 38.5 C"],
+  "labs": [],
+  "allergies": ["penicillin"],
+  "investigations": [],
+  "diagnoses": ["viral infection"],
+  "advice": ["drink plenty of fluids", "rest"],
+  "follow_up": ["if fever goes above 39.5", "if symptoms worsen after 3 days"],
+  "red_flags": []
+}

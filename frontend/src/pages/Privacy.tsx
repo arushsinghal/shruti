@@ -67,7 +67,8 @@ export default function Privacy() {
               The text returned by the speech-to-text service. Before storage, a local PHI scrubber
               removes personal identifiers including names, absolute dates, locations, and phone numbers.
               Relative clinical descriptions ("fever for 3 days", "since this morning") are preserved
-              because they are medically necessary.
+              because they are medically necessary. Manual text transcript input follows the same
+              consent, storage, and PHI scrubbing rules.
             </DataRow>
             <DataRow term="SOAP notes and clinical facts">
               AI-generated structured documentation derived from the scrubbed transcript. These are

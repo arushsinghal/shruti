@@ -118,9 +118,16 @@ export default function AudioUploader({ sessionId, onTranscript, onAutoProcess }
       setIsRecording(true);
       setError(null);
       setFile(null);
-    } catch (err) {
+    } catch (err: unknown) {
       console.error(err);
-      setError('Microphone access denied or unavailable.');
+      const name = err instanceof Error ? (err as any).name : '';
+      if (name === 'NotAllowedError' || name === 'PermissionDeniedError') {
+        setError('mic_denied');
+      } else if (name === 'NotFoundError' || name === 'DevicesNotFoundError') {
+        setError('mic_missing');
+      } else {
+        setError('Microphone unavailable. Please check your device settings.');
+      }
     }
   }
 
@@ -241,10 +248,10 @@ export default function AudioUploader({ sessionId, onTranscript, onAutoProcess }
           />
         </div>
       ) : (
-        <div className="border border-slate-200 rounded-xl p-8 flex flex-col items-center justify-center bg-slate-50">
+        <div className="border border-slate-200 rounded-xl p-6 sm:p-8 flex flex-col items-center justify-center bg-slate-50 min-h-[180px]">
           {!isRecording && !file && !isWorking && (
-            <button onClick={startRecording} className="w-16 h-16 rounded-full bg-red-100 flex items-center justify-center hover:bg-red-200 transition-colors cursor-pointer">
-              <div className="w-6 h-6 rounded-full bg-red-500"></div>
+            <button onClick={startRecording} className="w-20 h-20 sm:w-16 sm:h-16 rounded-full bg-red-100 flex items-center justify-center hover:bg-red-200 active:scale-95 transition-all cursor-pointer touch-manipulation">
+              <div className="w-7 h-7 sm:w-6 sm:h-6 rounded-full bg-red-500"></div>
             </button>
           )}
           {isRecording && (
@@ -293,7 +300,7 @@ export default function AudioUploader({ sessionId, onTranscript, onAutoProcess }
             {isRecording
               ? `Recording... ${formatTime(recordingTime)}`
               : isAutoFlow
-                ? status === 'uploading' ? `Uploading… ${uploadPct}%` : 'Transcribing via Sarvam AI…'
+                ? status === 'uploading' ? `Uploading… ${uploadPct}%` : 'Diarizing via Sarvam Batch… (~60s)'
                 : file ? 'Ready to process'
                 : 'Click to start dictation'}
           </div>
@@ -317,9 +324,17 @@ export default function AudioUploader({ sessionId, onTranscript, onAutoProcess }
       )}
 
       {status === 'transcribing' && !isAutoFlow && (
-        <div className="flex items-center gap-2 text-sm text-indigo-600">
-          <span className="animate-spin">⟳</span>
-          <span>{mode === 'text' ? 'Processing transcript...' : 'Transcribing audio via Sarvam AI…'}</span>
+        <div className="space-y-1.5">
+          <div className="flex items-center gap-2 text-sm text-indigo-600">
+            <svg className="w-4 h-4 animate-spin shrink-0" fill="none" viewBox="0 0 24 24">
+              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/>
+              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
+            </svg>
+            <span className="font-medium">{mode === 'text' ? 'Processing transcript...' : 'Transcribing + separating speakers…'}</span>
+          </div>
+          {mode !== 'text' && (
+            <p className="text-xs text-slate-400 pl-6">Sarvam Batch API diarization — up to 60 seconds</p>
+          )}
         </div>
       )}
 
@@ -345,7 +360,49 @@ export default function AudioUploader({ sessionId, onTranscript, onAutoProcess }
         </p>
       )}
 
-      {error && (
+      {error === 'mic_denied' && (
+        <div className="bg-red-50 border border-red-200 rounded-xl p-4 space-y-2">
+          <div className="flex items-center gap-2">
+            <svg className="w-4 h-4 text-red-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
+            </svg>
+            <p className="text-sm font-bold text-red-700">Microphone access blocked</p>
+          </div>
+          <p className="text-xs text-red-600 leading-relaxed">
+            Lipi needs microphone permission to record the consultation.
+          </p>
+          <div className="text-xs text-red-700 space-y-1 pl-1">
+            <p className="font-semibold">To fix on Chrome / Edge:</p>
+            <p>Click the 🔒 lock icon in the address bar → Site settings → Microphone → Allow</p>
+            <p className="font-semibold mt-1">To fix on Safari:</p>
+            <p>Safari menu → Settings for This Website → Microphone → Allow</p>
+          </div>
+          <button
+            onClick={() => { setError(null); setMode('file'); }}
+            className="text-xs text-red-600 underline hover:text-red-800 transition-colors"
+          >
+            Or upload an audio file instead →
+          </button>
+        </div>
+      )}
+      {error === 'mic_missing' && (
+        <div className="bg-amber-50 border border-amber-200 rounded-xl p-4">
+          <div className="flex items-center gap-2 mb-1">
+            <svg className="w-4 h-4 text-amber-600 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+            </svg>
+            <p className="text-sm font-bold text-amber-700">No microphone found</p>
+          </div>
+          <p className="text-xs text-amber-700">No audio input device detected. Connect a microphone or use the Upload Audio option below.</p>
+          <button
+            onClick={() => { setError(null); setMode('file'); }}
+            className="text-xs text-amber-700 underline hover:text-amber-900 mt-2 transition-colors block"
+          >
+            Upload an audio file instead →
+          </button>
+        </div>
+      )}
+      {error && error !== 'mic_denied' && error !== 'mic_missing' && (
         <p className="text-sm text-red-600 bg-red-50 border border-red-200 rounded-lg px-3 py-2">
           {error}
         </p>

@@ -71,8 +71,15 @@ export default function Login() {
           Welcome to Lipi
         </h2>
         <p className="mt-2 text-center text-sm text-gray-400">
-          Clinical AI Infrastructure for the Next Billion
+          India's AI Clinical Scribe — Hindi · English · Hinglish
         </p>
+        <div className="mt-4 flex items-center justify-center gap-2 flex-wrap">
+          {['Audit Trail Enabled', 'Local NLP', 'Sarvam ASR', 'No LLM Hallucination'].map(label => (
+            <span key={label} className="text-[10px] font-bold uppercase tracking-wider text-cyan-400 border border-cyan-800 bg-cyan-950/60 px-2 py-1 rounded-full">
+              {label}
+            </span>
+          ))}
+        </div>
       </div>
 
       <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">

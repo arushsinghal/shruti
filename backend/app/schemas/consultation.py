@@ -25,10 +25,19 @@ class ModeEnum(str, Enum):
     general = "general"        # General transcription
 
 
+class ConsentLogResponse(BaseModel):
+    consent_mode: str
+    consent_text_version: str
+    consent_hash: str
+    timestamp: str
+
+
 class ConsultationSession(BaseModel):
     id: str = Field(default_factory=lambda: str(uuid4()))
     patient_name: Optional[str] = None
     doctor_name: Optional[str] = None
+    abha_number: Optional[str] = None
+    pmjay_beneficiary: bool = False
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
     cloud_ai_consent: bool = False
     status: StatusEnum = StatusEnum.created
@@ -41,10 +50,13 @@ class ConsultationSession(BaseModel):
     soap_note: Optional[dict[str, Any]] = None
     cds_suggestions: Optional[list[dict[str, Any]]] = None
     user_id: Optional[str] = None
+    consent_log: Optional[ConsentLogResponse] = None
 
 
 class CreateSessionRequest(BaseModel):
     patient_name: Optional[str] = None
     doctor_name: Optional[str] = None
+    abha_number: Optional[str] = None
+    pmjay_beneficiary: bool = False
     cloud_ai_consent: bool = False
     mode: ModeEnum = ModeEnum.health

@@ -63,6 +63,38 @@ CREATE TABLE IF NOT EXISTS users (
 );
 """
 
+PG_CREATE_CONSENT_LOGS_TABLE = """
+CREATE TABLE IF NOT EXISTS consent_logs (
+    id SERIAL PRIMARY KEY,
+    session_id TEXT NOT NULL,
+    user_id TEXT NOT NULL,
+    consent_mode TEXT NOT NULL,
+    consent_text_version TEXT NOT NULL,
+    consent_payload_json TEXT NOT NULL,
+    consent_hash TEXT NOT NULL,
+    timestamp TEXT NOT NULL,
+    user_agent TEXT,
+    ip_address TEXT
+);
+"""
+
+PG_CREATE_SOAP_FEEDBACK_TABLE = """
+CREATE TABLE IF NOT EXISTS soap_feedback (
+    id SERIAL PRIMARY KEY,
+    session_id TEXT NOT NULL,
+    user_id TEXT NOT NULL,
+    status TEXT NOT NULL,
+    original_soap TEXT,
+    final_soap TEXT,
+    delta TEXT,
+    phi_scrubbed_original_soap TEXT,
+    phi_scrubbed_final_soap TEXT,
+    phi_scrubbed_delta TEXT,
+    categories TEXT,
+    timestamp TEXT NOT NULL
+);
+"""
+
 # SQLite tables schema
 SQLITE_CREATE_SESSIONS_TABLE = """
 CREATE TABLE IF NOT EXISTS sessions (
@@ -94,6 +126,38 @@ CREATE TABLE IF NOT EXISTS users (
     hashed_password TEXT NOT NULL,
     full_name TEXT,
     is_active INTEGER DEFAULT 1
+);
+"""
+
+SQLITE_CREATE_CONSENT_LOGS_TABLE = """
+CREATE TABLE IF NOT EXISTS consent_logs (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    session_id TEXT NOT NULL,
+    user_id TEXT NOT NULL,
+    consent_mode TEXT NOT NULL,
+    consent_text_version TEXT NOT NULL,
+    consent_payload_json TEXT NOT NULL,
+    consent_hash TEXT NOT NULL,
+    timestamp TEXT NOT NULL,
+    user_agent TEXT,
+    ip_address TEXT
+);
+"""
+
+SQLITE_CREATE_SOAP_FEEDBACK_TABLE = """
+CREATE TABLE IF NOT EXISTS soap_feedback (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    session_id TEXT NOT NULL,
+    user_id TEXT NOT NULL,
+    status TEXT NOT NULL,
+    original_soap TEXT,
+    final_soap TEXT,
+    delta TEXT,
+    phi_scrubbed_original_soap TEXT,
+    phi_scrubbed_final_soap TEXT,
+    phi_scrubbed_delta TEXT,
+    categories TEXT,
+    timestamp TEXT NOT NULL
 );
 """
 
@@ -156,8 +220,8 @@ class ExecuteWrapper:
             parts = self.query.split('?')
             translated_query = "".join(f"{part}${i+1}" for i, part in enumerate(parts[:-1])) + parts[-1]
             
-            # For PostgreSQL, check if query is an INSERT on users table to return ID
-            if "INSERT INTO users" in self.query:
+            # For PostgreSQL, check if query is an INSERT to return ID
+            if "INSERT INTO" in self.query.upper():
                 translated_query += " RETURNING id"
                 lastrowid = await self.db_conn.conn.fetchval(translated_query, *self.parameters)
                 self.cursor = DBCursor([], lastrowid=lastrowid)
@@ -253,6 +317,8 @@ async def init_db() -> None:
             async with conn.transaction():
                 await conn.execute(PG_CREATE_SESSIONS_TABLE)
                 await conn.execute(PG_CREATE_USERS_TABLE)
+                await conn.execute(PG_CREATE_CONSENT_LOGS_TABLE)
+                await conn.execute(PG_CREATE_SOAP_FEEDBACK_TABLE)
                 
                 # Admin seeding
                 if settings.shruti_admin_user and settings.shruti_admin_password:
@@ -282,6 +348,8 @@ async def init_db() -> None:
         async with aiosqlite.connect(_DB_PATH) as db:
             await db.execute(SQLITE_CREATE_SESSIONS_TABLE)
             await db.execute(SQLITE_CREATE_USERS_TABLE)
+            await db.execute(SQLITE_CREATE_CONSENT_LOGS_TABLE)
+            await db.execute(SQLITE_CREATE_SOAP_FEEDBACK_TABLE)
             for stmt in SQLITE_MIGRATIONS:
                 try:
                     await db.execute(stmt)

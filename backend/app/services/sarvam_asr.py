@@ -135,7 +135,7 @@ class SarvamASRService:
                 return self._stub_response(language_code)
 
             body = response.json()
-            detected = body.get("language_code", language_code)
+            detected = body.get("language_code") or language_code or "hi-IN"
             transcript = body.get("transcript", "")
             logger.info("Sarvam ASR OK — detected language: %s", detected)
 
@@ -222,7 +222,7 @@ class SarvamASRService:
     def _stub_response(language_code: str) -> dict:
         return {
             "transcript": _STUB_TRANSCRIPT,
-            "language_code": language_code,
+            "language_code": language_code or "hi-IN",
             "is_stub": True,
         }
 

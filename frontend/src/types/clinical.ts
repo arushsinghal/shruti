@@ -117,6 +117,8 @@ export interface ConsultationSession {
   id: string;
   patient_name?: string;
   doctor_name?: string;
+  abha_number?: string;
+  pmjay_beneficiary?: boolean;
   created_at: string;
   cloud_ai_consent: boolean;
   status: SessionStatus;
@@ -133,6 +135,8 @@ export interface ConsultationSession {
 export interface CreateSessionRequest {
   patient_name?: string;
   doctor_name?: string;
+  abha_number?: string;
+  pmjay_beneficiary?: boolean;
   cloud_ai_consent?: boolean;
   mode?: SessionMode;
 }

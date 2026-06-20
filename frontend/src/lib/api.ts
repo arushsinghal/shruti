@@ -48,8 +48,15 @@ export async function createSession(data: CreateSessionRequest = {}): Promise<Co
   return res.data;
 }
 
-export async function grantConsent(sessionId: string): Promise<ConsultationSession> {
-  const res = await client.patch<ConsultationSession>(`/sessions/${sessionId}/consent`);
+export async function grantConsent(
+  sessionId: string,
+  consentMode: string = "verbal",
+  consentTextVersion: string = "v1"
+): Promise<ConsultationSession> {
+  const res = await client.patch<ConsultationSession>(`/sessions/${sessionId}/consent`, {
+    consent_mode: consentMode,
+    consent_text_version: consentTextVersion
+  });
   return res.data;
 }
 
@@ -85,8 +92,12 @@ export async function uploadAudio(
   return res.data;
 }
 
-export async function transcribeAudio(sessionId: string): Promise<TranscribeResponse> {
-  const res = await client.post<TranscribeResponse>(`/sessions/${sessionId}/transcribe?language_code=hi-IN&diarize=false`);
+export async function transcribeAudio(sessionId: string, diarize = true): Promise<TranscribeResponse> {
+  const res = await client.post<TranscribeResponse>(
+    `/sessions/${sessionId}/transcribe?language_code=hi-IN&diarize=${diarize}&num_speakers=2`,
+    null,
+    { timeout: 120000 },
+  );
   return res.data;
 }
 

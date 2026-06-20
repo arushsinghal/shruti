@@ -229,6 +229,11 @@ async def submit_text_transcript(
     session = await repo.get_session(session_id, str(current_user["id"]))
     if session is None:
         raise HTTPException(status_code=404, detail="Session not found")
+    if not session.cloud_ai_consent:
+        raise HTTPException(
+            status_code=403,
+            detail="Patient consent required before submitting transcript. Confirm consent first.",
+        )
 
     scrubbed_text = phi_scrubber.scrub(body.transcript)
 

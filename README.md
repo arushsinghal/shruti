@@ -68,3 +68,48 @@ App available at `http://localhost:5173`
 | M5 | SOAP generation + editable SOAP UI + export | Complete |
 | M6 | Local CDS engine + urgency-sorted suggestions | Complete |
 | M7 | Sample transcripts + error handling + demo mode | Complete |
+
+## Evaluation Harness
+
+Lipi includes an offline evaluation harness to measure extraction precision, recall, and F1-score without running the web app or making HTTP calls.
+
+### Usage
+
+1. **Describe Mode** (print extracted fields from a transcript):
+   ```bash
+   cd backend
+   uv run python -m eval.run_eval --transcript samples/transcript_demo.txt
+   ```
+
+2. **Ground Truth Comparison** (evaluate single transcript against a ground-truth JSON):
+   ```bash
+   cd backend
+   uv run python -m eval.run_eval --transcript samples/transcript_demo.txt --ground-truth samples/transcript_demo_gt.json
+   ```
+
+3. **Batch Directory Mode** (evaluate multiple transcripts in a folder against ground truth):
+   ```bash
+   cd backend
+   uv run python -m eval.run_eval --dir samples/ --output samples/eval_results.json
+   ```
+
+---
+
+## Observation Sprint Kit
+
+To coordinate real-world clinic pilots (e.g. 14-day OPD observation sprints), Lipi provides a ready-to-use template kit under the `observation_sprint/` folder:
+
+- **Instructions**: [sprint_instructions.md](file:///Users/arushsinghal/Documents/clinical-decision-support-system/observation_sprint/sprint_instructions.md)
+- **Checklist**: [14_day_checklist.md](file:///Users/arushsinghal/Documents/clinical-decision-support-system/observation_sprint/14_day_checklist.md)
+- **Consent Scripts**: [patient_consent_script.md](file:///Users/arushsinghal/Documents/clinical-decision-support-system/observation_sprint/patient_consent_script.md) & [doctor_consent_script.md](file:///Users/arushsinghal/Documents/clinical-decision-support-system/observation_sprint/doctor_consent_script.md)
+- **Tracking Sheets**: CSV templates for consultation metadata and per-field extraction failure logs.
+
+---
+
+## Privacy & Safety Controls
+
+1. **Patient Consent Gate**: Audio uploads, manual text submissions, and NLP processing are strictly blocked until doctor confirms patient verbal consent in the UI (`cloud_ai_consent=true`).
+2. **Local PHI Scrubber**: Patient names, email addresses, phone numbers, and absolute dates are detected and scrubbed locally before transcript text is saved to the database.
+3. **Instant Audio Deletion**: Under DPDPA compliance guidelines, raw audio files are automatically unlinked (deleted) from servers immediately after clinical notes are successfully generated.
+4. **Assistive Warning**: All CDS suggestions carry a safety label `"doctor_review_required"`. The doctor remains the final medical authority and must review all draft outputs.
+
