@@ -1,0 +1,247 @@
+complete blood count	CBC
+hemoglobin	Hemoglobin
+hematocrit	Hematocrit
+white blood cell count	WBC Count
+platelet count	Platelet Count
+mean corpuscular volume	MCV
+mean corpuscular hemoglobin	MCH
+red cell distribution width	RDW
+reticulocyte count	Reticulocyte Count
+peripheral blood smear	Peripheral Smear
+erythrocyte sedimentation rate	ESR
+c reactive protein	CRP
+procalcitonin	Procalcitonin
+prothrombin time	PT
+inr	INR
+activated partial thromboplastin time	aPTT
+fibrinogen	Fibrinogen
+d dimer	D-Dimer
+bleeding time	Bleeding Time
+clotting time	Clotting Time
+blood group and type	Blood Group
+direct coombs test	Direct Coombs
+indirect coombs test	Indirect Coombs
+g6pd	G6PD
+hemoglobin electrophoresis	Hb Electrophoresis
+liver function test	LFT
+serum bilirubin	Bilirubin
+direct bilirubin	Direct Bilirubin
+indirect bilirubin	Indirect Bilirubin
+sgot	SGOT/AST
+sgpt	SGPT/ALT
+aspartate aminotransferase	AST
+alanine aminotransferase	ALT
+alkaline phosphatase	ALP
+gamma glutamyl transferase	GGT
+serum albumin	Albumin
+total protein	Total Protein
+serum globulin	Globulin
+albumin globulin ratio	A/G Ratio
+renal function test	RFT
+kidney function test	KFT
+blood urea nitrogen	BUN
+blood urea	Blood Urea
+serum creatinine	Creatinine
+estimated glomerular filtration rate	eGFR
+uric acid	Uric Acid
+cystatin c	Cystatin C
+serum sodium	Sodium
+serum potassium	Potassium
+serum chloride	Chloride
+serum bicarbonate	Bicarbonate
+serum calcium	Calcium
+ionized calcium	Ionized Calcium
+serum magnesium	Magnesium
+serum phosphorus	Phosphorus
+fasting blood glucose	Fasting Glucose
+postprandial blood glucose	PP Glucose
+random blood sugar	RBS
+oral glucose tolerance test	OGTT
+glycated hemoglobin	HbA1c
+hba1c	HbA1c
+fasting insulin	Fasting Insulin
+c peptide	C-Peptide
+lipid profile	Lipid Profile
+total cholesterol	Total Cholesterol
+triglycerides	Triglycerides
+hdl cholesterol	HDL
+ldl cholesterol	LDL
+vldl cholesterol	VLDL
+apolipoprotein a1	Apo A1
+apolipoprotein b	Apo B
+lipoprotein a	Lp(a)
+troponin i	Troponin I
+troponin t	Troponin T
+high sensitivity troponin	hs-Troponin
+ck mb	CK-MB
+cpk	CPK
+bnp	BNP
+nt pro bnp	NT-proBNP
+ldh	LDH
+homocysteine	Homocysteine
+thyroid stimulating hormone	TSH
+tsh	TSH
+free t3	Free T3
+free t4	Free T4
+total t3	Total T3
+total t4	Total T4
+anti tpo antibodies	Anti-TPO
+thyroglobulin	Thyroglobulin
+anti thyroglobulin antibodies	Anti-Tg Ab
+cortisol	Cortisol
+acth	ACTH
+prolactin	Prolactin
+growth hormone	GH
+igf 1	IGF-1
+testosterone	Testosterone
+free testosterone	Free Testosterone
+estradiol	Estradiol
+progesterone	Progesterone
+fsh	FSH
+lh	LH
+dehydroepiandrosterone sulfate	DHEA-S
+beta hcg	Beta HCG
+amh	AMH
+parathyroid hormone	PTH
+insulin like growth factor	IGF
+17 hydroxyprogesterone	17-OHP
+serum iron	Serum Iron
+total iron binding capacity	TIBC
+transferrin saturation	Transferrin Saturation
+serum ferritin	Ferritin
+vitamin d	Vitamin D
+25 hydroxy vitamin d	25-OH Vitamin D
+vitamin b12	Vitamin B12
+folate	Folate
+red cell folate	RBC Folate
+psa	PSA
+prostate specific antigen	PSA
+ca 125	CA-125
+ca 19 9	CA 19-9
+ca 15 3	CA 15-3
+alpha fetoprotein	AFP
+carcinoembryonic antigen	CEA
+beta 2 microglobulin	Beta-2 Microglobulin
+antinuclear antibody	ANA
+anti double stranded dna	Anti-dsDNA
+rheumatoid factor	RA Factor
+anti ccp	Anti-CCP
+anca	ANCA
+complement c3	C3
+complement c4	C4
+anti phospholipid antibodies	APLA
+hiv test	HIV Test
+hiv elisa	HIV ELISA
+hbsag	HBsAg
+anti hcv	Anti-HCV
+vdrl	VDRL
+rpr	RPR
+dengue ns1	Dengue NS1
+dengue igm	Dengue IgM
+malaria rapid test	Malaria RDT
+widal test	Widal Test
+typhidot	Typhidot
+aso titer	ASO Titer
+mantoux test	Mantoux Test
+quantiferon tb gold	QuantiFERON-TB
+covid 19 rt pcr	COVID RT-PCR
+covid rapid antigen	COVID Rapid Antigen
+urine routine examination	Urine Routine
+urine culture and sensitivity	Urine C/S
+urine microalbumin	Urine Microalbumin
+urine albumin creatinine ratio	UACR
+24 hour urine protein	24-Hr Urine Protein
+urine pregnancy test	UPT
+urine drug screen	Urine Drug Screen
+urine osmolality	Urine Osmolality
+stool routine examination	Stool Routine
+stool occult blood	Stool Occult Blood
+stool culture	Stool Culture
+stool for ova and parasites	Stool O&P
+fecal calprotectin	Fecal Calprotectin
+h pylori stool antigen	H. Pylori Stool Antigen
+blood culture and sensitivity	Blood C/S
+sputum culture	Sputum Culture
+wound culture	Wound Culture
+throat swab culture	Throat Swab C/S
+fungal culture	Fungal Culture
+afb smear	AFB Smear
+afb culture	AFB Culture
+koh mount	KOH Mount
+csf analysis	CSF Analysis
+csf protein	CSF Protein
+csf glucose	CSF Glucose
+csf cell count	CSF Cell Count
+arterial blood gas	ABG
+venous blood gas	VBG
+karyotyping	Karyotyping
+pcr	PCR
+fish	FISH
+chest x ray	Chest X-Ray
+x ray	X-Ray
+ultrasound	Ultrasound
+usg abdomen	USG Abdomen
+usg pelvis	USG Pelvis
+usg kub	USG KUB
+ct scan	CT Scan
+ct brain	CT Brain
+ct chest	CT Chest
+ct abdomen	CT Abdomen
+hrct chest	HRCT Chest
+ct angiography	CT Angiography
+mri	MRI
+mri brain	MRI Brain
+mri spine	MRI Spine
+mri knee	MRI Knee
+pet scan	PET Scan
+pet ct	PET-CT
+mammography	Mammography
+dexa scan	DEXA Scan
+bone scan	Bone Scan
+venous doppler	Venous Doppler
+arterial doppler	Arterial Doppler
+carotid doppler	Carotid Doppler
+renal doppler	Renal Doppler
+ecg	ECG
+electrocardiogram	ECG
+echocardiography	Echocardiography
+stress test	Stress Test
+tmt	TMT
+holter monitor	Holter Monitor
+coronary angiography	Coronary Angiography
+pulmonary function test	PFT
+spirometry	Spirometry
+peak flow meter	Peak Flow
+upper gi endoscopy	Upper GI Endoscopy
+colonoscopy	Colonoscopy
+ercp	ERCP
+sigmoidoscopy	Sigmoidoscopy
+liver biopsy	Liver Biopsy
+eeg	EEG
+electroencephalogram	EEG
+emg	EMG
+nerve conduction study	NCS
+lumbar puncture	Lumbar Puncture
+visual evoked potential	VEP
+brainstem auditory evoked response	BAER
+fundoscopy	Fundoscopy
+tonometry	Tonometry
+slit lamp examination	Slit Lamp
+visual acuity	Visual Acuity
+visual field test	Visual Field
+oct	OCT
+fluorescein angiography	FFA
+refraction	Refraction
+biopsy	Biopsy
+fnac	FNAC
+histopathology	Histopathology
+immunohistochemistry	IHC
+bone marrow biopsy	Bone Marrow Biopsy
+pure tone audiometry	PTA
+tympanometry	Tympanometry
+opg	OPG
+iopa	IOPA
+cbct	CBCT
+ige total	Total IgE
+specific ige	Specific IgE
+skin prick test	Skin Prick Test

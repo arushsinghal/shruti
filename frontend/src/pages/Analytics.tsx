@@ -4,7 +4,7 @@ import {
 } from 'recharts';
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { apiPath } from '../lib/api';
+import client from '../lib/api';
 
 interface AnalyticsData {
   overview: {
@@ -18,6 +18,13 @@ interface AnalyticsData {
   top_medications: Array<{ name: string; count: number }>;
   top_allergies: Array<{ name: string; count: number }>;
   sessions_by_day: Array<{ date: string; consultations: number }>;
+  patient_cohort: {
+    age_distribution: Array<{ bucket: string; count: number }>;
+    sex_distribution: Array<{ sex: string; count: number }>;
+    total_unique_patients: number;
+    repeat_patients: number;
+    repeat_visit_rate: number;
+  };
 }
 
 const CHART_COLORS = ['#1B5E3B', '#F4A435', '#C0392B', '#8B5CF6', '#10B981', '#3B82F6', '#EC4899', '#06B6D4'];
@@ -27,13 +34,18 @@ export default function Analytics() {
   const [data, setData] = useState<AnalyticsData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [insights, setInsights] = useState<{ stats: any; narrative: string } | null>(null);
 
   useEffect(() => {
-    fetch(apiPath('/analytics/dashboard'))
-      .then((r) => r.json())
-      .then(setData)
+    client.get('/analytics/dashboard')
+      .then((r) => setData(r.data))
       .catch(() => setError('Failed to load analytics data. Ensure backend service is running.'))
       .finally(() => setLoading(false));
+
+    // Personal practice reflection — separate, non-blocking fetch.
+    client.get('/doctor/practice-insights')
+      .then((r) => setInsights(r.data))
+      .catch(() => {});
   }, []);
 
   const aiSplitData = data ? [
@@ -229,6 +241,98 @@ export default function Analytics() {
                 </section>
               )}
             </div>
+
+            {/* Personal practice reflection — descriptive only, never evaluative */}
+            {insights && insights.stats.consultations_current_period > 0 && (
+              <section>
+                <h2 className="text-xs font-bold text-slate-500 uppercase tracking-widest mb-4">Your Practice, Last 30 Days</h2>
+                <div className="border border-slate-200 rounded-lg p-6 bg-white shadow-sm">
+                  <p className="text-[13.5px] text-text-dark leading-relaxed mb-4">{insights.narrative}</p>
+                  <div className="grid sm:grid-cols-2 gap-6">
+                    {insights.stats.top_diagnoses.length > 0 && (
+                      <div>
+                        <p className="text-[11px] font-semibold uppercase tracking-wider text-slate-400 mb-2">Most treated</p>
+                        <div className="space-y-1.5">
+                          {insights.stats.top_diagnoses.map((d: { name: string; count: number }) => (
+                            <div key={d.name} className="flex items-center justify-between text-[12.5px]">
+                              <span className="text-slate-700">{d.name}</span>
+                              <span className="font-mono text-slate-400">{d.count}</span>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                    {insights.stats.top_medications.length > 0 && (
+                      <div>
+                        <p className="text-[11px] font-semibold uppercase tracking-wider text-slate-400 mb-2">Most prescribed</p>
+                        <div className="space-y-1.5">
+                          {insights.stats.top_medications.map((m: { name: string; count: number }) => (
+                            <div key={m.name} className="flex items-center justify-between text-[12.5px]">
+                              <span className="text-slate-700 capitalize">{m.name}</span>
+                              <span className="font-mono text-slate-400">{m.count}</span>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                  <p className="text-[10.5px] text-slate-400 mt-4 pt-3 border-t border-slate-100">
+                    A private reflection of your own consultations. This describes patterns only, it does not evaluate or grade clinical decisions.
+                  </p>
+                </div>
+              </section>
+            )}
+
+            {/* Patient cohort */}
+            {data.patient_cohort && data.patient_cohort.total_unique_patients > 0 && (
+              <div className="grid lg:grid-cols-2 gap-8">
+                <section>
+                  <h2 className="text-xs font-bold text-slate-500 uppercase tracking-widest mb-4">Patient Age Distribution</h2>
+                  <div className="border border-slate-200 rounded-lg p-6 bg-white shadow-sm">
+                    <ResponsiveContainer width="100%" height={200}>
+                      <BarChart data={data.patient_cohort.age_distribution}>
+                        <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
+                        <XAxis dataKey="bucket" tick={{ fontSize: 11, fill: '#64748b' }} />
+                        <YAxis tick={{ fontSize: 11, fill: '#64748b' }} allowDecimals={false} />
+                        <Tooltip contentStyle={{ fontSize: '11px', borderRadius: '4px', border: '1px solid #e2e8f0' }} />
+                        <Bar dataKey="count" fill="#1B5E3B" radius={[4, 4, 0, 0]} />
+                      </BarChart>
+                    </ResponsiveContainer>
+                  </div>
+                </section>
+
+                <section>
+                  <h2 className="text-xs font-bold text-slate-500 uppercase tracking-widest mb-4">Repeat Visits</h2>
+                  <div className="border border-slate-200 rounded-lg p-6 bg-white shadow-sm">
+                    <div className="grid grid-cols-2 gap-4 mb-5">
+                      <div>
+                        <p className="text-2xl font-bold text-text-dark font-mono">{data.patient_cohort.total_unique_patients}</p>
+                        <p className="text-[11px] text-slate-500 mt-0.5">Unique patients</p>
+                      </div>
+                      <div>
+                        <p className="text-2xl font-bold text-primary font-mono">{(data.patient_cohort.repeat_visit_rate * 100).toFixed(0)}%</p>
+                        <p className="text-[11px] text-slate-500 mt-0.5">Return for a follow-up</p>
+                      </div>
+                    </div>
+                    <ResponsiveContainer width="100%" height={120}>
+                      <PieChart>
+                        <Pie
+                          data={data.patient_cohort.sex_distribution}
+                          cx="50%" cy="50%" outerRadius={45}
+                          dataKey="count" nameKey="sex"
+                          label={({ name, value }) => `${name} ${value}`}
+                        >
+                          {data.patient_cohort.sex_distribution.map((_, i) => (
+                            <Cell key={i} fill={CHART_COLORS[i % CHART_COLORS.length]} />
+                          ))}
+                        </Pie>
+                        <Tooltip contentStyle={{ fontSize: '11px', borderRadius: '4px', border: '1px solid #e2e8f0' }} />
+                      </PieChart>
+                    </ResponsiveContainer>
+                  </div>
+                </section>
+              </div>
+            )}
 
             {data.overview.total_sessions === 0 && (
               <div className="text-center py-20 border border-dashed border-slate-200 rounded-lg bg-white shadow-sm">

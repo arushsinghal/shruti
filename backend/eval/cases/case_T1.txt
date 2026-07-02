@@ -1,0 +1,6 @@
+Patient is a 32-year-old male presenting with fever and cough since 3 days.
+Temperature is 38.5 C. BP is 130/80.
+Prescribed paracetamol 500 mg twice daily.
+Also cetirizine 10 mg once a day.
+Order CBC and CRP.
+Follow up in 5 days.

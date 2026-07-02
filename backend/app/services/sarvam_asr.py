@@ -60,8 +60,12 @@ class SarvamASRService:
             dict with keys: transcript, language_code, is_stub
         """
         if not settings.sarvam_api_key:
-            logger.warning("SARVAM_API_KEY not set — returning stub transcript")
-            return self._stub_response(language_code)
+            if settings.allow_stub_asr:
+                logger.warning("SARVAM_API_KEY not set — returning stub transcript (ALLOW_STUB_ASR=true)")
+                return self._stub_response(language_code)
+            raise RuntimeError(
+                "SARVAM_API_KEY not set. Configure it in .env, or set ALLOW_STUB_ASR=true for demo/test mode."
+            )
 
         path = Path(audio_path)
         logger.info("Transcribing file: %s (language_code=%s)", audio_path, language_code)

@@ -41,3 +41,11 @@ frontend/.vite/
 *.swo
 .DS_Store
 .claude/
+.gstack/
+.cursor/
+
+# Generated / downloaded artifacts (regenerable, not source)
+graphify-out/
+frontend/src/graphify-out/
+backend/models/
+.rlm_memory.json

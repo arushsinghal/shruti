@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
 import type { ProcessClinicalResponse } from '../types/clinical';
 import { getFhirBundle } from '../lib/api';
 import PrintableReport from './PrintableReport';
@@ -52,13 +53,14 @@ interface ClinicalResultsProps {
 }
 
 export default function ClinicalResults({ results, sessionId, patientName, doctorName, abhaNumber, pmjayBeneficiary, timings }: ClinicalResultsProps) {
+  const navigate = useNavigate();
   const { state, soap, cds, source } = results;
   const [fhirData, setFhirData] = useState<any>(null);
   const [isExporting, setIsExporting] = useState(false);
 
   // HITL State
   const [editableSoap, setEditableSoap] = useState({ S: '', O: '', A: '', P: '' });
-  const [isSigned, setIsSigned] = useState(false);
+  const [isSigned] = useState(false);
   const hasAnimatedRef = useRef(false);
 
   // Typewriter animation: fills each SOAP section simultaneously over ~600ms
@@ -128,7 +130,7 @@ export default function ClinicalResults({ results, sessionId, patientName, docto
   }
 
   function handleSignNote() {
-    setIsSigned(true);
+    navigate(`/review/${sessionId}`);
   }
 
   const totalMs = (timings?.asrMs ?? 0) + (timings?.nlpMs ?? 0);

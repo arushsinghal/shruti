@@ -1,0 +1,136 @@
+abd pain	abdominal pain	symptom
+abg	arterial blood gas	investigation
+acs	acute coronary syndrome	diagnosis
+af	atrial fibrillation	diagnosis
+afib	atrial fibrillation	diagnosis
+afp	alpha fetoprotein	investigation
+aki	acute kidney injury	diagnosis
+als	amyotrophic lateral sclerosis	diagnosis
+ana	antinuclear antibody	investigation
+anca	anti neutrophil cytoplasmic antibody	investigation
+aptt	activated partial thromboplastin time	investigation
+ards	acute respiratory distress syndrome	diagnosis
+a/s	ankylosing spondylitis	diagnosis
+aso	antistreptolysin o	investigation
+bmi	body mass index	investigation
+bmp	basic metabolic panel	investigation
+bnp	brain natriuretic peptide	investigation
+bp	blood pressure	symptom
+bph	benign prostatic hyperplasia	diagnosis
+bsa	body surface area	investigation
+bse	breast self examination	investigation
+ca125	cancer antigen 125	investigation
+cad	coronary artery disease	diagnosis
+cag	coronary angiography	investigation
+cbc	complete blood count	investigation
+cea	carcinoembryonic antigen	investigation
+chf	congestive heart failure	diagnosis
+ckd	chronic kidney disease	diagnosis
+cmp	comprehensive metabolic panel	investigation
+copd	chronic obstructive pulmonary disease	diagnosis
+cp	chest pain	symptom
+crp	c reactive protein	investigation
+ct	computed tomography	investigation
+ctpa	ct pulmonary angiography	investigation
+cva	cerebrovascular accident	diagnosis
+cxr	chest x ray	investigation
+dcm	dilated cardiomyopathy	diagnosis
+dexa	dual energy x ray absorptiometry	investigation
+dic	disseminated intravascular coagulation	diagnosis
+dka	diabetic ketoacidosis	diagnosis
+dm	diabetes mellitus	diagnosis
+dm2	type 2 diabetes	diagnosis
+doe	dyspnea on exertion	symptom
+dvt	deep vein thrombosis	diagnosis
+ecg	electrocardiogram	investigation
+echo	echocardiography	investigation
+eeg	electroencephalogram	investigation
+ekg	electrocardiogram	investigation
+emg	electromyography	investigation
+ercp	endoscopic retrograde cholangiopancreatography	investigation
+esr	erythrocyte sedimentation rate	investigation
+fbc	full blood count	investigation
+fbs	fasting blood sugar	investigation
+ffa	fundus fluorescein angiography	investigation
+fnac	fine needle aspiration cytology	investigation
+gbs	guillain barre syndrome	diagnosis
+gerd	gastroesophageal reflux disease	diagnosis
+gpa	granulomatosis with polyangiitis	diagnosis
+h/a	headache	symptom
+hba1c	glycated hemoglobin	investigation
+hcm	hypertrophic cardiomyopathy	diagnosis
+hhs	hyperosmolar hyperglycemic state	diagnosis
+h/r	heart rate	symptom
+hrct	high resolution ct	investigation
+htn	hypertension	diagnosis
+hus	hemolytic uremic syndrome	diagnosis
+ibd	inflammatory bowel disease	diagnosis
+ibs	irritable bowel syndrome	diagnosis
+ihc	immunohistochemistry	investigation
+ihd	ischemic heart disease	diagnosis
+inr	international normalized ratio	investigation
+ipf	idiopathic pulmonary fibrosis	diagnosis
+itp	idiopathic thrombocytopenic purpura	diagnosis
+ivu	intravenous urography	investigation
+jvd	jugular venous distention	symptom
+kft	kidney function test	investigation
+kub	kidney ureter bladder x ray	investigation
+lft	liver function test	investigation
+loa	loss of appetite	symptom
+loc	loss of consciousness	symptom
+low	loss of weight	symptom
+lrti	lower respiratory tract infection	diagnosis
+mcug	micturating cystourethrography	investigation
+m/i	myocardial infarction	diagnosis
+mra	magnetic resonance angiography	investigation
+mrcp	magnetic resonance cholangiopancreatography	investigation
+mri	magnetic resonance imaging	investigation
+m/s	multiple sclerosis	diagnosis
+mvp	mitral valve prolapse	diagnosis
+n&v	nausea and vomiting	symptom
+n/v	nausea and vomiting	symptom
+nafld	non alcoholic fatty liver disease	diagnosis
+nash	non alcoholic steatohepatitis	diagnosis
+ncs	nerve conduction study	investigation
+nstemi	non st elevation myocardial infarction	diagnosis
+oa	osteoarthritis	diagnosis
+oct	optical coherence tomography	investigation
+ogtt	oral glucose tolerance test	investigation
+opg	orthopantomogram	investigation
+osa	obstructive sleep apnea	diagnosis
+pad	peripheral arterial disease	diagnosis
+pcos	polycystic ovarian syndrome	diagnosis
+p/e	pulmonary embolism	diagnosis
+pet	positron emission tomography	investigation
+pft	pulmonary function test	investigation
+pid	pelvic inflammatory disease	diagnosis
+pnd	paroxysmal nocturnal dyspnea	symptom
+ppbs	post prandial blood sugar	investigation
+psa	prostate specific antigen	investigation
+pt	prothrombin time	investigation
+pta	pure tone audiometry	investigation
+ptb	pulmonary tuberculosis	diagnosis
+pvd	peripheral vascular disease	diagnosis
+ra	rheumatoid arthritis	diagnosis
+rbs	random blood sugar	investigation
+rf	rheumatoid factor	investigation
+rft	renal function test	investigation
+rhd	rheumatic heart disease	diagnosis
+rr	respiratory rate	symptom
+sjs	stevens johnson syndrome	diagnosis
+sle	systemic lupus erythematosus	diagnosis
+sob	shortness of breath	symptom
+spo2	oxygen saturation	investigation
+stemi	st elevation myocardial infarction	diagnosis
+tb	tuberculosis	diagnosis
+tee	transesophageal echo	investigation
+ten	toxic epidermal necrolysis	diagnosis
+tft	thyroid function test	investigation
+tfts	thyroid function tests	investigation
+tia	transient ischemic attack	diagnosis
+tmt	treadmill test	investigation
+tte	transthoracic echo	investigation
+ttp	thrombotic thrombocytopenic purpura	diagnosis
+uri	upper respiratory infection	diagnosis
+usg	ultrasonography	investigation
+uti	urinary tract infection	diagnosis

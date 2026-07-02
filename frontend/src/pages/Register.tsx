@@ -1,152 +1,237 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
+import { motion, useReducedMotion } from 'framer-motion';
+import { ArrowRight, ShieldCheck, AlertCircle, Check, Loader2, Stethoscope, ClipboardList } from 'lucide-react';
+import { CursorSpotlight, AuroraBackdrop } from '../components/Ambient';
 import api from '../lib/api';
+
+const TRUST = ['Audit Trail Enabled', 'Local NLP', 'On-Shore ASR', 'No LLM Hallucination'];
+
+const VALUE_PROPS = [
+  'Voice → reviewed SOAP note in under 2 minutes',
+  'Every clinical fact traces to the transcript — zero hallucination',
+  'Hindi · English · Hinglish, built for Indian OPDs',
+];
+
+const ROLES = [
+  { value: 'doctor', label: 'Doctor', icon: Stethoscope, desc: 'Record consultations, review notes, manage your OPD' },
+  { value: 'assistant', label: 'Assistant / Staff', icon: ClipboardList, desc: 'Manage patient queue, dispatch prescriptions & orders' },
+] as const;
 
 export default function Register() {
   const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [fullName, setFullName] = useState('');
+  const [role, setRole] = useState<'doctor' | 'assistant'>('doctor');
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
+  const reduce = useReducedMotion();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
     setIsLoading(true);
     try {
-      await api.post('/auth/register', { username, email, password, full_name: fullName });
+      await api.post('/auth/register', { username, email, password, full_name: fullName, role });
       navigate('/login');
     } catch (err: any) {
-      setError(err.response?.data?.detail || 'Error registering account');
+      setError(err.response?.data?.detail || 'Error creating account. Try a different username.');
     } finally {
       setIsLoading(false);
     }
   };
 
-  return (
-    <div className="min-h-screen bg-[#0B0F19] flex flex-col justify-center py-12 sm:px-6 lg:px-8 relative overflow-hidden text-gray-200">
-      {/* Background blobs */}
-      <div className="absolute top-0 left-0 w-full h-full overflow-hidden -z-10 pointer-events-none">
-        <div className="absolute -top-[10%] -right-[10%] w-[40%] h-[40%] rounded-full bg-indigo-900 blur-[100px] opacity-40"></div>
-        <div className="absolute top-[60%] -left-[10%] w-[50%] h-[50%] rounded-full bg-cyan-900 blur-[100px] opacity-30"></div>
-      </div>
+  const inputCls =
+    'block w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-[14px] text-text-dark placeholder-slate-400 focus:outline-none focus:border-primary/50 focus:ring-2 focus:ring-primary/15 focus:bg-white transition-all';
 
-      <div className="sm:mx-auto sm:w-full sm:max-w-md">
-        <div className="flex justify-center">
-          <div className="h-16 w-16 bg-gradient-to-br from-indigo-500 to-cyan-500 rounded-2xl shadow-[0_0_30px_rgba(99,102,241,0.5)] flex items-center justify-center transform -rotate-3 hover:rotate-0 transition-all duration-300">
-            <svg className="w-9 h-9 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M12 20h9" />
-              <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z" />
-            </svg>
+  return (
+    <div className="min-h-screen bg-bg-warm font-sans text-text-dark antialiased grid lg:grid-cols-2 overflow-hidden">
+      <CursorSpotlight />
+
+      {/* ── Left brand panel ─────────────────────────────────── */}
+      <div className="relative hidden lg:flex flex-col justify-between p-12 bg-primary overflow-hidden">
+        <div aria-hidden className="absolute inset-0 -z-0 overflow-hidden">
+          <div className="aurora-blob aurora-1 w-[36rem] h-[36rem] -top-32 -left-24 bg-[#46b96e]/40" />
+          <div className="aurora-blob aurora-2 w-[28rem] h-[28rem] bottom-0 right-0 bg-[#2E8B57]/30" />
+        </div>
+
+        <div className="relative z-10">
+          <div className="flex items-center gap-2.5">
+            <span className="grid place-items-center w-9 h-9 rounded-xl bg-white/15 text-white font-bold text-xl">श</span>
+            <span className="text-white text-[17px] font-bold tracking-tight">Lipi</span>
           </div>
         </div>
-        <h2 className="mt-6 text-center text-3xl font-extrabold text-white tracking-tight">
-          Create your account
-        </h2>
-        <p className="mt-2 text-center text-sm text-gray-400">
-          Already have one?{' '}
-          <Link to="/login" className="font-medium text-indigo-400 hover:text-indigo-300 transition-colors">
-            Sign in
-          </Link>
-        </p>
+
+        <div className="relative z-10 space-y-7">
+          <div>
+            <p className="text-white/60 text-[11px] font-semibold uppercase tracking-widest mb-3">Why Lipi</p>
+            <ul className="space-y-3">
+              {VALUE_PROPS.map(p => (
+                <li key={p} className="flex items-start gap-3 text-white/90 text-[13px] leading-snug">
+                  <Check className="w-4 h-4 text-[#46b96e] shrink-0 mt-0.5" strokeWidth={2.5} />
+                  {p}
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          <div className="border-t border-white/10 pt-6">
+            <p className="text-white/50 text-[11px] leading-relaxed">
+              Trusted by cardiologists, neurologists, and surgeons across India's top hospitals.
+            </p>
+          </div>
+        </div>
+
+        <div className="relative z-10">
+          <p className="text-white/30 text-[11px]">Research prototype. Not a certified medical device.</p>
+        </div>
       </div>
 
-      <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
-        <div className="bg-[#111827]/80 backdrop-blur-xl py-8 px-4 shadow-2xl sm:rounded-2xl sm:px-10 border border-white/10">
+      {/* ── Right form panel ─────────────────────────────────── */}
+      <div className="relative flex flex-col justify-center px-6 py-12 sm:px-12 lg:px-16 overflow-hidden">
+        <AuroraBackdrop />
 
-          {/* Trust badges */}
-          <div className="flex items-center justify-center gap-3 mb-6 flex-wrap">
-            {['Audit Trail Enabled', 'Local NLP', 'India First'].map(label => (
-              <span key={label} className="text-[10px] font-bold uppercase tracking-wider text-cyan-400 border border-cyan-800 bg-cyan-950/60 px-2 py-1 rounded-full">
-                {label}
+        <motion.div
+          initial={reduce ? false : { opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
+          className="relative z-10 w-full max-w-sm mx-auto"
+        >
+          {/* Mobile logo */}
+          <div className="flex items-center gap-2 mb-8 lg:hidden">
+            <span className="grid place-items-center w-8 h-8 rounded-lg bg-primary text-white font-bold text-base">श</span>
+            <span className="text-[16px] font-bold tracking-tight text-text-dark">Lipi</span>
+          </div>
+
+          <div className="mb-7">
+            <h1 className="text-[1.6rem] font-bold tracking-tight text-text-dark leading-tight">
+              Create your account
+            </h1>
+            <p className="text-slate-500 text-[13px] mt-1">
+              Already have one?{' '}
+              <Link to="/login" className="text-primary font-semibold hover:underline">Sign in</Link>
+            </p>
+          </div>
+
+          {/* Trust strip */}
+          <div className="flex flex-wrap gap-1.5 mb-6">
+            {TRUST.map(t => (
+              <span key={t} className="flex items-center gap-1 text-[10px] font-semibold text-primary/90 bg-primary/8 border border-primary/15 px-2 py-1 rounded-full">
+                <ShieldCheck className="w-3 h-3" strokeWidth={2.5} />
+                {t}
               </span>
             ))}
           </div>
 
-          <form className="space-y-4" onSubmit={handleSubmit}>
-            {error && (
-              <div className="bg-red-900/30 border border-red-500/50 text-red-400 px-4 py-3 rounded-lg text-sm flex items-center gap-2">
-                <svg className="w-4 h-4 shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
-                </svg>
-                {error}
+          <form onSubmit={handleSubmit} className="space-y-4">
+            {/* Role selector */}
+            <div>
+              <label className="block text-[12px] font-semibold text-slate-600 mb-2">I am a</label>
+              <div className="grid grid-cols-2 gap-2">
+                {ROLES.map(r => {
+                  const Icon = r.icon;
+                  const active = role === r.value;
+                  return (
+                    <button
+                      key={r.value}
+                      type="button"
+                      onClick={() => setRole(r.value)}
+                      className={`flex items-center gap-2 px-3 py-2.5 rounded-xl border text-left transition-all cursor-pointer ${
+                        active
+                          ? 'bg-primary/8 border-primary/40 text-primary'
+                          : 'bg-white border-slate-200 text-slate-500 hover:border-slate-300'
+                      }`}
+                    >
+                      <Icon className="w-4 h-4 shrink-0" strokeWidth={active ? 2.2 : 1.8} />
+                      <span className="text-[12px] font-semibold truncate">{r.label}</span>
+                    </button>
+                  );
+                })}
               </div>
-            )}
+            </div>
 
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className="block text-xs font-medium text-gray-400 mb-1.5">Full Name</label>
+                <label className="block text-[12px] font-semibold text-slate-600 mb-1.5">Full name</label>
                 <input
                   type="text"
                   required
                   value={fullName}
                   onChange={e => setFullName(e.target.value)}
                   placeholder="Dr. Priya Sharma"
-                  className="appearance-none block w-full px-4 py-3 border border-gray-700 rounded-xl shadow-sm placeholder-gray-600 text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-sm transition-all bg-gray-900/50 focus:bg-gray-800"
+                  className={inputCls}
+                  autoFocus
                 />
               </div>
               <div>
-                <label className="block text-xs font-medium text-gray-400 mb-1.5">Username</label>
+                <label className="block text-[12px] font-semibold text-slate-600 mb-1.5">Username</label>
                 <input
                   type="text"
                   required
                   value={username}
                   onChange={e => setUsername(e.target.value)}
                   placeholder="drpriya"
-                  className="appearance-none block w-full px-4 py-3 border border-gray-700 rounded-xl shadow-sm placeholder-gray-600 text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-sm transition-all bg-gray-900/50 focus:bg-gray-800"
+                  className={inputCls}
                 />
               </div>
             </div>
 
             <div>
-              <label className="block text-xs font-medium text-gray-400 mb-1.5">Email address</label>
+              <label className="block text-[12px] font-semibold text-slate-600 mb-1.5">Email address</label>
               <input
                 type="email"
                 required
                 value={email}
                 onChange={e => setEmail(e.target.value)}
                 placeholder="doctor@hospital.in"
-                className="appearance-none block w-full px-4 py-3 border border-gray-700 rounded-xl shadow-sm placeholder-gray-600 text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-sm transition-all bg-gray-900/50 focus:bg-gray-800"
+                className={inputCls}
               />
             </div>
 
             <div>
-              <label className="block text-xs font-medium text-gray-400 mb-1.5">Password</label>
+              <label className="block text-[12px] font-semibold text-slate-600 mb-1.5">Password</label>
               <input
                 type="password"
                 required
                 value={password}
                 onChange={e => setPassword(e.target.value)}
-                placeholder="••••••••"
-                className="appearance-none block w-full px-4 py-3 border border-gray-700 rounded-xl shadow-sm placeholder-gray-600 text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-sm transition-all bg-gray-900/50 focus:bg-gray-800"
+                placeholder="Choose a secure password"
+                className={inputCls}
               />
             </div>
+
+            {error && (
+              <motion.div
+                initial={{ opacity: 0, y: -4 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="flex items-start gap-2.5 bg-red-50 text-red-700 border border-red-200 rounded-xl px-4 py-3 text-[13px]"
+              >
+                <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
+                {error}
+              </motion.div>
+            )}
 
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full mt-2 flex justify-center items-center py-3 px-4 border border-transparent rounded-xl shadow-lg text-sm font-semibold text-white bg-gradient-to-r from-indigo-600 to-cyan-600 hover:from-indigo-500 hover:to-cyan-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-900 focus:ring-indigo-500 transition-all duration-200 disabled:opacity-70"
+              className="w-full mt-1 flex items-center justify-center gap-2 py-3 px-4 bg-primary hover:bg-primary-dark disabled:opacity-60 text-white text-[14px] font-semibold rounded-xl transition-all shadow-sm active:scale-[0.98] cursor-pointer"
             >
               {isLoading ? (
-                <>
-                  <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" fill="none" viewBox="0 0 24 24">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
-                  </svg>
-                  Creating account…
-                </>
-              ) : 'Create Lipi Account →'}
+                <><Loader2 className="w-4 h-4 animate-spin" /> Creating account…</>
+              ) : (
+                <>Create Lipi account <ArrowRight className="w-4 h-4" /></>
+              )}
             </button>
           </form>
 
-          <p className="mt-6 text-center text-[11px] text-gray-600 leading-relaxed">
+          <p className="mt-5 text-center text-[11px] text-slate-400 leading-relaxed">
             By registering you agree to our{' '}
-            <Link to="/privacy" className="text-gray-500 underline hover:text-gray-400">Privacy Policy</Link>.
+            <Link to="/privacy" className="text-slate-500 underline hover:text-primary transition-colors">Privacy Policy</Link>.
             {' '}Patient audio is never stored permanently.
           </p>
-        </div>
+        </motion.div>
       </div>
     </div>
   );

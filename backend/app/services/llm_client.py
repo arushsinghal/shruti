@@ -103,6 +103,8 @@ class LLMClientService:
     # review before any clinical use.
     # System never auto-finalizes records.
     def generate_soap_note(self, memory_state: dict) -> dict:
+        if not self.client:
+            return self._local_soap_fallback(memory_state)
         prompt = f"""
         You are a clinical documentation formatter.
         Convert the structured patient state into a concise SOAP note.
@@ -113,30 +115,44 @@ class LLMClientService:
         Patient State:
         {json.dumps(memory_state, indent=2)}
         """
-        result = self._generate_structured(prompt, SoapNoteSchema)
-        return {"S": result.S, "O": result.O, "A": result.A, "P": result.P}
+        try:
+            result = self._generate_structured(prompt, SoapNoteSchema)
+            return {"S": result.S, "O": result.O, "A": result.A, "P": result.P}
+        except Exception as exc:
+            logger.warning("Gemini SOAP formatting failed, using local fallback: %s", exc)
+            return self._local_soap_fallback(memory_state)
+
+    @staticmethod
+    def _local_soap_fallback(memory_state: dict) -> dict:
+        """Deterministic SOAP note from resolved memory_state — no LLM required."""
+        symptoms = ", ".join(str(s) for s in memory_state.get("symptoms", [])) or "not specified"
+        vitals = ", ".join(str(v) for v in memory_state.get("vitals", [])) or "not specified"
+        diagnoses = ", ".join(str(d) for d in memory_state.get("diagnoses", [])) or "not specified"
+        meds = ", ".join(
+            m.get("name", str(m)) if isinstance(m, dict) else str(m)
+            for m in memory_state.get("medications", [])
+        ) or "not specified"
+        follow_up = str(memory_state.get("follow_up") or "not specified")
+        investigations = ", ".join(str(i) for i in memory_state.get("investigations", [])) or "not specified"
+        return {
+            "S": f"Chief complaint: {symptoms}.",
+            "O": f"Vitals: {vitals}. Investigations: {investigations}.",
+            "A": f"Assessment: {diagnoses}.",
+            "P": f"Plan: Medications — {meds}. Follow-up: {follow_up}. Requires physician review.",
+        }
 
     def generate_soap_from_transcript(self, transcript: str) -> dict:
-        """Generate SOAP directly from raw transcript (Hindi/Hinglish/English).
-        Used when local regex extraction returns empty results."""
-        prompt = f"""You are a clinical scribe assistant for Indian doctors.
-Extract a SOAP note from this doctor-patient consultation transcript.
-The transcript may be in Hindi, Hinglish, or English.
+        """DISABLED by zero-LLM safety policy.
 
-Rules:
-- S (Subjective): Patient's symptoms, complaints, duration in English
-- O (Objective): Vitals, measurements, exam findings in English
-- A (Assessment): Likely diagnosis or differential — physician must confirm
-- P (Plan): Medications, investigations, follow-up mentioned in transcript
-
-Only include what was explicitly said. Do not invent facts.
-Write in English. This draft requires physician review before clinical use.
-
-Transcript:
-{transcript}
-"""
-        result = self._generate_structured(prompt, SoapNoteSchema)
-        return {"S": result.S, "O": result.O, "A": result.A, "P": result.P}
+        Generating SOAP directly from a raw transcript means the LLM infers
+        clinical facts (symptoms, diagnoses, dosages) from unstructured speech —
+        the exact thing Lipi's deterministic moat forbids. SOAP is produced only
+        from locally-resolved memory_state. This method must never run.
+        """
+        raise RuntimeError(
+            "Gemini transcript→SOAP is disabled by zero-LLM safety policy; "
+            "use deterministic extraction + local SOAP generation."
+        )
 
     def generate_cds(self, memory_state: dict) -> list[dict]:
         raise RuntimeError("Gemini CDS generation is disabled by safety policy; use local CDS.")
@@ -144,3 +160,56 @@ Transcript:
     def diarize_transcript(self, raw_transcript: str) -> str:
         """Cloud transcript diarization is disabled for clinical privacy."""
         raise RuntimeError("Gemini diarization is disabled by privacy policy.")
+
+    def narrate_practice_insight(self, stats: dict) -> str:
+        """Turn deterministically-computed doctor practice statistics into a
+        plain-language sentence or two.
+
+        Safety boundary, same class as generate_soap_note: Gemini receives
+        only already-computed numbers and is explicitly instructed to
+        describe them, never to judge, grade, or second-guess the doctor's
+        clinical decisions. It must not recommend a change in practice or
+        imply a number is good or bad — that judgment belongs to the doctor.
+        """
+        if not self.client:
+            return self._local_practice_insight_fallback(stats)
+
+        prompt = f"""
+        You are summarizing a doctor's own prescribing statistics back to them.
+        You are given only pre-computed numbers below. Write 1-2 short, plain
+        sentences describing what changed, using neutral, factual language.
+
+        Strict rules:
+        - Do not judge whether a number is good, bad, appropriate, or concerning.
+        - Do not recommend the doctor change anything.
+        - Do not add any clinical interpretation not present in the numbers.
+        - State only what the numbers show, nothing else.
+
+        Statistics:
+        {json.dumps(stats, indent=2)}
+        """
+        try:
+            response = self.client.models.generate_content(
+                model=_MODEL_ID,
+                contents=prompt,
+                config=types.GenerateContentConfig(temperature=0.1),
+            )
+            text = (response.text or "").strip()
+            return text or self._local_practice_insight_fallback(stats)
+        except Exception as exc:
+            logger.warning("Gemini practice-insight narration failed, using local fallback: %s", exc)
+            return self._local_practice_insight_fallback(stats)
+
+    @staticmethod
+    def _local_practice_insight_fallback(stats: dict) -> str:
+        """Deterministic, templated narration — no LLM required."""
+        top_dx = stats.get("top_diagnoses") or []
+        current = stats.get("consultations_current_period", 0)
+        prior = stats.get("consultations_prior_period", 0)
+        parts = [f"{current} consultations this period, compared to {prior} the prior period."]
+        if top_dx:
+            name = top_dx[0].get("name", "")
+            count = top_dx[0].get("count", 0)
+            if name:
+                parts.append(f"Most frequently treated: {name} ({count} cases).")
+        return " ".join(parts)

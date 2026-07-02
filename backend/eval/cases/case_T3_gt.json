@@ -1,0 +1,17 @@
+{
+  "_description": "Chronic condition context — Sprint 2 Task 1. Diabetes on metformin is background; diagnoses MUST be empty.",
+  "_safety_rule": "Diabetes Mellitus must NOT appear in diagnoses — 'known case of diabetes on metformin' is medication context, not new assessment.",
+  "symptoms": ["fever", "body ache"],
+  "diagnoses": [],
+  "vitals": ["BP 120/80", "Temp 38 C", "Blood Glucose 140 mg/dL"],
+  "medications": [
+    {"name": "metformin",    "dosage": "500 mg", "frequency": "BD"},
+    {"name": "paracetamol",  "dosage": "650 mg", "frequency": "TDS"}
+  ],
+  "investigations": ["Fasting Blood Glucose", "CBC"],
+  "allergies": [],
+  "follow_up": ["follow up in 3 days"],
+  "labs": [],
+  "advice": [],
+  "red_flags": []
+}

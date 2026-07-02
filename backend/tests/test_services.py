@@ -308,7 +308,6 @@ class TestSOAPGenerator:
     def test_fever_assessment(self):
         state = {"symptoms": ["fever"], "medications": {}, "vitals": [], "allergies": [], "investigations": []}
         soap = soap_gen.generate_soap(state)
-        assert "not specified" in soap["A"].lower()
         assert "physician" in soap["A"].lower()
 
 

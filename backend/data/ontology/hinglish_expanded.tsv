@@ -1,0 +1,158 @@
+tez dard	severe pain	symptom
+halka dard	mild pain	symptom
+dard ho raha	pain	symptom
+bahut dard	severe pain	symptom
+dard uth raha	pain radiating	symptom
+jor ka dard	severe pain	symptom
+ruk ruk ke dard	intermittent pain	symptom
+lagatar dard	continuous pain	symptom
+ek taraf dard	unilateral pain	symptom
+dono taraf dard	bilateral pain	symptom
+subah ka dard	morning pain	symptom
+raat ka dard	nocturnal pain	symptom
+peeth dard	back pain	symptom
+peeth mein dard	back pain	symptom
+gardan dard	neck pain	symptom
+gardan mein dard	neck pain	symptom
+gardan akad gayi	neck stiffness	symptom
+kandhe mein dard	shoulder pain	symptom
+kuhni mein dard	elbow pain	symptom
+kalai mein dard	wrist pain	symptom
+ungliyon mein dard	finger pain	symptom
+ediyon mein dard	heel pain	symptom
+talwe mein dard	sole pain	symptom
+pairon mein dard	leg pain	symptom
+pindliyon mein dard	calf pain	symptom
+jaangh mein dard	thigh pain	symptom
+neeche pet mein dard	lower abdominal pain	symptom
+upar pet mein dard	upper abdominal pain	symptom
+daayein taraf dard	right sided pain	symptom
+baayein taraf dard	left sided pain	symptom
+peechhe dard	posterior pain	symptom
+aage dard	anterior pain	symptom
+pet saaf nahi ho raha	constipation	symptom
+pet kharab	upset stomach	symptom
+pet mein gadbad	stomach upset	symptom
+pet phoolna	bloating	symptom
+pet mein gas	flatulence	symptom
+pet mein marod	abdominal cramps	symptom
+pet mein gurgling	borborygmi	symptom
+muh ka swad kharab	dysgeusia	symptom
+muh mein pani aana	excessive salivation	symptom
+muh sukh raha	dry mouth	symptom
+bhukh zyada lag rahi	increased appetite	symptom
+pyaas zyada lag rahi	increased thirst	symptom
+kuch hazam nahi ho raha	indigestion	symptom
+khana atak raha	dysphagia	symptom
+neeche se khoon aa raha	rectal bleeding	symptom
+chhink	sneezing	symptom
+chhink aa rahi	sneezing	symptom
+balgam	sputum	symptom
+balgam aa rahi	productive cough	symptom
+khoon ki balgam	hemoptysis	symptom
+seeti ki awaaz	wheezing	symptom
+ghurghurahat	wheezing	symptom
+dum ghutna	suffocation	symptom
+saans ruk ruk ke	dyspnea	symptom
+lete hue saans mein takleef	orthopnea	symptom
+peshab mein ruk ruk ke aana	hesitancy	symptom
+peshab rokne mein takleef	urinary urgency	symptom
+peshab ka rang badal gaya	discolored urine	symptom
+peshab mein jhag	frothy urine	symptom
+peshab mein badbu	foul smelling urine	symptom
+raat ko peshab aana	nocturia	symptom
+mahawari mein dard	dysmenorrhea	symptom
+mahawari nahi aa rahi	amenorrhea	symptom
+mahawari mein zyada khoon	menorrhagia	symptom
+mahawari irregular	irregular periods	symptom
+safed paani	leucorrhea	symptom
+neeche se paani aa raha	vaginal discharge	symptom
+chamdi par daag	skin lesion	symptom
+chamdi lal ho gayi	erythema	symptom
+chamdi jal rahi	burning skin	symptom
+chamdi sukh gayi	dry skin	symptom
+chamdi mein sujan	skin swelling	symptom
+phunsi	boil/acne	symptom
+phafoley	blisters	symptom
+chhale	ulcers	symptom
+dhabbe	patches	symptom
+safed dhabbe	white patches	symptom
+kale dhabbe	dark patches	symptom
+tabiyat theek nahi	feeling unwell	symptom
+tabiyat kharab	feeling unwell	symptom
+acha nahi lag raha	malaise	symptom
+bahut kamzori	severe weakness	symptom
+haath pair thande	cold extremities	symptom
+sar bhari bhari	heaviness in head	symptom
+nazar ke saamne andhera	visual blackout	symptom
+ghabrahat ho rahi	feeling anxious	symptom
+dil dhak dhak	palpitations	symptom
+dil ghabra raha	palpitations	symptom
+saans nahi aa rahi	breathlessness	symptom
+paseena bahut aa raha	excessive sweating	symptom
+paseena raat ko	night sweats	symptom
+sar ghoom raha	vertigo	symptom
+sugar badhna	hyperglycemia	diagnosis
+sugar girna	hypoglycemia	diagnosis
+bp girna	hypotension	diagnosis
+khoon ki kami	anemia	diagnosis
+khoon patla	coagulopathy	diagnosis
+khoon gaadha	polycythemia	diagnosis
+haddi tootna	fracture	diagnosis
+haddi kamzor	osteoporosis	diagnosis
+nass chadh gayi	muscle strain	diagnosis
+kamar ki nass	lumbar radiculopathy	diagnosis
+slip disc	disc herniation	diagnosis
+gathiya rog	arthritis	diagnosis
+aankh aana	conjunctivitis	diagnosis
+kaan bahna	otitis media	diagnosis
+gale ka infction	pharyngitis	diagnosis
+phephdon mein paani	pleural effusion	diagnosis
+liver badhna	hepatomegaly	diagnosis
+tilli badhna	splenomegaly	diagnosis
+gurde ka infection	pyelonephritis	diagnosis
+pet mein paani	ascites	diagnosis
+nadi ki kamzori	peripheral neuropathy	diagnosis
+chhati mein infection	pneumonia	diagnosis
+daad	ringworm	diagnosis
+khaaj	scabies	diagnosis
+safed dag	vitiligo	diagnosis
+masa	wart	diagnosis
+naasoor	chronic ulcer	diagnosis
+rasauli	tumor	diagnosis
+gilti	lymph node enlargement	diagnosis
+juram	fever	symptom
+talaivali	headache	symptom
+vayitru vali	abdominal pain	symptom
+irumal	cough	symptom
+moochu thinakal	breathlessness	symptom
+vaanthi	vomiting	symptom
+bedhi	diarrhea	symptom
+malabaddakam	constipation	symptom
+kaichal	fever	symptom
+nenju vali	chest pain	symptom
+mandham	dizziness	symptom
+jor	fever	symptom
+matha byatha	headache	symptom
+pet byatha	abdominal pain	symptom
+kashi	cough	symptom
+bomi	vomiting	symptom
+durbolota	weakness	symptom
+shash koshto	breathlessness	symptom
+taap	fever	symptom
+dokhey dukhney	headache	symptom
+pot dukhney	abdominal pain	symptom
+khokhla	cough	symptom
+ulti	vomiting	symptom
+thakwa	fatigue	symptom
+chakkar yene	dizziness	symptom
+taav	fever	symptom
+mathu dukhe	headache	symptom
+pet ma dard	abdominal pain	symptom
+khaansi	cough	symptom
+okaari	vomiting	symptom
+bukhar	fever	symptom
+sir dukh reha	headache	symptom
+pett dukh reha	abdominal pain	symptom
+khaansi aa rehi	cough	symptom
+ultee	vomiting	symptom

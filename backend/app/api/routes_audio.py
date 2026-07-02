@@ -2,7 +2,8 @@ import logging
 from pathlib import Path
 from typing import Optional
 
-from fastapi import APIRouter, File, HTTPException, Query, UploadFile, Depends
+import httpx
+from fastapi import APIRouter, Depends, File, HTTPException, Query, Request, UploadFile
 from pydantic import BaseModel
 
 from app.schemas.consultation import StatusEnum
@@ -12,6 +13,7 @@ from app.services.sarvam_batch_asr import SarvamBatchASRService
 from app.services.local_asr import LocalASRService
 from app.storage.repository import SessionRepository
 from app.utils.config import settings
+from app.utils.rate_limit import limiter
 from app.api.routes_auth import get_current_user
 
 logger = logging.getLogger(__name__)
@@ -25,8 +27,15 @@ phi_scrubber = PHIScrubberService()
 _BACKEND_DIR = Path(__file__).resolve().parent.parent.parent
 _DATA_DIR = Path(settings.data_dir) if settings.data_dir else _BACKEND_DIR
 _UPLOADS_DIR = _DATA_DIR / "uploads"
-_ALLOWED_SUFFIXES = {".mp3", ".wav", ".m4a", ".webm"}
+_ALLOWED_SUFFIXES = {".mp3", ".wav", ".m4a", ".webm", ".ogg"}
 _MAX_UPLOAD_BYTES = 25 * 1024 * 1024  # 25 MB — Sarvam limit is ~60 s of audio
+MAGIC_BYTES: dict[str, list[bytes]] = {
+    ".mp3": [b"\xff\xfb", b"\xff\xf3", b"\xff\xf2", b"ID3"],
+    ".wav": [b"RIFF"],
+    ".m4a": [b"\x00\x00\x00\x18ftypM4A", b"\x00\x00\x00\x20ftyp"],
+    ".webm": [b"\x1a\x45\xdf\xa3"],
+    ".ogg": [b"OggS"],  # WhatsApp voice notes are Opus-encoded OGG
+}
 
 
 class AudioUploadResponse(BaseModel):
@@ -86,6 +95,7 @@ async def upload_audio(
     session_id: str,
     file: UploadFile = File(...),
     current_user: dict = Depends(get_current_user),
+    request: Request = None,
 ) -> AudioUploadResponse:
     """Upload raw consultation audio. Accepts MP3, WAV, M4A, WebM."""
     session = await repo.get_session(session_id, str(current_user["id"]))
@@ -104,18 +114,35 @@ async def upload_audio(
             detail=f"Unsupported file type '{suffix}'. Allowed: {', '.join(sorted(_ALLOWED_SUFFIXES))}",
         )
 
+    header = await file.read(16)
+    await file.seek(0)
+    valid = False
+    for magic in MAGIC_BYTES.get(suffix, []):
+        if header[: len(magic)] == magic:
+            valid = True
+            break
+
     dest_dir = _UPLOADS_DIR / session_id
     dest_dir.mkdir(parents=True, exist_ok=True)
-    dest_path = dest_dir / (file.filename or f"audio{suffix}")
+    import uuid as _uuid
+    dest_path = dest_dir / f"{_uuid.uuid4().hex}{suffix}"
 
-    contents = await file.read()
-    if len(contents) > _MAX_UPLOAD_BYTES:
-        raise HTTPException(
-            status_code=413,
-            detail=f"Audio file too large ({len(contents) // 1024} KB). Maximum is {_MAX_UPLOAD_BYTES // (1024*1024)} MB.",
-        )
-    dest_path.write_bytes(contents)
-    logger.info("Saved audio to %s (%d bytes)", dest_path, len(contents))
+    total = 0
+    with open(dest_path, "wb") as out:
+        while chunk := await file.read(65536):
+            total += len(chunk)
+            if total > _MAX_UPLOAD_BYTES:
+                out.close()
+                dest_path.unlink(missing_ok=True)
+                raise HTTPException(
+                    status_code=413,
+                    detail=f"Audio file too large. Maximum is {_MAX_UPLOAD_BYTES // (1024*1024)} MB.",
+                )
+            out.write(chunk)
+    if not valid and suffix in MAGIC_BYTES:
+        dest_path.unlink(missing_ok=True)
+        raise HTTPException(status_code=400, detail=f"File content does not match declared type '{suffix}'.")
+    logger.info("Saved audio to %s (%d bytes)", dest_path, total)
 
     session.status = StatusEnum.audio_uploaded
     session.audio_file_path = str(dest_path)
@@ -129,7 +156,9 @@ async def upload_audio(
 
 
 @router.post("/sessions/{session_id}/transcribe", response_model=TranscribeResponse)
+@limiter.limit("30/minute")
 async def transcribe_audio(
+    request: Request,
     session_id: str,
     language_code: str = Query(default="hi-IN", description="BCP-47 language hint. Default hi-IN for best Hindi/Hinglish accuracy."),
     diarize: bool = Query(default=False, description="Enable speaker diarization (slower, ~60s). Default off for live dictation."),
@@ -187,6 +216,8 @@ async def transcribe_audio(
                 "start_time_seconds": 0.0, "end_time_seconds": 0.0,
             }]
 
+    except httpx.TimeoutException as exc:
+        raise HTTPException(status_code=504, detail="ASR service timed out. Please retry.") from exc
     except RuntimeError as exc:
         raise HTTPException(status_code=502, detail=str(exc)) from exc
 
@@ -260,3 +291,95 @@ async def submit_text_transcript(
         diarized_segments=[DiarizedSegment(**s) for s in segments],  # type: ignore
         diarized_transcript=_format_diarized_transcript(segments),
     )
+
+
+# ---------------------------------------------------------------------------
+# Intake voice-extract (no session required)
+# ---------------------------------------------------------------------------
+
+def _extract_intake_fields(transcript: str) -> dict:
+    """Extract structured patient intake fields from a Hinglish/Hindi/English transcript."""
+    import re
+    fields: dict = {}
+    t = transcript
+
+    # Name: "naam X hai" / "naam hai X" / "patient ka naam X"
+    name_pats = [
+        r'(?:naam|name)\s+(?:hai\s+)?([A-Za-z][A-Za-z\s]{1,35}?)(?=\s+(?:hai|hain|ka|ki|ke|\d|age|umar|saal|year)|[,.]|$)',
+        r'patient\s+(?:ka\s+naam\s+)?([A-Za-z][A-Za-z\s]{1,35}?)(?=\s+(?:hai|hain|ka|ki|ke|\d|age|umar|saal|year)|[,.]|$)',
+    ]
+    for pat in name_pats:
+        m = re.search(pat, t, re.I)
+        if m:
+            candidate = m.group(1).strip().title()
+            if 2 <= len(candidate) <= 40 and not any(c.isdigit() for c in candidate):
+                fields['patient_name'] = candidate
+                break
+
+    # Age: "N saal" / "N years" / "age N"
+    age_m = re.search(r'(\d{1,3})\s*(?:saal|sal|year|varsh|baras|उम्र)', t, re.I)
+    if not age_m:
+        age_m = re.search(r'(?:age|umar|umra)\s+(?:is\s+)?(\d{1,3})', t, re.I)
+    if age_m:
+        age = int(age_m.group(1))
+        if 0 < age < 120:
+            fields['patient_age'] = str(age)
+
+    # Sex
+    if re.search(r'\b(male|purush|aadmi|mard|ladka)\b', t, re.I):
+        fields['patient_sex'] = 'M'
+    elif re.search(r'\b(female|mahila|aurat|ladki|girl|woman)\b', t, re.I):
+        fields['patient_sex'] = 'F'
+
+    # Chief complaint: common complaint patterns
+    cc_pats = [
+        r'(?:complaint|problem|takleef|pareshani|symptom)[:\s]+([^.!?\n]{3,100})',
+        r'(?:bukhaar|fever|dard|pain|khasi|cough|ulti|vomit|sar|sir|pait|pet|chest|saans|chakkar)\b[^.!?\n]{0,80}',
+    ]
+    for pat in cc_pats:
+        m = re.search(pat, t, re.I)
+        if m:
+            cc = m.group(1).strip() if m.lastindex and m.lastindex >= 1 else m.group(0).strip()
+            if len(cc) >= 3:
+                fields['chief_complaint'] = cc[:120]
+                break
+
+    return fields
+
+
+@router.post("/intake/voice-extract")
+async def intake_voice_extract(
+    file: UploadFile = File(...),
+    current_user: dict = Depends(get_current_user),
+) -> dict:
+    """Transcribe assistant intake audio via Sarvam and extract patient fields.
+
+    No session is created. Returns raw transcript and extracted fields so the
+    assistant can review and correct before submitting the intake form.
+    """
+    if current_user.get("role") != "assistant":
+        raise HTTPException(status_code=403, detail="Only assistants can use voice intake.")
+
+    suffix = Path(file.filename or "audio.bin").suffix.lower()
+    if suffix not in _ALLOWED_SUFFIXES:
+        raise HTTPException(status_code=400, detail=f"Unsupported type '{suffix}'. Use mp3, wav, m4a, or webm.")
+
+    import os
+    import tempfile
+    with tempfile.NamedTemporaryFile(suffix=suffix, delete=False) as tmp:
+        tmp_path = tmp.name
+        while chunk := await file.read(65536):
+            tmp.write(chunk)
+
+    try:
+        result = await realtime_asr.transcribe(tmp_path, language_code="hi-IN")
+        transcript = result.get("transcript", "")
+        fields = _extract_intake_fields(transcript)
+        return {
+            "transcript": transcript,
+            "language_detected": result.get("language_code", "hi-IN"),
+            "is_stub": result.get("is_stub", False),
+            **fields,
+        }
+    finally:
+        os.unlink(tmp_path)

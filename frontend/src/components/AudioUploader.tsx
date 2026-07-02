@@ -6,10 +6,14 @@ interface Props {
   sessionId: string;
   onTranscript: (result: TranscribeResponse, asrMs?: number) => void;
   onAutoProcess?: () => void;
+  externalMode?: InputMode;
+  onModeChange?: (mode: InputMode) => void;
+  hideTabs?: boolean;
+  dark?: boolean;
 }
 
 type UploadStatus = 'idle' | 'uploading' | 'transcribing' | 'done' | 'error';
-type InputMode = 'file' | 'record' | 'text';
+export type InputMode = 'file' | 'record' | 'text';
 
 const ACCEPTED = '.mp3,.wav,.m4a,.webm';
 const ACCEPTED_SET = new Set(['audio/mpeg', 'audio/wav', 'audio/x-wav', 'audio/mp4', 'audio/m4a', 'audio/webm', 'video/webm']);
@@ -19,12 +23,16 @@ function isAccepted(file: File) {
   return ACCEPTED_SET.has(file.type) || ['mp3', 'wav', 'm4a', 'webm'].includes(ext);
 }
 
-export default function AudioUploader({ sessionId, onTranscript, onAutoProcess }: Props) {
+export default function AudioUploader({ sessionId, onTranscript, onAutoProcess, externalMode, onModeChange, hideTabs, dark }: Props) {
+  // d(darkClass, lightClass) — picks based on dark prop
+  const d = (dk: string, lt: string) => dark ? dk : lt;
   const inputRef = useRef<HTMLInputElement>(null);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const chunksRef = useRef<Blob[]>([]);
 
-  const [mode, setMode] = useState<InputMode>('record');
+  const [internalMode, setInternalMode] = useState<InputMode>('record');
+  const mode = externalMode ?? internalMode;
+  function setMode(m: InputMode) { setInternalMode(m); onModeChange?.(m); }
   const [file, setFile] = useState<File | null>(null);
   const [status, setStatus] = useState<UploadStatus>('idle');
   const [uploadPct, setUploadPct] = useState(0);
@@ -36,6 +44,43 @@ export default function AudioUploader({ sessionId, onTranscript, onAutoProcess }
   // Recording State
   const [isRecording, setIsRecording] = useState(false);
   const [recordingTime, setRecordingTime] = useState(0);
+
+  // Waveform visualiser
+  const analyserRef = useRef<AnalyserNode | null>(null);
+  const animFrameRef = useRef<number | null>(null);
+  const [barHeights, setBarHeights] = useState<number[]>(Array(20).fill(4));
+
+  function startWaveform(stream: MediaStream) {
+    try {
+      const ctx = new AudioContext();
+      const src = ctx.createMediaStreamSource(stream);
+      const analyser = ctx.createAnalyser();
+      analyser.fftSize = 64;
+      src.connect(analyser);
+      analyserRef.current = analyser;
+      const buf = new Uint8Array(analyser.frequencyBinCount);
+      const NUM_BARS = 20;
+      function tick() {
+        analyser.getByteFrequencyData(buf);
+        const step = Math.floor(buf.length / NUM_BARS);
+        const heights = Array.from({ length: NUM_BARS }, (_, i) => {
+          const val = buf[i * step] ?? 0;
+          return Math.max(4, (val / 255) * 48);
+        });
+        setBarHeights(heights);
+        animFrameRef.current = requestAnimationFrame(tick);
+      }
+      tick();
+    } catch {
+      // Web Audio not available — use CSS fallback (existing animation)
+    }
+  }
+
+  function stopWaveform() {
+    if (animFrameRef.current) cancelAnimationFrame(animFrameRef.current);
+    analyserRef.current = null;
+    setBarHeights(Array(20).fill(4));
+  }
 
   // Timer for recording duration
   useEffect(() => {
@@ -118,6 +163,7 @@ export default function AudioUploader({ sessionId, onTranscript, onAutoProcess }
       setIsRecording(true);
       setError(null);
       setFile(null);
+      startWaveform(stream);
     } catch (err: unknown) {
       console.error(err);
       const name = err instanceof Error ? (err as any).name : '';
@@ -135,6 +181,7 @@ export default function AudioUploader({ sessionId, onTranscript, onAutoProcess }
     if (mediaRecorderRef.current && isRecording) {
       mediaRecorderRef.current.stop();
       setIsRecording(false);
+      stopWaveform();
     }
   }
 
@@ -187,28 +234,23 @@ export default function AudioUploader({ sessionId, onTranscript, onAutoProcess }
   const isAutoFlow = fromRecording && isWorking;
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-3">
       {/* Mode Toggle */}
-      {!isWorking && status !== 'done' && (
-        <div className="flex bg-slate-100 p-1 rounded-lg">
-          <button
-            onClick={() => setMode('record')}
-            className={`flex-1 py-1.5 text-xs font-medium rounded-md transition-colors ${mode === 'record' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}
-          >
-            Live Dictation
-          </button>
-          <button
-            onClick={() => setMode('file')}
-            className={`flex-1 py-1.5 text-xs font-medium rounded-md transition-colors ${mode === 'file' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}
-          >
-            Upload Audio
-          </button>
-          <button
-            onClick={() => setMode('text')}
-            className={`flex-1 py-1.5 text-xs font-medium rounded-md transition-colors ${mode === 'text' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}
-          >
-            Direct Text Input
-          </button>
+      {!isWorking && status !== 'done' && !hideTabs && (
+        <div className={`flex p-1 rounded-lg ${d('bg-slate-800', 'bg-slate-100')}`}>
+          {(['record', 'file', 'text'] as const).map((m, i) => (
+            <button
+              key={m}
+              onClick={() => setMode(m)}
+              className={`flex-1 py-1.5 text-xs font-medium rounded-md transition-colors ${
+                mode === m
+                  ? d('bg-slate-700 text-white shadow-sm', 'bg-white text-slate-900 shadow-sm')
+                  : d('text-slate-400 hover:text-slate-200', 'text-slate-500 hover:text-slate-700')
+              }`}
+            >
+              {['Live Dictation', 'Upload Audio', 'Direct Text'][i]}
+            </button>
+          ))}
         </div>
       )}
 
@@ -221,194 +263,172 @@ export default function AudioUploader({ sessionId, onTranscript, onAutoProcess }
           onDragLeave={onDragLeave}
           onDrop={onDrop}
           className={[
-            'border-2 border-dashed rounded-xl px-6 py-10 text-center transition-colors',
+            'border-2 border-dashed rounded-xl px-6 py-8 text-center transition-colors',
             isWorking ? 'cursor-not-allowed opacity-60' : 'cursor-pointer',
-            dragOver ? 'border-blue-400 bg-blue-50' : file ? 'border-green-400 bg-green-50' : 'border-slate-300 bg-slate-50 hover:border-blue-300 hover:bg-blue-50',
+            dragOver
+              ? d('border-blue-500 bg-blue-900/30', 'border-blue-400 bg-blue-50')
+              : file
+                ? d('border-green-600 bg-green-900/20', 'border-green-400 bg-green-50')
+                : d('border-slate-600 bg-slate-800/60 hover:border-blue-500 hover:bg-blue-900/20',
+                    'border-slate-300 bg-slate-50 hover:border-blue-300 hover:bg-blue-50'),
           ].join(' ')}
         >
           <input ref={inputRef} type="file" accept={ACCEPTED} className="hidden" onChange={(e) => handleFiles(e.target.files)} />
           <div className="text-3xl mb-2">{file ? '🎵' : '📁'}</div>
           {file ? (
-            <p className="text-sm font-medium text-green-700">{file.name}</p>
+            <p className={`text-sm font-medium ${d('text-emerald-400', 'text-green-700')}`}>{file.name}</p>
           ) : (
             <>
-              <p className="text-sm font-medium text-slate-700">Drop an audio file here, or click to browse</p>
-              <p className="text-xs text-slate-400 mt-1">mp3 · wav · m4a · webm</p>
+              <p className={`text-sm font-medium ${d('text-slate-300', 'text-slate-700')}`}>Drop audio here, or click to browse</p>
+              <p className={`text-xs mt-1 ${d('text-slate-500', 'text-slate-400')}`}>mp3 · wav · m4a · webm</p>
             </>
           )}
         </div>
       ) : mode === 'text' ? (
-        <div className="border border-slate-200 rounded-xl p-4 bg-slate-50">
+        <div className={`border rounded-xl p-3 ${d('border-slate-700 bg-slate-800/60', 'border-slate-200 bg-slate-50')}`}>
           <textarea
             value={transcriptText}
             onChange={(e) => setTranscriptText(e.target.value)}
             disabled={isWorking}
             placeholder="Paste or write the doctor's transcript here..."
-            className="w-full h-32 p-3 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+            className={`w-full h-32 p-3 text-sm border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none ${
+              d('bg-slate-900 border-slate-700 text-slate-200 placeholder:text-slate-500',
+                'bg-white border-slate-200 text-slate-800')
+            }`}
           />
         </div>
       ) : (
-        <div className="border border-slate-200 rounded-xl p-6 sm:p-8 flex flex-col items-center justify-center bg-slate-50 min-h-[180px]">
+        /* Record mode */
+        <div className={`border rounded-xl p-6 flex flex-col items-center justify-center min-h-[200px] ${
+          d('border-slate-700 bg-slate-800/40', 'border-slate-200 bg-slate-50')
+        }`}>
           {!isRecording && !file && !isWorking && (
-            <button onClick={startRecording} className="w-20 h-20 sm:w-16 sm:h-16 rounded-full bg-red-100 flex items-center justify-center hover:bg-red-200 active:scale-95 transition-all cursor-pointer touch-manipulation">
-              <div className="w-7 h-7 sm:w-6 sm:h-6 rounded-full bg-red-500"></div>
+            <button
+              onClick={startRecording}
+              className={`w-16 h-16 rounded-full flex items-center justify-center active:scale-95 transition-all cursor-pointer touch-manipulation ${
+                d('bg-red-900/50 hover:bg-red-900/70 border border-red-800/60', 'bg-red-100 hover:bg-red-200')
+              }`}
+            >
+              <div className="w-6 h-6 rounded-full bg-red-500"></div>
             </button>
           )}
           {isRecording && (
-            <button onClick={stopRecording} className="group relative w-24 h-24 rounded-full bg-red-50 flex flex-col items-center justify-center border-2 border-red-500 shadow-[0_0_20px_rgba(239,68,68,0.2)] cursor-pointer hover:bg-red-100 transition-colors">
-              <div className="flex items-center gap-1 h-8 px-2">
-                {[1, 2, 3, 4, 5].map((i) => (
-                  <div 
-                    key={i} 
-                    className="w-1.5 bg-red-500 rounded-full"
-                    style={{
-                      animation: `waveform 1s ease-in-out infinite`,
-                      animationDelay: `${i * 0.15}s`,
-                      height: '40%'
-                    }}
+            <div className="flex flex-col items-center gap-4 w-full">
+              {/* Live waveform visualiser */}
+              <div className="flex items-end gap-0.5 h-12 px-4 py-1">
+                {barHeights.map((h, i) => (
+                  <div
+                    key={i}
+                    className="w-[5px] bg-red-500 rounded-full transition-all duration-75"
+                    style={{ height: `${h}px`, opacity: 0.6 + (h / 48) * 0.4 }}
                   />
                 ))}
               </div>
-              <div className="absolute inset-0 rounded-full border-2 border-red-500 opacity-50 animate-ping"></div>
-              <style>{`
-                @keyframes waveform {
-                  0%, 100% { height: 30%; }
-                  50% { height: 100%; }
-                }
-              `}</style>
-            </button>
+              <button
+                onClick={stopRecording}
+                className="relative flex items-center gap-3 px-6 py-3 rounded-full bg-red-100 border-2 border-red-400 text-red-700 font-bold text-sm cursor-pointer hover:bg-red-200 transition-colors active:scale-[0.97]"
+              >
+                <span className="w-2 h-2 rounded-full bg-red-500 animate-pulse" />
+                {formatTime(recordingTime)} — Tap to stop
+                <div className="absolute inset-0 rounded-full border-2 border-red-400 opacity-30 animate-ping" />
+              </button>
+            </div>
           )}
-          {/* Auto-flow: recording stopped, processing in progress */}
           {!isRecording && isAutoFlow && (
-            <div className="flex flex-col items-center gap-3">
-              <div className="w-14 h-14 rounded-full border-2 border-primary/30 flex items-center justify-center">
-                <svg className="w-6 h-6 text-primary animate-spin" fill="none" viewBox="0 0 24 24">
-                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/>
-                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
-                </svg>
-              </div>
+            <div className="w-12 h-12 rounded-full border-2 border-indigo-500/40 flex items-center justify-center">
+              <svg className="w-5 h-5 text-indigo-400 animate-spin" fill="none" viewBox="0 0 24 24">
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/>
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
+              </svg>
             </div>
           )}
           {file && !isRecording && !isAutoFlow && (
             <div className="text-center">
               <div className="text-3xl mb-2">🎤</div>
-              <p className="text-sm font-medium text-green-700">Recording Captured</p>
-              <button onClick={() => { setFile(null); setFromRecording(false); }} className="text-xs text-slate-500 hover:text-red-500 mt-2 underline">Discard & Re-record</button>
+              <p className={`text-sm font-medium ${d('text-emerald-400', 'text-green-700')}`}>Recording Captured</p>
+              <button
+                onClick={() => { setFile(null); setFromRecording(false); }}
+                className={`text-xs mt-2 underline ${d('text-slate-500 hover:text-red-400', 'text-slate-500 hover:text-red-500')}`}
+              >
+                Discard & Re-record
+              </button>
             </div>
           )}
-          <div className="mt-4 text-sm font-medium text-slate-600">
+          <div className={`mt-4 text-sm font-medium ${d('text-slate-400', 'text-slate-600')}`}>
             {isRecording
-              ? `Recording... ${formatTime(recordingTime)}`
+              ? <span className="text-red-400 font-semibold">● {formatTime(recordingTime)}</span>
               : isAutoFlow
-                ? status === 'uploading' ? `Uploading… ${uploadPct}%` : 'Diarizing via Sarvam Batch… (~60s)'
+                ? status === 'uploading' ? `Uploading… ${uploadPct}%` : 'Transcribing…'
                 : file ? 'Ready to process'
-                : 'Click to start dictation'}
+                : 'Tap to start recording'}
           </div>
           {isAutoFlow && (
-            <p className="text-xs text-slate-400 mt-1">Generating documentation automatically</p>
+            <p className={`text-xs mt-1 ${d('text-slate-500', 'text-slate-400')}`}>Generating documentation automatically</p>
           )}
         </div>
       )}
 
-      {/* Progress / status (file/upload mode) */}
+      {/* Upload progress */}
       {status === 'uploading' && !isAutoFlow && (
         <div className="space-y-1">
-          <div className="flex justify-between text-xs text-slate-500">
-            <span>Uploading…</span>
-            <span>{uploadPct}%</span>
+          <div className={`flex justify-between text-xs ${d('text-slate-400', 'text-slate-500')}`}>
+            <span>Uploading…</span><span>{uploadPct}%</span>
           </div>
-          <div className="h-1.5 bg-slate-200 rounded-full overflow-hidden">
+          <div className={`h-1.5 rounded-full overflow-hidden ${d('bg-slate-700', 'bg-slate-200')}`}>
             <div className="h-full bg-blue-500 transition-all duration-200" style={{ width: `${uploadPct}%` }} />
           </div>
         </div>
       )}
 
       {status === 'transcribing' && !isAutoFlow && (
-        <div className="space-y-1.5">
-          <div className="flex items-center gap-2 text-sm text-indigo-600">
-            <svg className="w-4 h-4 animate-spin shrink-0" fill="none" viewBox="0 0 24 24">
-              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/>
-              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
-            </svg>
-            <span className="font-medium">{mode === 'text' ? 'Processing transcript...' : 'Transcribing + separating speakers…'}</span>
-          </div>
-          {mode !== 'text' && (
-            <p className="text-xs text-slate-400 pl-6">Sarvam Batch API diarization — up to 60 seconds</p>
-          )}
+        <div className={`flex items-center gap-2 text-sm ${d('text-indigo-400', 'text-indigo-600')}`}>
+          <svg className="w-4 h-4 animate-spin shrink-0" fill="none" viewBox="0 0 24 24">
+            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/>
+            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
+          </svg>
+          <span className="font-medium">{mode === 'text' ? 'Processing…' : 'Transcribing + diarizing…'}</span>
         </div>
       )}
 
       {status === 'done' && (
-        <div className="space-y-1">
-          <p className="text-sm text-green-600 font-medium">Transcription complete.</p>
-          <p className="text-xs text-slate-400">Transcript identifiers scrubbed before storage.</p>
-        </div>
+        <p className={`text-sm font-medium ${d('text-emerald-400', 'text-green-600')}`}>Transcription complete.</p>
       )}
 
-      {/* Sarvam trust disclosure */}
+      {/* Speech-processing trust disclosure */}
       {mode !== 'text' && status !== 'done' && !isAutoFlow && (
-        <p className="text-[11px] text-slate-400 leading-relaxed border-t border-slate-100 pt-3">
-          Audio is processed through{' '}
-          <a href="https://sarvam.ai" target="_blank" rel="noopener noreferrer" className="underline hover:text-slate-600">
-            Sarvam AI
-          </a>{' '}
-          for speech-to-text. Transcript identifiers are scrubbed before storage. Raw audio is deleted
-          after note generation.{' '}
-          <a href="/privacy" className="underline hover:text-slate-600">
-            Privacy policy
-          </a>
+        <p className={`text-[11px] leading-relaxed border-t pt-3 ${
+          d('text-slate-500 border-slate-800', 'text-slate-400 border-slate-100')
+        }`}>
+          Audio processed on-shore via an India-based speech recognition service. Identifiers scrubbed before storage. Audio deleted after transcription.{' '}
+          <a href="/privacy" className={`underline ${d('hover:text-slate-300', 'hover:text-slate-600')}`}>Privacy policy</a>
         </p>
       )}
 
+      {/* Mic errors */}
       {error === 'mic_denied' && (
-        <div className="bg-red-50 border border-red-200 rounded-xl p-4 space-y-2">
-          <div className="flex items-center gap-2">
-            <svg className="w-4 h-4 text-red-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
-            </svg>
-            <p className="text-sm font-bold text-red-700">Microphone access blocked</p>
-          </div>
-          <p className="text-xs text-red-600 leading-relaxed">
-            Lipi needs microphone permission to record the consultation.
-          </p>
-          <div className="text-xs text-red-700 space-y-1 pl-1">
-            <p className="font-semibold">To fix on Chrome / Edge:</p>
-            <p>Click the 🔒 lock icon in the address bar → Site settings → Microphone → Allow</p>
-            <p className="font-semibold mt-1">To fix on Safari:</p>
-            <p>Safari menu → Settings for This Website → Microphone → Allow</p>
-          </div>
-          <button
-            onClick={() => { setError(null); setMode('file'); }}
-            className="text-xs text-red-600 underline hover:text-red-800 transition-colors"
-          >
-            Or upload an audio file instead →
+        <div className={`border rounded-xl p-4 space-y-2 ${d('bg-red-900/20 border-red-800/40', 'bg-red-50 border-red-200')}`}>
+          <p className={`text-sm font-bold ${d('text-red-400', 'text-red-700')}`}>Microphone access blocked</p>
+          <p className={`text-xs ${d('text-red-400', 'text-red-600')}`}>Lipi needs microphone permission to record.</p>
+          <button onClick={() => { setError(null); setMode('file'); }} className={`text-xs underline ${d('text-red-400 hover:text-red-300', 'text-red-600 hover:text-red-800')}`}>
+            Upload an audio file instead →
           </button>
         </div>
       )}
       {error === 'mic_missing' && (
-        <div className="bg-amber-50 border border-amber-200 rounded-xl p-4">
-          <div className="flex items-center gap-2 mb-1">
-            <svg className="w-4 h-4 text-amber-600 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-            </svg>
-            <p className="text-sm font-bold text-amber-700">No microphone found</p>
-          </div>
-          <p className="text-xs text-amber-700">No audio input device detected. Connect a microphone or use the Upload Audio option below.</p>
-          <button
-            onClick={() => { setError(null); setMode('file'); }}
-            className="text-xs text-amber-700 underline hover:text-amber-900 mt-2 transition-colors block"
-          >
+        <div className={`border rounded-xl p-4 ${d('bg-amber-900/20 border-amber-800/40', 'bg-amber-50 border-amber-200')}`}>
+          <p className={`text-sm font-bold ${d('text-amber-400', 'text-amber-700')}`}>No microphone found</p>
+          <button onClick={() => { setError(null); setMode('file'); }} className={`text-xs underline mt-2 block ${d('text-amber-400 hover:text-amber-300', 'text-amber-700 hover:text-amber-900')}`}>
             Upload an audio file instead →
           </button>
         </div>
       )}
       {error && error !== 'mic_denied' && error !== 'mic_missing' && (
-        <p className="text-sm text-red-600 bg-red-50 border border-red-200 rounded-lg px-3 py-2">
+        <p className={`text-sm border rounded-lg px-3 py-2 ${d('text-red-400 bg-red-900/20 border-red-800/40', 'text-red-600 bg-red-50 border-red-200')}`}>
           {error}
         </p>
       )}
 
-      {/* Action button — only shown for non-auto file/text modes */}
+      {/* Action buttons */}
       {status !== 'done' && !isAutoFlow && (
         mode === 'text' ? (
           <button

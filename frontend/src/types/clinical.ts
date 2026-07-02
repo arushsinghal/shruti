@@ -119,6 +119,10 @@ export interface ConsultationSession {
   doctor_name?: string;
   abha_number?: string;
   pmjay_beneficiary?: boolean;
+  patient_phone?: string;
+  patient_age?: string;
+  patient_sex?: string;
+  initiated_by?: string;
   created_at: string;
   cloud_ai_consent: boolean;
   status: SessionStatus;
@@ -129,6 +133,12 @@ export interface ConsultationSession {
   memory_state?: MemoryState;
   soap_note?: SOAPNote;
   cds_suggestions?: CDSSuggestion[];
+  consent_log?: {
+    consent_mode: string;
+    consent_text_version: string;
+    consent_hash: string;
+    timestamp: string;
+  };
   user_id?: string;
 }
 
@@ -139,6 +149,9 @@ export interface CreateSessionRequest {
   pmjay_beneficiary?: boolean;
   cloud_ai_consent?: boolean;
   mode?: SessionMode;
+  patient_phone?: string;
+  patient_age?: string;
+  patient_sex?: string;
 }
 
 export interface AudioUploadResponse {
@@ -197,4 +210,64 @@ export interface ProcessClinicalResponse {
   soap: DeterministicSOAP;
   cds: DeterministicCDS[];
   source?: string;
+  extracted_facts?: ExtractedFact[];
+}
+
+export interface ExtractedFact {
+  id: string;
+  fact_id?: string;
+  category: string;
+  field: string;
+  value: string;
+  normalized_value?: string;
+  raw_text?: string;
+  source_sentence?: string;
+  source_span: string;
+  extractor?: string;
+  evidence_spans: Array<{
+    start_char: number;
+    end_char: number;
+    raw_text: string;
+  }>;
+  metadata?: Record<string, unknown>;
+  certainty?: string;
+  confidence: number;
+  review_status: 'candidate' | 'confirmed' | 'rejected';
+  confirmed_by?: string;
+  confirmed_at?: string;
+}
+
+export interface AuditLogEntry {
+  id: number;
+  session_id: string;
+  user_id: string;
+  action: string;
+  event_type: string;
+  resource_type?: string;
+  resource_id?: string;
+  detail?: string;
+  details?: string;
+  timestamp: string;
+}
+
+export interface AssistantTask {
+  id: string;
+  session_id: string;
+  user_id?: string;
+  task_type: string;
+  title: string;
+  status: 'open' | 'in_progress' | 'done' | 'blocked';
+  owner?: string;
+  due?: string;
+  notes?: string;
+  completed_at?: string;
+  created_at?: string;
+}
+
+export interface DoctorProfile {
+  name?: string;
+  mci_number?: string;
+  clinic_name?: string;
+  clinic_address?: string;
+  clinic_phone?: string;
 }

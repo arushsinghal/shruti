@@ -110,6 +110,5 @@ To coordinate real-world clinic pilots (e.g. 14-day OPD observation sprints), Li
 
 1. **Patient Consent Gate**: Audio uploads, manual text submissions, and NLP processing are strictly blocked until doctor confirms patient verbal consent in the UI (`cloud_ai_consent=true`).
 2. **Local PHI Scrubber**: Patient names, email addresses, phone numbers, and absolute dates are detected and scrubbed locally before transcript text is saved to the database.
-3. **Instant Audio Deletion**: Under DPDPA compliance guidelines, raw audio files are automatically unlinked (deleted) from servers immediately after clinical notes are successfully generated.
+3. **Audio Retention Limit**: Audio is processed via Sarvam cloud ASR with consent. Raw audio is deleted after successful transcription; incomplete or failed sessions may be retained for up to 48 hours.
 4. **Assistive Warning**: All CDS suggestions carry a safety label `"doctor_review_required"`. The doctor remains the final medical authority and must review all draft outputs.
-

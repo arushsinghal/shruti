@@ -5,6 +5,163 @@ import type { ConsultationSession } from '../types/clinical';
 import { MODE_LABELS, MODE_COLORS } from '../types/clinical';
 import { motion } from 'framer-motion';
 
+function ReferralModal({ sessionId }: { sessionId: string }) {
+  const [open, setOpen] = useState(false);
+  const [toDoctor, setToDoctor] = useState('');
+  const [specialty, setSpecialty] = useState('');
+  const [reason, setReason] = useState('');
+  const [urgency, setUrgency] = useState<'routine' | 'urgent'>('routine');
+  const [loading, setLoading] = useState(false);
+
+  async function generate() {
+    if (!toDoctor.trim()) return;
+    setLoading(true);
+    try {
+      const resp = await api.post(`/sessions/${sessionId}/referral`,
+        { to_doctor: toDoctor, to_specialty: specialty, reason, urgency },
+        { responseType: 'blob' }
+      );
+      const url = URL.createObjectURL(new Blob([resp.data], { type: 'application/pdf' }));
+      const a = document.createElement('a');
+      a.href = url; a.download = `referral-${sessionId.slice(0, 8)}.pdf`; a.click();
+      URL.revokeObjectURL(url);
+      setOpen(false);
+    } catch { alert('Could not generate referral letter.'); }
+    finally { setLoading(false); }
+  }
+
+  return (
+    <>
+      <button onClick={() => setOpen(true)}
+        className="border border-violet-300 hover:bg-violet-50 text-violet-700 text-xs font-semibold px-3 py-1.5 rounded transition-all flex items-center gap-1.5 cursor-pointer print:hidden">
+        <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+          <path strokeLinecap="round" strokeLinejoin="round" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+        </svg>
+        Refer
+      </button>
+      {open && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30">
+          <div className="bg-white rounded-2xl shadow-xl border border-slate-200 w-full max-w-md mx-4 p-6">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-[14px] font-bold text-slate-900">Referral Letter</h3>
+              <button onClick={() => setOpen(false)} className="text-slate-400 hover:text-slate-600">✕</button>
+            </div>
+            <div className="space-y-3">
+              <div>
+                <label className="block text-[11px] font-semibold text-slate-500 mb-1">Refer to Doctor *</label>
+                <input value={toDoctor} onChange={e => setToDoctor(e.target.value)}
+                  placeholder="Dr. Sharma"
+                  className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-violet-400" />
+              </div>
+              <div>
+                <label className="block text-[11px] font-semibold text-slate-500 mb-1">Specialty</label>
+                <input value={specialty} onChange={e => setSpecialty(e.target.value)}
+                  placeholder="Cardiology, Neurology…"
+                  className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-violet-400" />
+              </div>
+              <div>
+                <label className="block text-[11px] font-semibold text-slate-500 mb-1">Reason for referral</label>
+                <textarea value={reason} onChange={e => setReason(e.target.value)}
+                  rows={2} placeholder="Further evaluation of…"
+                  className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-violet-400 resize-none" />
+              </div>
+              <div className="flex items-center gap-3">
+                {(['routine', 'urgent'] as const).map(u => (
+                  <button key={u} onClick={() => setUrgency(u)}
+                    className={`px-3 py-1.5 rounded-lg text-xs font-semibold border transition-all ${urgency === u ? (u === 'urgent' ? 'bg-red-50 border-red-300 text-red-700' : 'bg-violet-50 border-violet-300 text-violet-700') : 'border-slate-200 text-slate-500'}`}>
+                    {u.charAt(0).toUpperCase() + u.slice(1)}
+                  </button>
+                ))}
+              </div>
+            </div>
+            <div className="flex gap-2 mt-5">
+              <button onClick={() => setOpen(false)} className="flex-1 border border-slate-200 text-slate-600 text-sm font-semibold py-2 rounded-lg hover:bg-slate-50">Cancel</button>
+              <button onClick={generate} disabled={loading || !toDoctor.trim()}
+                className="flex-1 bg-violet-600 hover:bg-violet-700 disabled:opacity-40 text-white text-sm font-semibold py-2 rounded-lg transition-all">
+                {loading ? 'Generating…' : 'Download PDF'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </>
+  );
+}
+
+function TpaClaimModal({ sessionId }: { sessionId: string }) {
+  const [open, setOpen] = useState(false);
+  const [policy, setPolicy] = useState('');
+  const [insurer, setInsurer] = useState('');
+  const [tpa, setTpa] = useState('');
+  const [loading, setLoading] = useState(false);
+
+  async function generate() {
+    setLoading(true);
+    try {
+      const resp = await api.post(`/sessions/${sessionId}/tpa-claim`,
+        { policy_number: policy, insurer_name: insurer, tpa_name: tpa },
+        { responseType: 'blob' }
+      );
+      const url = URL.createObjectURL(new Blob([resp.data], { type: 'application/pdf' }));
+      const a = document.createElement('a');
+      a.href = url; a.download = `tpa-claim-${sessionId.slice(0, 8)}.pdf`; a.click();
+      URL.revokeObjectURL(url);
+      setOpen(false);
+    } catch { alert('Could not generate TPA claim.'); }
+    finally { setLoading(false); }
+  }
+
+  return (
+    <>
+      <button onClick={() => setOpen(true)}
+        className="border border-blue-300 hover:bg-blue-50 text-blue-700 text-xs font-semibold px-3 py-1.5 rounded transition-all flex items-center gap-1.5 cursor-pointer print:hidden">
+        <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+          <path strokeLinecap="round" strokeLinejoin="round" d="M9 14l6-6m-5.5.5h.01m4.99 5h.01M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16l3.5-2 3.5 2 3.5-2 3.5 2z" />
+        </svg>
+        TPA Claim
+      </button>
+      {open && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30">
+          <div className="bg-white rounded-2xl shadow-xl border border-slate-200 w-full max-w-md mx-4 p-6">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-[14px] font-bold text-slate-900">Insurance / TPA Claim</h3>
+              <button onClick={() => setOpen(false)} className="text-slate-400 hover:text-slate-600">✕</button>
+            </div>
+            <p className="text-[12px] text-slate-500 mb-4">Fill patient's insurance details. Leave blank if unknown — PDF will have fields for manual entry.</p>
+            <div className="space-y-3">
+              <div>
+                <label className="block text-[11px] font-semibold text-slate-500 mb-1">Policy Number</label>
+                <input value={policy} onChange={e => setPolicy(e.target.value)}
+                  placeholder="POL-XXXXXXXXXX"
+                  className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm font-mono focus:outline-none focus:border-blue-400" />
+              </div>
+              <div>
+                <label className="block text-[11px] font-semibold text-slate-500 mb-1">Insurer</label>
+                <input value={insurer} onChange={e => setInsurer(e.target.value)}
+                  placeholder="Star Health, HDFC ERGO, PMJAY…"
+                  className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-400" />
+              </div>
+              <div>
+                <label className="block text-[11px] font-semibold text-slate-500 mb-1">TPA Name</label>
+                <input value={tpa} onChange={e => setTpa(e.target.value)}
+                  placeholder="Medi Assist, MD India…"
+                  className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-400" />
+              </div>
+            </div>
+            <div className="flex gap-2 mt-5">
+              <button onClick={() => setOpen(false)} className="flex-1 border border-slate-200 text-slate-600 text-sm font-semibold py-2 rounded-lg hover:bg-slate-50">Cancel</button>
+              <button onClick={generate} disabled={loading}
+                className="flex-1 bg-blue-600 hover:bg-blue-700 disabled:opacity-40 text-white text-sm font-semibold py-2 rounded-lg transition-all">
+                {loading ? 'Generating…' : 'Download Claim PDF'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </>
+  );
+}
+
 function TypewriterText({ text }: { text?: string }) {
   if (!text) return null;
   const letters = Array.from(text);
@@ -35,11 +192,19 @@ function TypewriterText({ text }: { text?: string }) {
 
 // ─── Shared helpers ───────────────────────────────────────────────────────────
 
+const SOAP_SECTION_COLORS: Record<string, string> = {
+  'S — Subjective': 'border-l-blue-400 bg-blue-50/30',
+  'O — Objective':  'border-l-purple-400 bg-purple-50/30',
+  'A — Assessment': 'border-l-red-400 bg-red-50/30',
+  'P — Plan':       'border-l-green-400 bg-green-50/30',
+};
+
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
+  const accent = SOAP_SECTION_COLORS[title];
   return (
-    <div className="border border-slate-200 rounded-lg overflow-hidden bg-white shadow-sm">
-      <div className="px-5 py-3 bg-slate-50 border-b border-slate-200">
-        <h3 className="text-xs font-bold text-slate-500 uppercase tracking-widest">{title}</h3>
+    <div className={`border border-slate-200 rounded-lg overflow-hidden bg-white shadow-sm ${accent ? 'border-l-4 ' + accent.split(' ')[0] : ''}`}>
+      <div className={`px-5 py-3 border-b border-slate-200 ${accent ? accent.split(' ')[1] : 'bg-slate-50'}`}>
+        <h3 className="text-xs font-bold text-slate-600 uppercase tracking-widest">{title}</h3>
       </div>
       <div className="p-5">{children}</div>
     </div>
@@ -452,23 +617,31 @@ export default function ReviewNote() {
   const [feedbackSubmitted, setFeedbackSubmitted] = useState(false);
   const [feedbackMessage, setFeedbackMessage] = useState('');
   const [editedSoap, setEditedSoap] = useState({ S: '', O: '', A: '', P: '' });
+  const [extractedFacts, setExtractedFacts] = useState<any[]>([]);
+  const [confirmingFactId, setConfirmingFactId] = useState<string | null>(null);
+  const [editingFactId, setEditingFactId] = useState<string | null>(null);
+  const [editingValue, setEditingValue] = useState('');
+  const [showAddFact, setShowAddFact] = useState(false);
+  const [addFactCategory, setAddFactCategory] = useState('symptom');
+  const [addFactValue, setAddFactValue] = useState('');
+  const [addingFact, setAddingFact] = useState(false);
+  const [showTranscript, setShowTranscript] = useState(false);
+  const [inlineError, setInlineError] = useState<string | null>(null);
+
+  const loadSession = async () => {
+    if (!id) return;
+    const s = await getSession(id);
+    setSession(s);
+    const facts = (s.memory_state as any)?._extracted_facts || [];
+    setExtractedFacts(facts);
+    if (s.soap_note) {
+      const soap = s.soap_note as any;
+      setEditedSoap({ S: soap.S || '', O: soap.O || '', A: soap.A || '', P: soap.P || '' });
+    }
+  };
 
   useEffect(() => {
-    if (!id) return;
-    getSession(id)
-      .then((s) => {
-        setSession(s);
-        if (s.soap_note) {
-          const soap = s.soap_note as any;
-          setEditedSoap({
-            S: soap.S || '',
-            O: soap.O || '',
-            A: soap.A || '',
-            P: soap.P || ''
-          });
-        }
-      })
-      .catch(() => setError('Session not found'));
+    loadSession().catch(() => setError('Session not found'));
   }, [id]);
 
   const handleAccept = async () => {
@@ -525,6 +698,73 @@ export default function ReviewNote() {
     }
   };
 
+  const handleFactAction = async (factId: string, action: 'accept' | 'reject') => {
+    if (!id) return;
+    setConfirmingFactId(factId);
+    try {
+      await api.put(`/sessions/${id}/facts/${factId}`, { action });
+      await loadSession();
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setConfirmingFactId(null);
+    }
+  };
+
+  const handleFactEdit = async (factId: string, newValue: string) => {
+    if (!id || !newValue.trim()) { setEditingFactId(null); return; }
+    setConfirmingFactId(factId);
+    try {
+      await api.put(`/sessions/${id}/facts/${factId}`, { action: 'edit', normalized_value: newValue.trim() });
+      await loadSession();
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setConfirmingFactId(null);
+      setEditingFactId(null);
+    }
+  };
+
+  const handleAddFact = async () => {
+    if (!id || !addFactValue.trim()) return;
+    setAddingFact(true);
+    try {
+      await api.post(`/sessions/${id}/facts`, { category: addFactCategory, normalized_value: addFactValue.trim() });
+      await loadSession();
+      setAddFactValue('');
+      setShowAddFact(false);
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setAddingFact(false);
+    }
+  };
+
+  const handleViewInvestigationOrder = async () => {
+    if (!id) return;
+    try {
+      const resp = await api.get(`/sessions/${id}/investigation-order`, {
+        responseType: 'text',
+        headers: { Accept: 'text/html' },
+      });
+      const blob = new Blob([resp.data as string], { type: 'text/html' });
+      const url = URL.createObjectURL(blob);
+      const win = window.open(url, '_blank');
+      if (win) setTimeout(() => URL.revokeObjectURL(url), 60000);
+    } catch (e: any) {
+      if (e.response?.status === 409) {
+        setInlineError('No investigations ordered in this session.');
+        setTimeout(() => setInlineError(null), 4000);
+      } else if (e.response?.status === 404) {
+        setInlineError('No investigations found for this session.');
+        setTimeout(() => setInlineError(null), 4000);
+      } else {
+        setInlineError('Failed to generate investigation order.');
+        setTimeout(() => setInlineError(null), 4000);
+      }
+    }
+  };
+
   if (error) {
     return (
       <div className="min-h-screen bg-bg-warm flex items-center justify-center font-sans">
@@ -575,28 +815,73 @@ export default function ReviewNote() {
       `}} />
 
       <header className="border-b border-slate-200/80 sticky top-0 bg-white/90 backdrop-blur-md z-10 shadow-sm print:hidden">
-        <div className="max-w-3xl mx-auto px-6 h-14 flex items-center justify-between">
+        <div className={`${mode === 'health' ? 'max-w-7xl' : 'max-w-3xl'} mx-auto px-6 h-14 flex items-center justify-between`}>
           <div className="flex items-center gap-4">
-            <button
-              onClick={() => navigate(`/consultation/${id}`)}
-              className="text-slate-400 hover:text-primary transition-colors flex items-center text-xs font-semibold cursor-pointer"
-            >
-              <svg className="w-4 h-4 mr-1 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-              </svg>
-              Back to Session
-            </button>
-            <div className="h-4 w-px bg-slate-200" />
             <div className="flex items-center gap-2">
               <span className="font-bold text-primary text-base">श</span>
               <span className="text-sm font-bold text-text-dark font-sans">Lipi</span>
             </div>
-            <div className="h-4 w-px bg-slate-200" />
-            <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wide border ${MODE_COLORS[mode]}`}>
-              {MODE_LABELS[mode]}
-            </span>
+            {mode === 'health' ? (
+              <nav className="flex items-center ml-2">
+                <button
+                  onClick={() => navigate('/')}
+                  className="px-4 h-14 text-xs font-semibold text-slate-400 hover:text-slate-700 transition-colors cursor-pointer border-b-2 border-transparent"
+                >
+                  DASHBOARD
+                </button>
+                <button className="px-4 h-14 text-xs font-semibold text-emerald-700 border-b-2 border-emerald-600 cursor-pointer">
+                  FACT REVIEW
+                </button>
+                <button
+                  onClick={() => navigate('/')}
+                  className="px-4 h-14 text-xs font-semibold text-slate-400 hover:text-slate-700 transition-colors cursor-pointer border-b-2 border-transparent"
+                >
+                  PATIENT LIST
+                </button>
+              </nav>
+            ) : (
+              <>
+                <div className="h-4 w-px bg-slate-200" />
+                <button
+                  onClick={() => navigate(`/consultation/${id}`)}
+                  className="text-slate-400 hover:text-primary transition-colors flex items-center text-xs font-semibold cursor-pointer"
+                >
+                  <svg className="w-4 h-4 mr-1 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                  </svg>
+                  Back to Session
+                </button>
+                <div className="h-4 w-px bg-slate-200" />
+                <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wide border ${MODE_COLORS[mode]}`}>
+                  {MODE_LABELS[mode]}
+                </span>
+              </>
+            )}
           </div>
           <div className="flex items-center gap-3">
+            {session?.transcript && !session.transcript.startsWith('[Chief complaint:') && mode === 'health' && (
+              <button
+                onClick={() => setShowTranscript(v => !v)}
+                className={`border text-xs font-semibold px-3 py-1.5 rounded transition-all flex items-center gap-1.5 cursor-pointer print:hidden ${
+                  showTranscript
+                    ? 'bg-primary/10 border-primary/30 text-primary'
+                    : 'border-slate-300 hover:bg-slate-50 text-slate-600'
+                }`}
+              >
+                <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                </svg>
+                {showTranscript ? 'Hide source' : 'View source'}
+              </button>
+            )}
+            {doc && mode === 'health' && (
+              <button
+                onClick={handleViewInvestigationOrder}
+                className="border border-slate-300 hover:bg-slate-50 text-slate-700 text-xs font-semibold px-3 py-1.5 rounded transition-all flex items-center gap-1.5 cursor-pointer"
+              >
+                Investigation Order
+              </button>
+            )}
             {doc && (
               <button
                 onClick={() => window.print()}
@@ -608,6 +893,68 @@ export default function ReviewNote() {
                 Print / Export
               </button>
             )}
+            {session?.status === 'complete' && (
+              <button
+                onClick={async () => {
+                  try {
+                    const resp = await api.get(`/sessions/${id}/legal-export`, { responseType: 'blob' });
+                    const url = URL.createObjectURL(new Blob([resp.data], { type: 'application/pdf' }));
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = `lipi-legal-${(id || '').slice(0, 8)}.pdf`;
+                    a.click();
+                    URL.revokeObjectURL(url);
+                  } catch {
+                    alert('Legal export failed — session may not be complete yet.');
+                  }
+                }}
+                className="border border-slate-300 hover:bg-amber-50 hover:border-amber-300 text-slate-700 hover:text-amber-700 text-xs font-semibold px-3 py-1.5 rounded transition-all flex items-center gap-1.5 cursor-pointer print:hidden"
+              >
+                <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M3 6l3 1m0 0l-3 9a5.002 5.002 0 006.001 0M6 7l3 9M6 7l6-2m6 2l3-1m-3 1l-3 9a5.002 5.002 0 006.001 0M18 7l3 9m-3-9l-6-2m0-2v2m0 16V5m0 16H9m3 0h3" />
+                </svg>
+                Legal PDF
+              </button>
+            )}
+            {session?.status === 'complete' && (
+              <button
+                onClick={async () => {
+                  try {
+                    const resp = await api.get(`/sessions/${id}/prescription`, { responseType: 'blob' });
+                    const url = URL.createObjectURL(new Blob([resp.data], { type: 'application/pdf' }));
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = `prescription-${(id || '').slice(0, 8)}.pdf`;
+                    a.click();
+                    URL.revokeObjectURL(url);
+                  } catch {
+                    alert('Could not generate prescription.');
+                  }
+                }}
+                className="border border-emerald-300 hover:bg-emerald-50 text-emerald-700 text-xs font-semibold px-3 py-1.5 rounded transition-all flex items-center gap-1.5 cursor-pointer print:hidden"
+              >
+                <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                </svg>
+                Prescription
+              </button>
+            )}
+            {session?.status === 'complete' && (
+              <ReferralModal sessionId={id || ''} />
+            )}
+            {session?.status === 'complete' && (
+              <TpaClaimModal sessionId={id || ''} />
+            )}
+            {session?.status === 'complete' && (
+              <a
+                href={`/internal/tpa/${id}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="border border-emerald-300 hover:bg-emerald-50 text-emerald-700 text-xs font-semibold px-3 py-1.5 rounded transition-all flex items-center gap-1.5 print:hidden"
+              >
+                Insurance Claim →
+              </a>
+            )}
             <span className="bg-emerald-50 text-emerald-700 border border-emerald-200 px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider">
               {session.status.replace(/_/g, ' ')}
             </span>
@@ -615,8 +962,14 @@ export default function ReviewNote() {
         </div>
       </header>
 
-      <main className="max-w-3xl mx-auto px-6 py-8">
-        
+      {inlineError && (
+        <div className="fixed top-4 right-4 z-50 bg-red-50 border border-red-200 text-red-700 text-xs font-semibold px-4 py-2 rounded shadow-md">
+          {inlineError}
+        </div>
+      )}
+
+      <main className={`${mode === 'health' ? 'max-w-7xl' : 'max-w-3xl'} mx-auto px-6 py-6`}>
+
         {/* Printable Lipi Header */}
         <div className="hidden print:block mb-6 border-b-2 border-emerald-600 pb-4">
           <div className="flex justify-between items-center">
@@ -631,197 +984,507 @@ export default function ReviewNote() {
           </div>
         </div>
 
-        {/* Visible Consent Trust Panel */}
-        {session.cloud_ai_consent && (
-          <div className="border border-slate-200 rounded-lg p-4 bg-slate-50/50 shadow-xs mb-6 text-xs text-slate-600 print:hidden animate-fade-in-up">
-            <div className="flex items-center justify-between font-bold text-slate-700 mb-2 border-b border-slate-100 pb-1.5">
-              <div className="flex items-center gap-1.5">
-                <svg className="w-4 h-4 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-                </svg>
-                <span>Consent Audit Trail</span>
-              </div>
-              <span className="text-[10px] text-slate-400 font-bold tracking-wider">Audit Integrity Hash</span>
+        {/* ── Transcript Evidence Panel ─────────────────────── */}
+        {showTranscript && session?.transcript && !session.transcript.startsWith('[Chief complaint:') && (
+          <div className="mb-6 bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden print:hidden">
+            <div className="flex items-center gap-2 px-5 py-3 border-b border-slate-100 bg-slate-50/60">
+              <svg className="w-3.5 h-3.5 text-primary shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
+              </svg>
+              <span className="text-[11px] font-bold text-primary uppercase tracking-widest">Source transcript — every fact traces to a line below</span>
             </div>
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-slate-600">
-              <div>
-                <span className="block text-[10px] text-slate-400 font-bold uppercase tracking-wider">Consent Captured</span>
-                <span className="font-semibold text-emerald-700">✓ Granted</span>
-              </div>
-              <div>
-                <span className="block text-[10px] text-slate-400 font-bold uppercase tracking-wider">Mode</span>
-                <span className="font-semibold capitalize">{session.consent_log?.consent_mode || "verbal"}</span>
-              </div>
-              <div>
-                <span className="block text-[10px] text-slate-400 font-bold uppercase tracking-wider">Version</span>
-                <span className="font-semibold">{session.consent_log?.consent_text_version || "v1"}</span>
-              </div>
-              <div>
-                <span className="block text-[10px] text-slate-400 font-bold uppercase tracking-wider">Timestamp</span>
-                <span className="font-semibold text-slate-700">
-                  {session.consent_log?.timestamp 
-                    ? new Date(session.consent_log.timestamp).toLocaleString('en-IN', { hour12: true }) 
-                    : new Date(session.created_at).toLocaleString('en-IN', { hour12: true })}
-                </span>
-              </div>
+            <div className="px-5 py-4 space-y-1.5 max-h-64 overflow-y-auto">
+              {(() => {
+                const rawText = session.transcript || '';
+                const sentences = rawText
+                  .split(/(?<=[.!?])\s+|(?=\[)|\n+/)
+                  .map(s => s.trim())
+                  .filter(s => s.length > 3);
+
+                // Keywords from all confirmed facts (for highlighting)
+                const factKeywords = (extractedFacts || [])
+                  .flatMap((f: any) => (f.normalized_value || '').toLowerCase().split(/\s+/))
+                  .filter((w: string) => w.length > 3);
+
+                const soapText = [
+                  (session.soap_note as any)?.S,
+                  (session.soap_note as any)?.O,
+                  (session.soap_note as any)?.A,
+                  (session.soap_note as any)?.P,
+                ].filter(Boolean).join(' ').toLowerCase();
+
+                return sentences.map((sentence, i) => {
+                  const lower = sentence.toLowerCase();
+                  // Highlight if this sentence contains a keyword from facts or SOAP
+                  const isEvidence = factKeywords.some((kw: string) => lower.includes(kw)) ||
+                    lower.split(/\s+/).some((w: string) => w.length > 4 && soapText.includes(w));
+                  return (
+                    <div key={i} className={`flex items-start gap-2.5 rounded-lg px-3 py-2 transition-colors ${
+                      isEvidence ? 'bg-primary/5 border border-primary/15' : 'hover:bg-slate-50'
+                    }`}>
+                      <span className="text-[10px] font-mono text-slate-300 tabular-nums shrink-0 mt-0.5">{String(i + 1).padStart(2, '0')}</span>
+                      <p className={`text-[12.5px] leading-relaxed ${isEvidence ? 'text-slate-800 font-medium' : 'text-slate-500'}`}>
+                        {sentence}
+                      </p>
+                      {isEvidence && (
+                        <span className="shrink-0 mt-0.5 text-[9px] font-bold text-primary uppercase tracking-wider bg-primary/10 px-1.5 py-0.5 rounded-full">
+                          cited
+                        </span>
+                      )}
+                    </div>
+                  );
+                });
+              })()}
             </div>
-            {session.consent_log?.consent_hash && (
-              <div className="mt-3 bg-white border border-slate-200 rounded px-2.5 py-1.5 font-mono text-[10px] flex items-center justify-between select-all text-slate-500">
-                <span>Hash: {session.consent_log.consent_hash}</span>
-                <span className="text-slate-400 font-sans font-bold text-[9px] uppercase">Short: {session.consent_log.consent_hash.slice(0, 8)}...{session.consent_log.consent_hash.slice(-8)}</span>
-              </div>
-            )}
           </div>
         )}
 
-        {!doc ? (
-          <div className="text-center py-20 border border-dashed border-slate-200 rounded-lg bg-white shadow-sm print:hidden">
-            <svg className="w-10 h-10 mx-auto mb-4 text-slate-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-            </svg>
-            <p className="text-sm font-semibold text-slate-500">No document generated yet</p>
-            <p className="text-xs text-slate-400 mt-1">Go back to the consultation and run "Begin Documentation".</p>
-            <button
-              onClick={() => navigate(`/consultation/${id}`)}
-              className="mt-4 bg-primary hover:bg-primary-dark text-white text-xs font-semibold px-4 py-2 rounded transition-all shadow-sm cursor-pointer"
-            >
-              Go to Consultation →
-            </button>
+        {mode === 'health' ? (
+          /* ── Two-column health review layout ── */
+          <div className="flex gap-6 items-start print:block">
+
+            {/* LEFT — title + progress + facts grid */}
+            <div className="flex-1 min-w-0">
+
+              {/* Title row */}
+              <div className="flex items-start justify-between mb-3">
+                <div>
+                  <h1 className="text-xl font-bold text-slate-800">Clinical Fact Review</h1>
+                  <p className="text-xs text-slate-400 mt-0.5">Review and verify information extracted from the consultation.</p>
+                </div>
+                {extractedFacts.length > 0 && (
+                  <span className="shrink-0 ml-4 mt-1 border border-amber-300 text-amber-700 bg-amber-50 px-3 py-1 rounded text-[11px] font-bold uppercase tracking-wider">
+                    {extractedFacts.filter((f: any) => f.review_status === 'candidate').length} FACTS · NEEDS REVIEW
+                  </span>
+                )}
+              </div>
+
+              {/* Progress bar */}
+              {extractedFacts.length > 0 && (() => {
+                const total = extractedFacts.length;
+                const removed = extractedFacts.filter((f: any) => f.review_status === 'rejected').length;
+                const remaining = extractedFacts.filter((f: any) => f.review_status === 'candidate').length;
+                const pct = total > 0 ? Math.round((removed / total) * 100) : 0;
+                return (
+                  <div className="mb-5 print:hidden">
+                    <div className="flex justify-between text-[11px] text-slate-400 mb-1.5">
+                      <span>{removed} removed · {remaining} remaining</span>
+                      <span>{pct}%</span>
+                    </div>
+                    <div className="h-1.5 bg-slate-100 rounded-full overflow-hidden">
+                      <div className="h-1.5 bg-emerald-500 rounded-full transition-all duration-300" style={{ width: `${pct}%` }} />
+                    </div>
+                  </div>
+                );
+              })()}
+
+              {/* Facts grid */}
+              {extractedFacts.length > 0 && (() => {
+                const pending = extractedFacts.filter((f: any) => f.review_status === 'candidate');
+                const CATEGORY_META: Record<string, { label: string; border: string; badge: string; labelColor: string }> = {
+                  symptom:       { label: 'Symptom',       border: 'border-l-blue-400',   badge: 'bg-blue-50 text-blue-600 border-blue-200',     labelColor: 'text-blue-600' },
+                  vital:         { label: 'Vital',         border: 'border-l-purple-400', badge: 'bg-purple-50 text-purple-600 border-purple-200', labelColor: 'text-purple-600' },
+                  medication:    { label: 'Medication',    border: 'border-l-green-400',  badge: 'bg-green-50 text-green-700 border-green-200',   labelColor: 'text-green-700' },
+                  investigation: { label: 'Investigation', border: 'border-l-amber-400',  badge: 'bg-amber-50 text-amber-700 border-amber-200',   labelColor: 'text-amber-700' },
+                  diagnosis:     { label: 'Diagnosis',     border: 'border-l-red-400',    badge: 'bg-red-50 text-red-600 border-red-200',         labelColor: 'text-red-600' },
+                  allergy:       { label: 'Allergy',       border: 'border-l-rose-400',   badge: 'bg-rose-50 text-rose-600 border-rose-200',      labelColor: 'text-rose-600' },
+                  follow_up:     { label: 'Follow-up',     border: 'border-l-teal-400',   badge: 'bg-teal-50 text-teal-700 border-teal-200',      labelColor: 'text-teal-700' },
+                };
+                const DEFAULT_META = { label: 'Fact', border: 'border-l-slate-300', badge: 'bg-slate-50 text-slate-500 border-slate-200', labelColor: 'text-slate-500' };
+                if (pending.length === 0) return (
+                  <div className="text-center py-12 border border-dashed border-emerald-200 rounded-lg bg-emerald-50/30">
+                    <p className="text-sm font-semibold text-emerald-700">All facts reviewed</p>
+                    <p className="text-xs text-slate-400 mt-1">Click "Sign & Finalize" in the sidebar to complete.</p>
+                  </div>
+                );
+                return (
+                  <>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2.5 print:hidden">
+                      {pending.map((fact: any) => {
+                        const meta = CATEGORY_META[fact.category] || DEFAULT_META;
+                        const isEditingThis = editingFactId === fact.id;
+                        return (
+                          <div
+                            key={fact.id}
+                            className={`relative flex flex-col gap-1.5 pl-3 pr-8 py-3 rounded-md border border-slate-200 border-l-4 ${meta.border} bg-white`}
+                          >
+                            <span className={`text-[10px] font-bold uppercase tracking-widest ${meta.labelColor}`}>{meta.label}</span>
+                            {isEditingThis ? (
+                              <input
+                                autoFocus
+                                value={editingValue}
+                                onChange={e => setEditingValue(e.target.value)}
+                                onBlur={() => handleFactEdit(fact.id, editingValue)}
+                                onKeyDown={e => {
+                                  if (e.key === 'Enter') handleFactEdit(fact.id, editingValue);
+                                  if (e.key === 'Escape') setEditingFactId(null);
+                                }}
+                                className="text-sm font-semibold text-slate-800 border-b border-slate-300 focus:border-emerald-500 outline-none bg-transparent w-full pb-0.5"
+                              />
+                            ) : (
+                              <span
+                                className="text-sm font-semibold text-slate-800 leading-snug cursor-text hover:text-emerald-700 group"
+                                title="Click to edit"
+                                onClick={() => { setEditingFactId(fact.id); setEditingValue(fact.normalized_value); }}
+                              >
+                                {fact.normalized_value}
+                                <span className="opacity-0 group-hover:opacity-100 ml-1 text-[10px] text-slate-400 font-normal">✎</span>
+                              </span>
+                            )}
+                            {fact.source_sentence && !isEditingThis && (
+                              <p className="text-[11px] text-slate-400 italic leading-snug line-clamp-2" title={fact.source_sentence}>
+                                * {fact.source_sentence}
+                              </p>
+                            )}
+                            <button
+                              onClick={() => handleFactAction(fact.id, 'reject')}
+                              disabled={confirmingFactId === fact.id}
+                              className="absolute top-2.5 right-2.5 w-5 h-5 rounded-full flex items-center justify-center bg-slate-100 hover:bg-red-50 hover:text-red-500 text-slate-400 transition-colors disabled:opacity-40 cursor-pointer text-[11px] font-bold"
+                              title="Remove this fact from SOAP"
+                            >✕</button>
+                          </div>
+                        );
+                      })}
+
+                      {/* Add Fact card */}
+                      {showAddFact ? (
+                        <div className="flex flex-col gap-2 pl-3 pr-3 py-3 rounded-md border border-emerald-300 border-l-4 border-l-emerald-400 bg-emerald-50/30">
+                          <select
+                            value={addFactCategory}
+                            onChange={e => setAddFactCategory(e.target.value)}
+                            className="text-[10px] font-bold uppercase tracking-widest bg-transparent border-none outline-none text-emerald-700 cursor-pointer"
+                          >
+                            {Object.entries(CATEGORY_META).map(([k, v]) => (
+                              <option key={k} value={k}>{v.label}</option>
+                            ))}
+                          </select>
+                          <input
+                            autoFocus
+                            value={addFactValue}
+                            onChange={e => setAddFactValue(e.target.value)}
+                            onKeyDown={e => { if (e.key === 'Enter') handleAddFact(); if (e.key === 'Escape') setShowAddFact(false); }}
+                            placeholder="Enter value…"
+                            className="text-sm font-semibold text-slate-800 border-b border-emerald-300 focus:border-emerald-500 outline-none bg-transparent w-full pb-0.5 placeholder:font-normal placeholder:text-slate-400"
+                          />
+                          <div className="flex gap-2 mt-1">
+                            <button
+                              onClick={handleAddFact}
+                              disabled={addingFact || !addFactValue.trim()}
+                              className="text-[11px] font-bold text-white bg-emerald-600 hover:bg-emerald-700 px-2.5 py-1 rounded disabled:opacity-50 cursor-pointer"
+                            >
+                              {addingFact ? '…' : 'Add'}
+                            </button>
+                            <button
+                              onClick={() => { setShowAddFact(false); setAddFactValue(''); }}
+                              className="text-[11px] font-bold text-slate-500 hover:text-slate-700 cursor-pointer"
+                            >
+                              Cancel
+                            </button>
+                          </div>
+                        </div>
+                      ) : (
+                        <button
+                          onClick={() => setShowAddFact(true)}
+                          className="flex items-center justify-center gap-1.5 pl-3 pr-3 py-3 rounded-md border border-dashed border-slate-300 hover:border-emerald-400 hover:bg-emerald-50/30 text-slate-400 hover:text-emerald-600 text-xs font-semibold transition-colors cursor-pointer"
+                        >
+                          <span className="text-base leading-none">+</span> Add Fact
+                        </button>
+                      )}
+                    </div>
+                  </>
+                );
+              })()}
+
+              {/* No doc yet */}
+              {!doc && (
+                <div className="text-center py-20 border border-dashed border-slate-200 rounded-lg bg-white mt-4 print:hidden">
+                  <svg className="w-10 h-10 mx-auto mb-4 text-slate-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                  </svg>
+                  <p className="text-sm font-semibold text-slate-500">No document generated yet</p>
+                  <p className="text-xs text-slate-400 mt-1">Go back to the consultation and run "Begin Documentation".</p>
+                  <button onClick={() => navigate(`/consultation/${id}`)} className="mt-4 bg-primary hover:bg-primary-dark text-white text-xs font-semibold px-4 py-2 rounded transition-all shadow-sm cursor-pointer">
+                    Go to Consultation →
+                  </button>
+                </div>
+              )}
+
+              {/* Consent audit (compact, below facts) */}
+              {session.cloud_ai_consent && (
+                <div className="mt-4 border border-slate-100 rounded-lg p-3 bg-slate-50/50 text-[11px] text-slate-500 print:hidden flex items-center gap-3 flex-wrap">
+                  <svg className="w-3.5 h-3.5 text-emerald-600 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                  </svg>
+                  <span className="font-semibold text-emerald-700">Consent ✓</span>
+                  <span className="text-slate-400">·</span>
+                  <span>Mode: {session.consent_log?.consent_mode || 'verbal'}</span>
+                  <span className="text-slate-400">·</span>
+                  <span>{session.consent_log?.timestamp ? new Date(session.consent_log.timestamp).toLocaleString('en-IN', { hour12: true }) : new Date(session.created_at).toLocaleString('en-IN', { hour12: true })}</span>
+                  {session.consent_log?.consent_hash && (
+                    <span className="font-mono text-[10px] text-slate-400 truncate">#{session.consent_log.consent_hash.slice(0, 8)}</span>
+                  )}
+                </div>
+              )}
+            </div>
+
+            {/* RIGHT SIDEBAR — patient + SOAP + sign */}
+            <div className="w-72 shrink-0 sticky top-16 print:hidden">
+              {/* Patient header */}
+              <div className="bg-white border border-slate-200 border-b-0 rounded-t-lg px-4 py-3 flex items-center gap-3">
+                <div className="w-9 h-9 rounded-full bg-emerald-600 flex items-center justify-center text-white text-xs font-bold shrink-0">
+                  {(session.patient_name || 'P').split(' ').map((n: string) => n[0]).join('').slice(0, 2).toUpperCase()}
+                </div>
+                <div>
+                  <p className="text-sm font-semibold text-slate-800">{session.patient_name || 'Anonymous Patient'}</p>
+                  <p className="text-[10px] font-bold uppercase tracking-wider text-amber-600">DRAFT · NEEDS REVIEW</p>
+                </div>
+              </div>
+
+              {/* SOAP sections */}
+              {doc && (() => {
+                const soap = doc as any;
+                const simpleSOAP = 'S' in soap || 'O' in soap;
+                if (!simpleSOAP) return null;
+                const sections = [
+                  { key: 'S', label: 'Subjective', accent: 'border-l-blue-400',   color: 'text-blue-600' },
+                  { key: 'O', label: 'Objective',  accent: 'border-l-purple-400', color: 'text-purple-600' },
+                  { key: 'A', label: 'Assessment', accent: 'border-l-red-400',    color: 'text-red-600' },
+                  { key: 'P', label: 'Plan',       accent: 'border-l-green-400',  color: 'text-green-700' },
+                ];
+                return (
+                  <div className="bg-white border border-slate-200 border-t-0 border-b-0 divide-y divide-slate-100">
+                    {sections.map(s => (
+                      <div key={s.key} className={`px-4 py-3 border-l-2 ${s.accent}`}>
+                        <p className={`text-[10px] font-bold uppercase tracking-widest mb-1.5 ${s.color}`}>{s.label}</p>
+                        {isEditing ? (
+                          <textarea
+                            value={(editedSoap as any)[s.key] || ''}
+                            onChange={e => setEditedSoap({ ...editedSoap, [s.key]: e.target.value })}
+                            rows={3}
+                            className="w-full text-[12px] text-slate-700 leading-relaxed resize-none border border-slate-200 rounded px-2 py-1.5 focus:outline-none focus:border-emerald-400 bg-slate-50"
+                          />
+                        ) : (
+                          <p className="text-[12px] text-slate-600 leading-relaxed">{(doc as any)[s.key] || 'Not specified'}</p>
+                        )}
+                      </div>
+                    ))}
+                    {/* CDS alerts compact */}
+                    {cds && cds.length > 0 && !isEditing && (
+                      <div className="px-4 py-3">
+                        {cds.slice(0, 2).map((alert: any, i: number) => (
+                          <div key={i} className={`text-[11px] font-semibold mb-1 ${alert.urgency === 'critical' ? 'text-red-600' : 'text-amber-600'}`}>
+                            ⚠ {alert.suggestion}
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                );
+              })()}
+
+              {/* Sign & Finalize — or Save Edits when editing */}
+              {isEditing ? (
+                <div className="flex gap-0 border border-slate-200 border-t-0 rounded-b-lg overflow-hidden">
+                  <button
+                    onClick={submitFeedback}
+                    className="flex-1 bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold py-3.5 tracking-wider uppercase transition-colors cursor-pointer"
+                  >
+                    Save Edits
+                  </button>
+                  <button
+                    onClick={() => { setIsEditing(false); }}
+                    className="px-4 bg-slate-100 hover:bg-slate-200 text-slate-600 text-xs font-semibold transition-colors cursor-pointer border-l border-slate-200"
+                  >
+                    Cancel
+                  </button>
+                </div>
+              ) : (
+                <button
+                  onClick={handleAccept}
+                  disabled={feedbackSubmitted}
+                  className="w-full bg-emerald-700 hover:bg-emerald-800 disabled:bg-emerald-400 text-white text-xs font-bold py-3.5 rounded-b-lg tracking-wider uppercase transition-colors cursor-pointer"
+                >
+                  {feedbackSubmitted ? '✓ Signed' : 'Sign & Finalize'}
+                </button>
+              )}
+
+              {feedbackSubmitted && (
+                <p className="text-[11px] text-emerald-700 text-center mt-2">{feedbackMessage}</p>
+              )}
+
+              {/* Edit / Reject links */}
+              {doc && !feedbackSubmitted && !isEditing && (
+                <div className="mt-3 flex justify-center gap-4 text-[11px]">
+                  <button onClick={handleEditToggle} className="text-slate-500 hover:text-slate-700 cursor-pointer">
+                    Edit Note
+                  </button>
+                  <span className="text-slate-300">·</span>
+                  <button onClick={() => { setRejectMode(true); setIsEditing(false); }} className="text-slate-500 hover:text-red-600 cursor-pointer">
+                    Reject
+                  </button>
+                  <span className="text-slate-300">·</span>
+                  <button onClick={() => window.print()} className="text-slate-500 hover:text-slate-700 cursor-pointer">
+                    Print
+                  </button>
+                </div>
+              )}
+            </div>
+
           </div>
-        ) : mode === 'government' ? (
-          <FIRView fir={doc} session={session} />
-        ) : mode === 'legal' ? (
-          <LegalView doc={doc} session={session} />
-        ) : mode === 'general' ? (
-          <GeneralView doc={doc} />
         ) : (
-          <SOAPView 
-            soap={doc} 
-            cds={cds} 
-            session={session} 
-            isEditing={isEditing} 
-            editedSoap={editedSoap} 
-            setEditedSoap={setEditedSoap} 
-          />
+          /* ── Non-health modes (FIR / Legal / General) — single column ── */
+          <>
+            {!doc ? (
+              <div className="text-center py-20 border border-dashed border-slate-200 rounded-lg bg-white shadow-sm print:hidden">
+                <svg className="w-10 h-10 mx-auto mb-4 text-slate-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                </svg>
+                <p className="text-sm font-semibold text-slate-500">No document generated yet</p>
+                <p className="text-xs text-slate-400 mt-1">Go back to the consultation and run "Begin Documentation".</p>
+                <button
+                  onClick={() => navigate(`/consultation/${id}`)}
+                  className="mt-4 bg-primary hover:bg-primary-dark text-white text-xs font-semibold px-4 py-2 rounded transition-all shadow-sm cursor-pointer"
+                >
+                  Go to Consultation →
+                </button>
+              </div>
+            ) : mode === 'government' ? (
+              <FIRView fir={doc} session={session} />
+            ) : mode === 'legal' ? (
+              <LegalView doc={doc} session={session} />
+            ) : mode === 'general' ? (
+              <GeneralView doc={doc} />
+            ) : (
+              <SOAPView
+                soap={doc}
+                cds={cds}
+                session={session}
+                isEditing={isEditing}
+                editedSoap={editedSoap}
+                setEditedSoap={setEditedSoap}
+              />
+            )}
+          </>
+        )}
+
+        {/* PRINT-ONLY CLINICAL NOTE */}
+        {doc && mode === 'health' && (
+          <div className="hidden print:block mt-6 space-y-6">
+            {/* Patient info row */}
+            <div className="flex justify-between items-start border-b border-slate-200 pb-3">
+              <div>
+                <p className="text-sm font-bold text-slate-900">{session.patient_name || 'Anonymous Patient'}</p>
+                {session.abha_number && <p className="text-[10px] text-slate-500 mt-0.5">ABHA: {session.abha_number}</p>}
+              </div>
+              <div className="text-right text-[10px] text-slate-500">
+                <p>{session.doctor_name ? ('Dr. ' + session.doctor_name) : ''}</p>
+                <p>{new Date(session.created_at).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })}</p>
+              </div>
+            </div>
+
+            {/* SOAP Note */}
+            {(() => {
+              const soap = (doc as any);
+              const sections = [
+                { key: 'S', label: 'Subjective (Symptoms, History)', value: soap.S || soap.subjective },
+                { key: 'O', label: 'Objective (Vitals, Observations)', value: soap.O || soap.objective },
+                { key: 'A', label: 'Assessment (Clinical Impression)', value: soap.A || soap.assessment },
+                { key: 'P', label: 'Plan (Medications, Orders, Follow-Up)', value: soap.P || soap.plan },
+              ].filter(s => s.value);
+              return (
+                <div className="space-y-3">
+                  <h2 className="text-xs font-bold uppercase tracking-widest text-slate-600 border-b border-slate-100 pb-1">SOAP Clinical Note</h2>
+                  {sections.map(({ key, label, value }) => (
+                    <div key={key}>
+                      <p className="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-0.5">{key}. {label}</p>
+                      <p className="text-sm text-slate-800 leading-relaxed whitespace-pre-wrap">{value}</p>
+                    </div>
+                  ))}
+                </div>
+              );
+            })()}
+
+            {/* Extracted Facts table */}
+            {extractedFacts.length > 0 && (
+              <div>
+                <h2 className="text-xs font-bold uppercase tracking-widest text-slate-600 border-b border-slate-100 pb-1 mb-2">Extracted Clinical Facts</h2>
+                <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '11px' }}>
+                  <thead>
+                    <tr style={{ background: '#f8fafc' }}>
+                      <th style={{ textAlign: 'left', padding: '4px 8px', borderBottom: '1px solid #e2e8f0', color: '#64748b', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em', fontSize: '9px' }}>Category</th>
+                      <th style={{ textAlign: 'left', padding: '4px 8px', borderBottom: '1px solid #e2e8f0', color: '#64748b', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em', fontSize: '9px' }}>Value</th>
+                      <th style={{ textAlign: 'left', padding: '4px 8px', borderBottom: '1px solid #e2e8f0', color: '#64748b', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em', fontSize: '9px' }}>Source</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {extractedFacts.filter((f: any) => f.review_status !== 'rejected').map((f: any, i: number) => (
+                      <tr key={f.id} style={{ background: i % 2 === 0 ? '#fff' : '#f8fafc' }}>
+                        <td style={{ padding: '4px 8px', borderBottom: '1px solid #f1f5f9', color: '#475569', textTransform: 'capitalize' }}>{f.category?.replace('_', ' ')}</td>
+                        <td style={{ padding: '4px 8px', borderBottom: '1px solid #f1f5f9', color: '#1e293b', fontWeight: 600 }}>{f.normalized_value}</td>
+                        <td style={{ padding: '4px 8px', borderBottom: '1px solid #f1f5f9', color: '#94a3b8', fontStyle: 'italic', fontSize: '10px' }}>{f.source_sentence?.slice(0, 60)}{f.source_sentence?.length > 60 ? '...' : ''}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+
+            {/* Consent */}
+            {session.cloud_ai_consent && (
+              <p className="text-[10px] text-slate-500 border-t border-slate-100 pt-2">
+                <span className="font-semibold text-emerald-700">Consent ✓</span>
+                {' · '}Mode: {session.consent_log?.consent_mode || 'verbal'}
+                {' · '}{session.consent_log?.timestamp ? new Date(session.consent_log.timestamp).toLocaleString('en-IN', { hour12: true }) : new Date(session.created_at).toLocaleString('en-IN', { hour12: true })}
+              </p>
+            )}
+          </div>
         )}
 
         {/* Printable disclaimer footer */}
         <div className="hidden print:block mt-8 pt-4 border-t border-slate-200 text-[10px] text-slate-500 text-center">
-          <p className="font-semibold text-slate-700">“Doctor must review and sign off before clinical use”</p>
+          <p className="font-semibold text-slate-700">"Doctor must review and sign off before clinical use"</p>
           <p className="mt-1">Generated by Lipi on {new Date(session.created_at).toLocaleString('en-IN')}</p>
           <p className="mt-1 text-[8px]">This is an AI-assisted draft documentation. The physician retains final authority and accountability.</p>
         </div>
 
-        {/* Doctor Review & Feedback Controls */}
-        {doc && mode === 'health' && (
-          <section className="bg-white border border-slate-200 rounded-lg p-6 shadow-sm mt-6 print:hidden">
-            <h2 className="text-sm font-bold text-text-dark font-serif uppercase tracking-wider mb-4 pb-2 border-b border-slate-100 flex items-center gap-2">
-              <svg className="w-4 h-4 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
-              </svg>
-              Doctor Review & Feedback
+        {/* Expanded feedback form — only shown when doctor clicks Edit or Reject from sidebar */}
+        {doc && mode === 'health' && (isEditing || rejectMode) && !feedbackSubmitted && (
+          <section className="bg-white border border-slate-200 rounded-lg p-5 shadow-sm mt-4 print:hidden">
+            <h2 className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-3">
+              {isEditing ? 'Edit Note' : 'Reject Note'} — Correction Categories
             </h2>
-
-            {feedbackSubmitted ? (
-              <div className="bg-emerald-50 border border-emerald-200 text-emerald-800 p-4 rounded-lg text-sm font-semibold flex items-center gap-2">
-                <svg className="w-5 h-5 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-                {feedbackMessage}
-              </div>
-            ) : (
-              <div className="space-y-4">
-                {isEditing ? (
-                  <p className="text-xs text-slate-500">
-                    Make direct changes in the note sections above, select any correction categories, and save your feedback.
-                  </p>
-                ) : (
-                  <p className="text-xs text-slate-500">
-                    Review the generated draft note. You can Accept, Edit, or Reject it to save clinical metrics.
-                  </p>
-                )}
-
-                <div className="flex flex-wrap gap-3">
-                  {!isEditing && (
-                    <button
-                      onClick={handleAccept}
-                      className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-lg transition-colors cursor-pointer"
-                    >
-                      Accept & Save
-                    </button>
-                  )}
-                  
+            <div className="flex flex-wrap gap-2 mb-4">
+              {Object.entries(CATEGORY_LABELS).map(([catKey, catLabel]) => {
+                const isSelected = selectedCategories.includes(catKey);
+                return (
                   <button
-                    onClick={handleEditToggle}
-                    className={`px-4 py-2 text-xs font-bold rounded-lg transition-colors cursor-pointer ${
-                      isEditing 
-                        ? 'bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-300' 
-                        : 'bg-indigo-600 hover:bg-indigo-700 text-white'
+                    key={catKey}
+                    onClick={() => toggleCategory(catKey)}
+                    className={`px-3 py-1.5 rounded-full text-xs font-semibold border transition-all cursor-pointer ${
+                      isSelected
+                        ? 'bg-indigo-50 border-indigo-300 text-indigo-700'
+                        : 'bg-white border-slate-200 text-slate-600 hover:border-slate-300'
                     }`}
                   >
-                    {isEditing ? 'Cancel Edit' : 'Edit & Save'}
+                    {catLabel}
                   </button>
-
-                  {!isEditing && (
-                    <button
-                      onClick={() => {
-                        setRejectMode(true);
-                        setIsEditing(false);
-                      }}
-                      className="px-4 py-2 bg-slate-100 hover:bg-red-50 hover:text-red-700 text-slate-700 border border-slate-300 text-xs font-bold rounded-lg transition-colors cursor-pointer"
-                    >
-                      Reject Note
-                    </button>
-                  )}
-                </div>
-
-                {(isEditing || rejectMode) && (
-                  <div className="pt-4 border-t border-slate-100 space-y-3">
-                    <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider">
-                      Correction Categories (Select all that apply)
-                    </label>
-                    <div className="flex flex-wrap gap-2">
-                      {Object.entries(CATEGORY_LABELS).map(([catKey, catLabel]) => {
-                        const isSelected = selectedCategories.includes(catKey);
-                        return (
-                          <button
-                            key={catKey}
-                            onClick={() => toggleCategory(catKey)}
-                            className={`px-3 py-1.5 rounded-full text-xs font-semibold border transition-all cursor-pointer ${
-                              isSelected 
-                                ? 'bg-indigo-50 border-indigo-300 text-indigo-700'
-                                : 'bg-white border-slate-200 text-slate-600 hover:border-slate-300'
-                            }`}
-                          >
-                            {catLabel}
-                          </button>
-                        );
-                      })}
-                    </div>
-
-                    <div className="pt-2 flex justify-end gap-2">
-                      {rejectMode && (
-                        <button
-                          onClick={() => {
-                            setRejectMode(false);
-                            setSelectedCategories([]);
-                          }}
-                          className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-lg transition-colors cursor-pointer"
-                        >
-                          Cancel
-                        </button>
-                      )}
-                      <button
-                        onClick={submitFeedback}
-                        className="px-5 py-2 bg-primary hover:bg-primary-dark text-white text-xs font-bold rounded-lg shadow-sm transition-colors cursor-pointer"
-                      >
-                        {rejectMode ? 'Submit Rejection' : 'Submit Edits & Feedback'}
-                      </button>
-                    </div>
-                  </div>
-                )}
-              </div>
-            )}
+                );
+              })}
+            </div>
+            <div className="flex justify-end gap-2">
+              <button
+                onClick={() => { setRejectMode(false); setIsEditing(false); setSelectedCategories([]); }}
+                className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-lg transition-colors cursor-pointer"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={submitFeedback}
+                className="px-5 py-2 bg-primary hover:bg-primary-dark text-white text-xs font-bold rounded-lg shadow-sm transition-colors cursor-pointer"
+              >
+                {rejectMode ? 'Submit Rejection' : 'Submit Edits & Feedback'}
+              </button>
+            </div>
           </section>
         )}
       </main>

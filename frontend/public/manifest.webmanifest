@@ -1,0 +1,23 @@
+{
+  "name": "Lipi – Clinical Scribe",
+  "short_name": "Lipi",
+  "description": "AI clinical scribe for Indian OPDs. Spoken consultation → structured SOAP note.",
+  "theme_color": "#0f766e",
+  "background_color": "#ffffff",
+  "display": "standalone",
+  "orientation": "portrait",
+  "start_url": "/dashboard",
+  "scope": "/",
+  "icons": [
+    { "src": "/icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },
+    { "src": "/icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ],
+  "shortcuts": [
+    {
+      "name": "New Consultation",
+      "short_name": "New",
+      "url": "/dashboard",
+      "description": "Start a new patient consultation"
+    }
+  ]
+}

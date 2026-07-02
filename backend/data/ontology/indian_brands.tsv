@@ -1,0 +1,280 @@
+dolo	paracetamol
+dolo 650	paracetamol 650mg
+crocin	paracetamol
+crocin advance	paracetamol 500mg
+calpol	paracetamol
+metacin	paracetamol
+p 500	paracetamol 500mg
+pyrigesic	paracetamol
+combiflam	ibuprofen + paracetamol
+ibugesic	ibuprofen
+brufen	ibuprofen
+voveran	diclofenac
+voveran sr	diclofenac SR
+diclogem	diclofenac
+zerodol	aceclofenac
+zerodol sp	aceclofenac + serratiopeptidase
+zerodol p	aceclofenac + paracetamol
+hifenac	aceclofenac
+hifenac p	aceclofenac + paracetamol
+nimulid	nimesulide
+nise	nimesulide
+sumo	nimesulide + paracetamol
+saridon	propyphenazone + paracetamol + caffeine
+ultracet	tramadol + paracetamol
+drotin	drotaverine
+drotin ds	drotaverine 80mg
+meftal spas	mefenamic acid + dicyclomine
+meftal forte	mefenamic acid
+cyclopam	dicyclomine + paracetamol
+mox	amoxicillin
+mox cv	amoxicillin-clavulanate
+novamox	amoxicillin
+augmentin	amoxicillin-clavulanate
+clavam	amoxicillin-clavulanate
+moxikind cv	amoxicillin-clavulanate
+azee	azithromycin
+azithral	azithromycin
+azicip	azithromycin
+taxim o	cefixime
+ceftas	cefixime
+zifi	cefixime
+mahacef	cefixime
+monocef	ceftriaxone
+ceftum	cefuroxime
+cepodem	cefpodoxime
+ciplox	ciprofloxacin
+cifran	ciprofloxacin
+levoflox	levofloxacin
+levomac	levofloxacin
+oflox	ofloxacin
+zanocin	ofloxacin
+norflox tz	norfloxacin + tinidazole
+flagyl	metronidazole
+metrogyl	metronidazole
+ornof	ofloxacin + ornidazole
+o2	ofloxacin + ornidazole
+doxy	doxycycline
+doxt	doxycycline
+septran	cotrimoxazole
+bactrim	cotrimoxazole
+furadantin	nitrofurantoin
+macrobid	nitrofurantoin
+zentel	albendazole
+ivecop	ivermectin
+forcan	fluconazole
+flucos	fluconazole
+candiforce	itraconazole
+candid	clotrimazole
+candid b	clotrimazole + beclomethasone
+lamisil	terbinafine
+terbicip	terbinafine
+omez	omeprazole
+omez d	omeprazole + domperidone
+pan 40	pantoprazole 40mg
+pantop	pantoprazole
+pantocid	pantoprazole
+pantodac	pantoprazole
+pan d	pantoprazole + domperidone
+nexpro	esomeprazole
+razo	rabeprazole
+rablet	rabeprazole
+rantac	ranitidine
+zinetac	ranitidine
+aciloc	ranitidine
+gelusil	aluminium + magnesium hydroxide
+digene	aluminium + magnesium hydroxide
+mucaine	aluminium hydroxide + oxetacaine
+sucral	sucralfate
+emeset	ondansetron
+zofer	ondansetron
+domstal	domperidone
+vomistop	domperidone
+perinorm	metoclopramide
+duphalac	lactulose
+cremaffin	liquid paraffin + milk of magnesia
+dulcolax	bisacodyl
+imodium	loperamide
+eldoper	loperamide
+sporlac	lactobacillus
+bifilac	probiotic
+vizylac	probiotic
+econorm	saccharomyces boulardii
+electral	ORS
+okacet	cetirizine
+alerid	cetirizine
+cetzine	cetirizine
+zyrtec	cetirizine
+levocet	levocetirizine
+xyzal	levocetirizine
+allegra	fexofenadine
+lorfast	loratadine
+deslor	desloratadine
+atarax	hydroxyzine
+benadryl	diphenhydramine
+montair	montelukast
+montair lc	montelukast + levocetirizine
+singulair	montelukast
+stamlo	amlodipine
+amlodac	amlodipine
+amlong	amlodipine
+amlip	amlodipine
+aten	atenolol
+tenormin	atenolol
+metolar	metoprolol
+betaloc	metoprolol
+concor	bisoprolol
+ciplar	propranolol
+cardivas	carvedilol
+telma	telmisartan
+telma h	telmisartan + HCTZ
+telmikind	telmisartan
+repace	losartan
+losacar	losartan
+cardace	ramipril
+hopace	ramipril
+envas	enalapril
+depin	nifedipine
+ecosprin	aspirin
+ecosprin av	aspirin + atorvastatin
+loprin	aspirin
+clopivas	clopidogrel
+deplatt	clopidogrel
+clopilet	clopidogrel
+atorva	atorvastatin
+tonact	atorvastatin
+lipitor	atorvastatin
+rozavel	rosuvastatin
+crestor	rosuvastatin
+rosuvas	rosuvastatin
+lasix	furosemide
+fruselac	furosemide
+dytor	torsemide
+aldactone	spironolactone
+lanoxin	digoxin
+sorbitrate	isosorbide dinitrate
+clexane	enoxaparin
+xarelto	rivaroxaban
+eliquis	apixaban
+glycomet	metformin
+obimet	metformin
+glycomet gp	metformin + glimepiride
+glycomet sr	metformin SR
+amaryl	glimepiride
+glimer	glimepiride
+glimisave	glimepiride
+daonil	glibenclamide
+januvia	sitagliptin
+istavel	sitagliptin
+jalra	vildagliptin
+galvus	vildagliptin
+tenepure	teneligliptin
+jardiance	empagliflozin
+forxiga	dapagliflozin
+pioz	pioglitazone
+lantus	insulin glargine
+novorapid	insulin aspart
+humalog	insulin lispro
+human mixtard	premixed insulin
+vobose	voglibose
+asthalin	salbutamol
+ventolin	salbutamol
+levolin	levosalbutamol
+duolin	salbutamol + ipratropium
+budecort	budesonide
+pulmicort	budesonide
+foracort	formoterol + budesonide
+seroflo	salmeterol + fluticasone
+spiriva	tiotropium
+deriphyllin	theophylline + etophylline
+grilinctus	guaifenesin + dextromethorphan
+ascoril	salbutamol + bromhexine + guaifenesin
+ascoril ls	ambroxol + levosalbutamol + guaifenesin
+alex	dextromethorphan + phenylephrine + chlorpheniramine
+mucolite	ambroxol
+ambrodil	ambroxol
+sinarest	paracetamol + chlorpheniramine + pseudoephedrine
+otrivin	xylometazoline
+nasivion	oxymetazoline
+wysolone	prednisolone
+omnacortil	prednisolone
+dexona	dexamethasone
+medrol	methylprednisolone
+defcort	deflazacort
+thyronorm	levothyroxine
+eltroxin	levothyroxine
+neomercazole	carbimazole
+gabapin	gabapentin
+neurontin	gabapentin
+pregalin	pregabalin
+lyrica	pregabalin
+tryptomer	amitriptyline
+tegretol	carbamazepine
+eptoin	phenytoin
+levipil	levetiracetam
+valparin	valproate
+nexito	escitalopram
+cipralex	escitalopram
+zoloft	sertraline
+serta	sertraline
+flunil	fluoxetine
+prozac	fluoxetine
+mirtaz	mirtazapine
+alprax	alprazolam
+restyl	alprazolam
+lonazep	clonazepam
+zapiz	clonazepam
+ativan	lorazepam
+olanex	olanzapine
+oliza	olanzapine
+risnia	risperidone
+strocit	citicoline
+sumatriptan	sumatriptan
+shelcal	calcium + vitamin D
+calvit	calcium
+calcirol	cholecalciferol
+d rise	cholecalciferol
+arachitol	cholecalciferol
+celin	vitamin C
+limcee	vitamin C
+nurokind	methylcobalamin
+methycobal	methylcobalamin
+cobadex	methylcobalamin
+rejunex	methylcobalamin
+neurobion	B-complex
+becosules	B-complex + vitamin C
+zincovit	multivitamin + zinc
+supradyn	multivitamin
+revital	multivitamin
+folvite	folic acid
+orofer	iron supplement
+autrin	iron + folic acid
+fefol	ferrous fumarate + folic acid
+evion	vitamin E
+biotin	biotin
+betadine	povidone-iodine
+t bact	mupirocin
+bactroban	mupirocin
+soframycin	framycetin
+fucidin	fusidic acid
+volini	diclofenac gel
+moov	diclofenac + methyl salicylate
+calamine lotion	calamine
+clobetasol cream	clobetasol
+elocon	mometasone
+protopic	tacrolimus
+isotroin	isotretinoin
+tretinoin	tretinoin
+adapalene gel	adapalene
+benzoyl peroxide cream	benzoyl peroxide
+permethrin cream	permethrin
+scaboma	gamma benzene hexachloride
+moxicip	moxifloxacin eye drops
+ciplox eye drops	ciprofloxacin eye drops
+tobrex	tobramycin eye drops
+refresh tears	carboxymethylcellulose
+genteal	hydroxypropyl methylcellulose
+urimax	tamsulosin
+contiflo	tamsulosin
+finpecia	finasteride
+dutas	dutasteride

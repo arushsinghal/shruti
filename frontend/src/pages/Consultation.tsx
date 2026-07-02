@@ -1,7 +1,9 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
+import type { InputMode } from '../components/AudioUploader';
 import { useNavigate, useParams } from 'react-router-dom';
 import AudioUploader from '../components/AudioUploader';
 import TranscriptViewer from '../components/TranscriptViewer';
+import type { EntityHighlight } from '../components/TranscriptViewer';
 import ClinicalResults from '../components/ClinicalResults';
 import { getSession, grantConsent, processClinical, submitTranscriptText } from '../lib/api';
 import type { ConsultationSession, TranscribeResponse, ProcessClinicalResponse } from '../types/clinical';
@@ -34,39 +36,33 @@ function ConsentGate({ onConsented, error }: { onConsented: () => void; error?: 
   async function handleConfirm() {
     setConfirming(true);
     await onConsented();
-    // If error occurs, handleConsentGranted keeps consentGranted=false
-    // and sets consentError. React re-render will pass error prop here.
     setConfirming(false);
   }
 
   return (
-    <div className="border border-amber-200 rounded-lg bg-amber-50 p-5 space-y-4">
+    <div className="border border-amber-200/80 rounded-xl bg-amber-50/70 p-4 space-y-3">
       <div className="flex items-start gap-3">
-        <svg className="w-5 h-5 text-amber-600 mt-0.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-        </svg>
+        <span className="grid place-items-center w-7 h-7 rounded-lg bg-amber-100 text-amber-600 shrink-0">
+          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+          </svg>
+        </span>
         <div>
-          <p className="text-sm font-bold text-amber-800">Patient consent required before recording</p>
-          <p className="text-xs text-amber-700 mt-1 leading-relaxed">
-            Please inform the patient before starting. Suggested words:<br />
-            <span className="italic">"I will briefly record our conversation to help me write accurate notes. Your information is protected and used only for your medical record."</span>
+          <p className="text-xs font-bold text-amber-900">Patient consent required before recording</p>
+          <p className="text-[11px] text-amber-700 mt-1 leading-relaxed italic">
+            "I will briefly record our conversation to help write accurate notes."
           </p>
         </div>
       </div>
       {error && (
-        <div className="border border-red-200 bg-red-50 rounded-lg p-3 flex items-start gap-2">
-          <svg className="w-4 h-4 text-red-500 mt-0.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-          </svg>
-          <p className="text-xs text-red-700 font-medium">{error}</p>
-        </div>
+        <p className="text-[11px] text-red-700 bg-red-50 border border-red-200 rounded-lg px-2.5 py-1.5 font-medium">{error}</p>
       )}
       <button
         onClick={handleConfirm}
         disabled={confirming}
-        className="w-full py-2.5 rounded-lg text-sm font-semibold bg-amber-600 hover:bg-amber-700 disabled:opacity-50 text-white transition-colors cursor-pointer"
+        className="w-full py-2.5 rounded-lg text-xs font-bold bg-amber-600 hover:bg-amber-700 disabled:opacity-50 text-white transition-all active:scale-[0.99] cursor-pointer"
       >
-        {confirming ? 'Recording consent…' : error ? 'Retry consent →' : 'Patient has been informed and has consented →'}
+        {confirming ? 'Recording consent…' : error ? 'Retry consent →' : 'Patient informed & consented →'}
       </button>
     </div>
   );
@@ -128,7 +124,7 @@ function DocumentReadyCard({ mode, soap, onReview }: { mode: SessionMode; soap: 
 
       <button
         onClick={onReview}
-        className="w-full px-4 py-3 rounded bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-semibold transition-all shadow-md flex items-center justify-center gap-2 cursor-pointer"
+        className="w-full px-4 py-3 rounded-lg bg-primary hover:bg-primary-dark text-white text-sm font-semibold transition-all shadow-sm active:scale-[0.99] flex items-center justify-center gap-2 cursor-pointer"
       >
         <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
@@ -139,14 +135,15 @@ function DocumentReadyCard({ mode, soap, onReview }: { mode: SessionMode; soap: 
   );
 }
 
+// Pipeline status → brand-aligned semantic scale: neutral (start) → saffron (working) → green (done).
 const STATUS_COLORS: Record<string, string> = {
   created: 'bg-slate-100 text-slate-600 border border-slate-200',
-  audio_uploaded: 'bg-blue-50 text-blue-700 border border-blue-100',
-  transcribed: 'bg-indigo-50 text-indigo-700 border border-indigo-100',
-  extracted: 'bg-purple-50 text-purple-700 border border-purple-100',
-  memory_resolved: 'bg-amber-50 text-amber-700 border border-amber-100',
-  soap_ready: 'bg-orange-50 text-orange-700 border border-orange-100',
-  complete: 'bg-emerald-50 text-primary border border-primary/20',
+  audio_uploaded: 'bg-amber-50 text-amber-700 border border-amber-200/70',
+  transcribed: 'bg-amber-50 text-amber-700 border border-amber-200/70',
+  extracted: 'bg-amber-50 text-amber-700 border border-amber-200/70',
+  memory_resolved: 'bg-amber-50 text-amber-700 border border-amber-200/70',
+  soap_ready: 'bg-amber-100 text-amber-800 border border-amber-300/60',
+  complete: 'bg-primary/10 text-primary border border-primary/20',
 };
 
 function StatusBadge({ status }: { status: string }) {
@@ -178,6 +175,23 @@ export default function Consultation() {
   // Demo mode state
   const [isDemoRunning, setIsDemoRunning] = useState(false);
 
+  // Input mode control (for external tab control on AudioUploader)
+  const [inputMode, setInputMode] = useState<InputMode>('record');
+
+  // Entity highlights from extracted facts — maps evidence_spans → highlight positions
+  const entityHighlights: EntityHighlight[] = useMemo(() => {
+    if (!clinicalResults || !transcriptResult) return [];
+    const facts: any[] = (clinicalResults as any).extracted_facts ?? [];
+    return facts.flatMap((f) =>
+      (f.evidence_spans ?? []).map((s: { start_char: number; end_char: number }) => ({
+        start: s.start_char,
+        end: s.end_char,
+        category: f.category as string,
+        value: f.normalized_value as string,
+      }))
+    );
+  }, [clinicalResults, transcriptResult]);
+
   useEffect(() => {
     if (!id) return;
     getSession(id)
@@ -191,12 +205,12 @@ export default function Consultation() {
             is_stub: false,
           });
         }
-        if (s.clinical_facts && s.memory_state && s.soap_note && s.cds_suggestions) {
+        if (s.clinical_facts && s.soap_note) {
           setClinicalResults({
             facts: s.clinical_facts,
-            state: s.memory_state,
+            state: s.memory_state ?? {},
             soap: s.soap_note,
-            cds: s.cds_suggestions,
+            cds: s.cds_suggestions ?? {},
           } as unknown as ProcessClinicalResponse);
         }
       })
@@ -236,9 +250,10 @@ export default function Consultation() {
       setNlpMs(Date.now() - nlpStart);
       setClinicalResults(results);
       getSession(id).then(setSession);
-    } catch (e) {
+    } catch (e: any) {
       console.error(e);
-      setProcessError('Failed to process recording. Ensure the backend service is running.');
+      const detail = e?.response?.data?.detail;
+      setProcessError(detail || 'Processing failed. Check that the backend is running and the session has a transcript.');
     } finally {
       setIsProcessing(false);
     }
@@ -254,7 +269,7 @@ export default function Consultation() {
     setNlpMs(null);
 
     try {
-      // Simulate Sarvam ASR timing (it's local text submission, but show realistic timing)
+      // Simulate ASR timing (it's local text submission, but show realistic timing)
       const asrStart = Date.now();
       const result = await submitTranscriptText(id, DEMO_TRANSCRIPT);
       const demoAsrMs = Date.now() - asrStart + 1800; // add realistic delay for display
@@ -298,27 +313,27 @@ function AiProgressSequencer() {
   return (
     <div className="h-full flex flex-col items-center justify-center p-8">
       <div className="relative w-24 h-24 mb-8">
-        <div className="absolute inset-0 border-4 border-indigo-100 rounded-full"></div>
-        <div className="absolute inset-0 border-4 border-transparent border-t-indigo-600 rounded-full animate-spin"></div>
-        <div className="absolute inset-2 border-4 border-transparent border-b-cyan-500 rounded-full animate-[spin_1.5s_linear_infinite_reverse]"></div>
+        <div className="absolute inset-0 border-4 border-primary/10 rounded-full"></div>
+        <div className="absolute inset-0 border-4 border-transparent border-t-primary rounded-full animate-spin"></div>
+        <div className="absolute inset-2 border-4 border-transparent border-b-accent rounded-full animate-[spin_1.5s_linear_infinite_reverse]"></div>
         <div className="absolute inset-0 flex items-center justify-center">
-          <svg className="w-8 h-8 text-indigo-600 animate-pulse" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <svg className="w-8 h-8 text-primary animate-pulse" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
           </svg>
         </div>
       </div>
-      
+
       <div className="w-full max-w-sm space-y-3">
         {steps.map((text, idx) => (
           <div key={idx} className={`flex items-center gap-3 transition-all duration-300 ${idx <= step ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-4'}`}>
-            <div className={`w-5 h-5 rounded-full flex items-center justify-center shrink-0 ${idx < step ? 'bg-emerald-100 text-emerald-600' : idx === step ? 'bg-indigo-100 text-indigo-600 animate-pulse' : 'bg-slate-100 text-slate-300'}`}>
+            <div className={`w-5 h-5 rounded-full flex items-center justify-center shrink-0 transition-colors ${idx < step ? 'bg-primary/10 text-primary' : idx === step ? 'bg-primary/10 text-primary animate-pulse' : 'bg-slate-100 text-slate-300'}`}>
               {idx < step ? (
                 <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" /></svg>
               ) : idx === step ? (
-                <div className="w-2 h-2 bg-indigo-600 rounded-full"></div>
+                <div className="w-2 h-2 bg-primary rounded-full"></div>
               ) : null}
             </div>
-            <p className={`text-xs font-semibold ${idx === step ? 'text-indigo-900' : idx < step ? 'text-slate-500' : 'text-slate-300'}`}>
+            <p className={`text-xs font-semibold ${idx === step ? 'text-primary' : idx < step ? 'text-slate-500' : 'text-slate-300'}`}>
               {text}
             </p>
           </div>
@@ -347,231 +362,325 @@ function AiProgressSequencer() {
   const hasTranscript = !!transcriptResult;
   const showDemoButton = !hasTranscript && consentGranted && (session.mode === 'health' || !session.mode) && !isDemoRunning;
 
+  const isHealth = session.mode === 'health' || !session.mode;
+
   return (
-    <div className="min-h-screen bg-slate-50 pb-20 font-sans text-text-dark">
-      <header className="border-b border-slate-200/80 sticky top-0 bg-white/90 backdrop-blur-md z-10 shadow-sm">
-        <div className="max-w-6xl mx-auto px-6 h-14 flex items-center justify-between">
-          <div className="flex items-center gap-4">
+    <div className="h-screen flex flex-col overflow-hidden font-sans text-text-dark bg-bg-warm">
+
+      {/* ── Header ──────────────────────────────────────────────────── */}
+      <header className="border-b border-slate-200/80 bg-white z-20 flex-none h-14 flex items-center gap-4 px-5">
+        <button
+          onClick={() => navigate('/dashboard')}
+          className="text-slate-400 hover:text-primary transition-colors flex items-center gap-1 text-[13px] font-medium cursor-pointer shrink-0"
+        >
+          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+          </svg>
+          <span className="hidden sm:inline">Dashboard</span>
+        </button>
+        <div className="h-5 w-px bg-slate-200 shrink-0"></div>
+        <button onClick={() => navigate('/dashboard')} className="flex items-center gap-2 shrink-0 cursor-pointer group">
+          <span className="grid place-items-center w-7 h-7 rounded-lg bg-primary/10 text-primary font-bold text-sm group-hover:bg-primary/15 transition-colors">श</span>
+          <span className="text-[15px] font-bold tracking-tight text-text-dark hidden sm:inline">Lipi</span>
+        </button>
+        <div className="h-5 w-px bg-slate-200 shrink-0 hidden md:block"></div>
+        <div className="min-w-0 flex-1">
+          <h1 className="text-sm font-bold text-slate-800 truncate leading-tight">
+            {session.patient_name || 'Anonymous Session'}
+          </h1>
+          {session.doctor_name && <p className="text-[11px] text-slate-400 truncate leading-tight">{session.doctor_name}</p>}
+        </div>
+
+        <div className="flex items-center gap-2 shrink-0">
+          {session.mode && (
+            <span className={`hidden sm:inline-flex px-2 py-0.5 rounded-md text-[10px] font-bold uppercase tracking-wider border ${MODE_COLORS[session.mode]}`}>
+              {session.mode}
+            </span>
+          )}
+          <StatusBadge status={session.status} />
+          {isHealth && (
             <button
-              onClick={() => navigate('/dashboard')}
-              className="text-slate-500 hover:text-indigo-600 transition-colors flex items-center text-xs font-semibold cursor-pointer"
+              onClick={() => navigate(`/review/${id}`)}
+              className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 bg-primary hover:bg-primary-dark text-white text-xs font-semibold rounded-lg cursor-pointer transition-all active:scale-[0.98]"
             >
-              <svg className="w-4 h-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+              <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
               </svg>
-              Dashboard
+              Review Note
             </button>
-            <div className="h-4 w-px bg-slate-200"></div>
-            <div className="flex items-center gap-2">
-              <div className="w-6 h-6 bg-gradient-to-br from-indigo-600 to-cyan-500 rounded-md flex items-center justify-center shadow-sm">
-                <span className="font-bold text-white text-[10px]">श</span>
-              </div>
-              <span className="text-sm font-bold bg-clip-text text-transparent bg-gradient-to-r from-indigo-700 to-cyan-700">Lipi</span>
-            </div>
-            <div className="h-4 w-px bg-slate-200"></div>
-            <div>
-              <h1 className="text-sm font-bold text-slate-800">
-                {session.patient_name || 'Anonymous Session'}
-              </h1>
-            </div>
-            {session.doctor_name && (
-              <>
-                <div className="h-4 w-px bg-slate-200"></div>
-                <p className="text-xs font-semibold text-slate-500">{session.doctor_name}</p>
-              </>
-            )}
-          </div>
-          <div className="flex items-center gap-3">
-            {session.mode && (
-              <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider border ${MODE_COLORS[session.mode]}`}>
-                {session.mode}
-              </span>
-            )}
-            <StatusBadge status={session.status} />
+          )}
+          {/* Avatar */}
+          <div className="w-8 h-8 rounded-full bg-primary/10 text-primary border border-primary/15 flex items-center justify-center text-xs font-bold shrink-0">
+            {(session.doctor_name || 'D').charAt(0).toUpperCase()}
           </div>
         </div>
       </header>
 
-      <main className="max-w-6xl mx-auto px-6 py-8">
-        <div className="grid lg:grid-cols-[1fr_2fr] gap-8 items-start">
+      {/* ── Body: two-column split ───────────────────────────────────── */}
+      <div className="flex flex-1 overflow-hidden">
 
-          <div className="space-y-6 lg:sticky lg:top-20">
-            <section className="border border-indigo-100 rounded-2xl p-5 bg-white shadow-[0_4px_20px_-4px_rgba(99,102,241,0.05)] space-y-4">
-              <div className="flex items-center justify-between border-b border-slate-100 pb-3">
-                <h2 className="text-xs font-bold text-slate-600 uppercase tracking-widest flex items-center gap-2">
-                  <div className="w-2 h-2 rounded-full bg-red-500 animate-pulse"></div>
+        {/* LEFT PANEL — white, sticky, scrollable */}
+        <aside className="w-[360px] xl:w-[400px] shrink-0 bg-white flex flex-col overflow-y-auto border-r border-slate-200">
+
+          {/* Section header */}
+          <div className="px-5 pt-5 pb-4 border-b border-slate-100 shrink-0">
+            <div className="flex items-center justify-between gap-2">
+              <div className="flex items-center gap-2 min-w-0">
+                <div className="w-2 h-2 rounded-full bg-red-500 animate-pulse shrink-0"></div>
+                <span className="text-[11px] font-bold text-slate-500 uppercase tracking-widest truncate">
                   {session.mode === 'government' ? 'Officer Recording'
                    : session.mode === 'legal' ? 'Legal Recording'
                    : session.mode === 'general' ? 'Audio Input'
                    : 'Consultation Recording'}
-                </h2>
-                <span className="bg-indigo-50 text-indigo-700 border border-indigo-100 px-2 py-1 rounded-md text-[10px] font-bold uppercase tracking-widest">
-                  EN / HI / Hinglish
                 </span>
               </div>
+              <span className="text-[9px] font-bold text-primary bg-primary/10 border border-primary/15 px-2 py-0.5 rounded-full tracking-widest uppercase shrink-0">
+                HI / EN / HINGLISH
+              </span>
+            </div>
+          </div>
 
-              {consentGranted ? (
-                <div className="space-y-4">
-                  <div className="border border-slate-200 rounded-lg p-3 bg-slate-50/50 text-[11px] text-slate-600 space-y-1.5 shadow-2xs">
-                    <div className="flex items-center justify-between font-bold text-slate-700">
-                      <span className="flex items-center gap-1.5">
-                        <svg className="w-3.5 h-3.5 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-                        </svg>
-                        Consent Captured (verbal)
-                      </span>
-                      <span className="text-[9px] text-slate-400 font-mono">
-                        {session?.consent_log?.consent_hash ? session.consent_log.consent_hash.slice(0, 8) + '...' : 'Audit Logged'}
-                      </span>
-                    </div>
-                  </div>
-                  <AudioUploader
-                    sessionId={session.id}
-                    onTranscript={handleTranscript}
-                    onAutoProcess={handleExtractFacts}
-                  />
+          <div className="flex-1 flex flex-col px-5 py-5 gap-4">
+
+            {/* Patient intake card — visible when assistant pre-registered the patient */}
+            {(session.patient_age || session.patient_sex || session.patient_phone || session.initiated_by === 'assistant') && (
+              <div className="rounded-xl border border-primary/20 bg-primary/5 px-4 py-3 space-y-2">
+                <div className="flex items-center gap-2">
+                  <span className="text-[10px] font-bold text-primary uppercase tracking-widest">Patient on file</span>
+                  {session.initiated_by === 'assistant' && (
+                    <span className="text-[9px] font-bold text-white bg-primary/70 px-1.5 py-0.5 rounded-full">via assistant</span>
+                  )}
                 </div>
-              ) : (
-                <ConsentGate onConsented={handleConsentGranted} error={consentError} />
-              )}
-
-              {/* Demo fallback button */}
-              {showDemoButton && (
-                <div className="pt-3 border-t border-slate-100">
-                  <button
-                    onClick={handleDemoMode}
-                    className="w-full py-2.5 rounded-xl text-xs font-semibold border-2 border-dashed border-indigo-200 text-indigo-600 hover:border-indigo-400 hover:bg-indigo-50 transition-all flex items-center justify-center gap-2 shadow-sm"
-                  >
-                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
-                    Run VC Pitch Demo Scenario
-                  </button>
-                </div>
-              )}
-
-              {/* Demo running indicator */}
-              {isDemoRunning && (
-                <div className="flex items-center justify-center gap-2 text-xs text-indigo-600 font-bold py-2 bg-indigo-50 rounded-lg">
-                  <svg className="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/>
-                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
-                  </svg>
-                  Processing Sarvam Audio Stream...
-                </div>
-              )}
-            </section>
-
-            {hasTranscript && transcriptResult && (
-              <section className="border border-indigo-100 rounded-2xl bg-white overflow-hidden flex flex-col max-h-[500px] shadow-[0_4px_20px_-4px_rgba(99,102,241,0.05)]">
-                <div className="px-4 py-3 border-b border-slate-100 bg-slate-50 flex items-center justify-between">
-                  <h2 className="text-xs font-bold text-slate-600 uppercase tracking-widest">
-                    Live Transcript
-                  </h2>
-                  {asrMs && (
-                    <span className="text-[10px] font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 px-2 py-1 rounded-md shadow-sm">
-                      Sarvam API: {(asrMs / 1000).toFixed(1)}s
+                <p className="text-[15px] font-bold text-slate-800 leading-tight">{session.patient_name}</p>
+                <div className="flex flex-wrap gap-x-4 gap-y-1 text-[12px] text-slate-600">
+                  {session.patient_age && <span><span className="font-semibold text-slate-500">Age</span> {session.patient_age}</span>}
+                  {session.patient_sex && <span><span className="font-semibold text-slate-500">Sex</span> {session.patient_sex}</span>}
+                  {session.patient_phone && (
+                    <span className="flex items-center gap-1">
+                      <svg className="w-3 h-3 text-green-600" fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M11.962 0C5.354 0 0 5.354 0 11.962c0 2.11.552 4.088 1.514 5.808L0 24l6.395-1.677A11.928 11.928 0 0011.962 23.924C18.57 23.924 24 18.57 24 11.962 24 5.354 18.57 0 11.962 0zm0 21.849a9.875 9.875 0 01-5.031-1.376l-.361-.214-3.737.979 1.001-3.646-.235-.374A9.849 9.849 0 012.1 11.963c0-5.449 4.413-9.887 9.863-9.887 5.45 0 9.862 4.438 9.862 9.887 0 5.449-4.412 9.886-9.862 9.886z"/></svg>
+                      <span className="text-green-700 font-medium">{session.patient_phone}</span>
                     </span>
                   )}
                 </div>
-                <div className="p-4 overflow-y-auto flex-grow">
+                {session.transcript?.startsWith('[Chief complaint:') && (
+                  <p className="text-[12px] text-amber-800 bg-amber-50 border border-amber-200/60 rounded-lg px-3 py-1.5">
+                    <span className="font-semibold">CC: </span>
+                    {session.transcript.replace('[Chief complaint: ', '').replace(']', '')}
+                  </p>
+                )}
+              </div>
+            )}
+
+            {/* Consent gate or consent badge */}
+            {!consentGranted ? (
+              <ConsentGate onConsented={handleConsentGranted} error={consentError} />
+            ) : (
+              <div className="flex items-center justify-between bg-primary/5 border border-primary/15 rounded-lg px-3 py-2">
+                <span className="flex items-center gap-1.5 text-[11px] font-semibold text-primary">
+                  <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                  </svg>
+                  Consent Captured (verbal)
+                </span>
+                <span className="text-[9px] font-mono text-slate-400 uppercase tracking-wider">
+                  {session?.consent_log?.consent_hash ? session.consent_log.consent_hash.slice(0, 8) + '…' : 'AUDIT LOGGED'}
+                </span>
+              </div>
+            )}
+
+            {/* Input mode tabs */}
+            {consentGranted && (
+              <div className="flex bg-slate-100 rounded-lg p-1 text-[11px] font-semibold">
+                {(['record', 'file', 'text'] as const).map((m, i) => (
+                  <button
+                    key={m}
+                    onClick={() => setInputMode(m)}
+                    className={`flex-1 py-1.5 rounded-md transition-colors cursor-pointer ${
+                      inputMode === m
+                        ? 'bg-white text-slate-900 shadow-sm'
+                        : 'text-slate-500 hover:text-slate-700'
+                    }`}
+                  >
+                    {['Live Dictation', 'Upload Audio', 'Direct Text'][i]}
+                  </button>
+                ))}
+              </div>
+            )}
+
+            {/* AudioUploader — tabs hidden, mode controlled externally */}
+            {consentGranted && (
+              <AudioUploader
+                sessionId={session.id}
+                onTranscript={handleTranscript}
+                onAutoProcess={handleExtractFacts}
+                externalMode={inputMode}
+                onModeChange={setInputMode}
+                hideTabs
+              />
+            )}
+
+            {/* Demo fallback button */}
+            {showDemoButton && (
+              <button
+                onClick={handleDemoMode}
+                className="w-full py-2.5 rounded-xl text-xs font-semibold border border-dashed border-primary/30 text-primary hover:border-primary/50 hover:bg-primary/5 transition-all flex items-center justify-center gap-2 cursor-pointer"
+              >
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                Run demo consultation
+              </button>
+            )}
+
+            {isDemoRunning && (
+              <div className="flex items-center justify-center gap-2 text-xs text-primary font-bold py-2 bg-primary/5 rounded-lg border border-primary/15">
+                <svg className="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/>
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
+                </svg>
+                Processing audio…
+              </div>
+            )}
+
+            {/* Process button */}
+            {hasTranscript && !clinicalResults && (
+              <div className="flex flex-col gap-2">
+                {processError && <p className="text-xs text-red-600 font-medium bg-red-50 border border-red-100 rounded-lg px-3 py-2">{processError}</p>}
+                {!isProcessing ? (
+                  <button
+                    onClick={handleExtractFacts}
+                    className="w-full px-4 py-3 rounded-xl bg-primary hover:bg-primary-dark text-white text-sm font-bold transition-all shadow-sm active:scale-[0.99] flex items-center justify-center gap-2 cursor-pointer"
+                  >
+                    {session.mode === 'government' ? 'Generate FIR →'
+                    : session.mode === 'legal' ? 'Generate Legal Document →'
+                    : session.mode === 'general' ? 'Summarise Transcript →'
+                    : 'Process Clinical Intelligence →'}
+                  </button>
+                ) : (
+                  <div className="w-full px-4 py-3 rounded-xl bg-primary/5 border border-primary/15 text-primary text-sm font-bold flex items-center justify-center gap-2">
+                    <svg className="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/>
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
+                    </svg>
+                    Running AI pipeline…
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* LIVE TRANSCRIPT */}
+            {hasTranscript && transcriptResult && (
+              <div className="flex flex-col gap-2.5">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Live Transcript</span>
+                    {asrMs && (
+                      <span className="text-[9px] font-bold text-primary bg-primary/10 border border-primary/15 px-1.5 py-0.5 rounded tabular-nums">
+                        {(asrMs / 1000).toFixed(1)}s
+                      </span>
+                    )}
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <span className="text-[9px] font-mono text-slate-400 bg-slate-100 px-1.5 py-0.5 rounded">hi-IN</span>
+                    {!transcriptResult.is_stub && (
+                      <span className="text-[9px] font-bold text-primary bg-primary/10 border border-primary/15 px-1.5 py-0.5 rounded tracking-wide">PHI SCRUBBED</span>
+                    )}
+                  </div>
+                </div>
+                {entityHighlights.length > 0 && (
+                  <div className="flex flex-wrap gap-1.5">
+                    {[
+                      { cat: 'symptom', label: 'Symptom', color: 'text-blue-700 bg-blue-50 border-blue-200' },
+                      { cat: 'medication', label: 'Medication', color: 'text-green-700 bg-green-50 border-green-200' },
+                      { cat: 'vital', label: 'Vital', color: 'text-purple-700 bg-purple-50 border-purple-200' },
+                      { cat: 'allergy', label: 'Allergy', color: 'text-rose-700 bg-rose-50 border-rose-200' },
+                    ].filter(({ cat }) => entityHighlights.some(h => h.category === cat)).map(({ cat, label, color }) => (
+                      <span key={cat} className={`inline-flex items-center gap-1 text-[9px] font-bold px-1.5 py-0.5 rounded-md border tracking-wide ${color}`}>
+                        <span className="w-1.5 h-1.5 rounded-full bg-current" /> {label}
+                      </span>
+                    ))}
+                  </div>
+                )}
+                <div className="bg-slate-50/80 border border-slate-200 rounded-xl p-3.5 max-h-[260px] overflow-y-auto">
                   <TranscriptViewer
                     transcript={transcriptResult.transcript}
                     languageDetected={transcriptResult.language_detected}
                     isStub={transcriptResult.is_stub}
                     diarizedTranscript={transcriptResult.diarized_transcript}
+                    highlights={entityHighlights}
                   />
                 </div>
-              </section>
-            )}
-
-            {hasTranscript && !clinicalResults && (
-              <div className="flex flex-col">
-                {processError && <p className="text-xs text-alert-critical mb-2 font-medium">{processError}</p>}
-                {!isProcessing && (
-                  <button
-                    onClick={handleExtractFacts}
-                    disabled={isProcessing}
-                    className="w-full px-4 py-3.5 rounded-xl bg-gradient-to-r from-indigo-600 to-cyan-600 hover:from-indigo-700 hover:to-cyan-700 disabled:opacity-50 text-white text-sm font-bold transition-all shadow-lg hover:shadow-indigo-500/30 flex items-center justify-center gap-2 cursor-pointer"
-                  >
-                    {session.mode === 'government' ? 'Generate FIR →'
-                    : session.mode === 'legal' ? 'Generate Legal Document →'
-                    : session.mode === 'general' ? 'Summarise Transcript →'
-                    : 'Process Clinical Intelligence Engine →'}
-                  </button>
-                )}
-                {isProcessing && (
-                  <div className="w-full px-4 py-3 rounded-xl bg-indigo-50 border border-indigo-100 text-indigo-700 text-sm font-bold flex items-center justify-center gap-2">
-                    <svg className="w-5 h-5 animate-spin" fill="none" viewBox="0 0 24 24">
-                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/>
-                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
-                    </svg>
-                    Running AI Pipeline...
-                  </div>
-                )}
               </div>
             )}
 
-            {clinicalResults && id && (
+          </div>
+
+          {/* Bottom CTA — Review & Sign */}
+          {clinicalResults && id && (
+            <div className="p-4 border-t border-slate-100 bg-white shrink-0">
               <button
                 onClick={() => navigate(`/review/${id}`)}
-                className="w-full px-4 py-3.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-bold transition-all shadow-lg hover:shadow-emerald-500/30 flex items-center justify-center gap-2 cursor-pointer"
+                className="w-full px-4 py-3.5 rounded-xl bg-primary hover:bg-primary-dark text-white text-sm font-bold transition-all shadow-sm active:scale-[0.99] flex items-center justify-center gap-2 cursor-pointer"
               >
                 <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                 </svg>
-                Export Final SOAP Note →
+                Review &amp; Sign Note →
               </button>
-            )}
-          </div>
+            </div>
+          )}
+        </aside>
 
-          <div className="min-h-[500px]">
-            {clinicalResults ? (
-              session.mode === 'health' || !session.mode ? (
-                <div className="animate-in fade-in slide-in-from-bottom-4 duration-700 ease-out">
-                  <ClinicalResults
-                    results={clinicalResults}
-                    sessionId={id!}
-                    patientName={session.patient_name}
-                    doctorName={session.doctor_name}
-                    abhaNumber={session.abha_number}
-                    pmjayBeneficiary={session.pmjay_beneficiary}
-                    timings={asrMs !== null || nlpMs !== null ? { asrMs: asrMs ?? undefined, nlpMs: nlpMs ?? undefined } : undefined}
-                  />
-                </div>
-              ) : (
+        {/* RIGHT PANEL — scrollable */}
+        <main className="flex-1 overflow-y-auto bg-bg-warm">
+          {clinicalResults ? (
+            isHealth ? (
+              <div className="p-6 xl:p-8 animate-in fade-in slide-in-from-right-4 duration-500 ease-out">
+                <ClinicalResults
+                  results={clinicalResults}
+                  sessionId={id!}
+                  patientName={session.patient_name}
+                  doctorName={session.doctor_name}
+                  abhaNumber={session.abha_number}
+                  pmjayBeneficiary={session.pmjay_beneficiary}
+                  timings={asrMs !== null || nlpMs !== null ? { asrMs: asrMs ?? undefined, nlpMs: nlpMs ?? undefined } : undefined}
+                />
+              </div>
+            ) : (
+              <div className="p-6 xl:p-8">
                 <DocumentReadyCard
-                  mode={session.mode}
+                  mode={session.mode!}
                   soap={clinicalResults.soap as any}
                   onReview={() => navigate(`/review/${id}`)}
                 />
-              )
-            ) : (
-              <div className={`h-full flex flex-col items-center justify-center border-2 border-dashed rounded-2xl min-h-[550px] transition-all duration-500 ${isProcessing ? 'border-indigo-300 bg-white shadow-[0_8px_30px_rgb(0,0,0,0.04)]' : 'border-slate-200 bg-slate-50/50 text-slate-400'}`}>
-                {isProcessing ? (
-                  <AiProgressSequencer />
-                ) : (
-                  <>
-                    <div className="w-16 h-16 mb-4 rounded-2xl bg-white shadow-sm border border-slate-100 flex items-center justify-center">
-                      <svg className="w-8 h-8 text-slate-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" />
-                      </svg>
-                    </div>
-                    <p className="text-sm font-semibold text-slate-500">
-                      {session.mode === 'government' ? 'FIR document will appear here after processing.'
-                      : session.mode === 'legal' ? 'Legal document will appear here after processing.'
-                      : session.mode === 'general' ? 'Transcript summary will appear here after processing.'
-                      : 'The Clinical AI Engine is standing by.'}
-                    </p>
-                  </>
-                )}
               </div>
-            )}
-          </div>
+            )
+          ) : (
+            <div className={`h-full flex flex-col items-center justify-center min-h-[500px] transition-all duration-500 ${isProcessing ? 'bg-white' : 'bg-transparent'}`}>
+              {isProcessing ? (
+                <AiProgressSequencer />
+              ) : (
+                <div className="text-center px-8 max-w-sm">
+                  <div className="w-16 h-16 mx-auto mb-5 rounded-2xl bg-white shadow-sm border border-slate-200/70 flex items-center justify-center">
+                    <svg className="w-8 h-8 text-slate-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" />
+                    </svg>
+                  </div>
+                  <p className="text-sm font-semibold text-slate-600">
+                    {session.mode === 'government' ? 'FIR document will appear here after processing.'
+                    : session.mode === 'legal' ? 'Legal document will appear here after processing.'
+                    : session.mode === 'general' ? 'Transcript summary will appear here after processing.'
+                    : 'Clinical documentation will appear here after processing.'}
+                  </p>
+                  <p className="text-xs text-slate-400 mt-2">Record or upload audio on the left to begin.</p>
+                </div>
+              )}
+            </div>
+          )}
+        </main>
 
-        </div>
-      </main>
+      </div>
     </div>
   );
 }

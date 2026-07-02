@@ -1,0 +1,161 @@
+can't breathe	breathlessness	symptom
+hard to breathe	breathlessness	symptom
+gasping	breathlessness	symptom
+winded	breathlessness	symptom
+short of breath	breathlessness	symptom
+air hunger	breathlessness	symptom
+can't catch my breath	breathlessness	symptom
+throwing up	vomiting	symptom
+puking	vomiting	symptom
+feeling sick	nausea	symptom
+queasy	nausea	symptom
+sick to my stomach	nausea	symptom
+running nose	rhinorrhea	symptom
+stuffy nose	nasal congestion	symptom
+blocked nose	nasal congestion	symptom
+nose blocked	nasal congestion	symptom
+sore throat	pharyngitis	symptom
+throat pain	pharyngitis	symptom
+scratchy throat	pharyngitis	symptom
+tummy ache	abdominal pain	symptom
+stomach ache	abdominal pain	symptom
+stomach cramps	abdominal cramps	symptom
+belly pain	abdominal pain	symptom
+stomach upset	dyspepsia	symptom
+heartburn	acid reflux	symptom
+acid reflux	gastroesophageal reflux	symptom
+indigestion	dyspepsia	symptom
+bloating	abdominal distension	symptom
+gassy	flatulence	symptom
+passing gas	flatulence	symptom
+belching	eructation	symptom
+burping	eructation	symptom
+loose motions	diarrhea	symptom
+loose stools	diarrhea	symptom
+watery stools	diarrhea	symptom
+frequent stools	diarrhea	symptom
+blood in stool	hematochezia	symptom
+black stool	melena	symptom
+hard stool	constipation	symptom
+can't pass stool	constipation	symptom
+straining at stool	constipation	symptom
+chest tightness	chest pain	symptom
+chest heaviness	chest pain	symptom
+chest pressure	chest pain	symptom
+squeezing chest	chest pain	symptom
+heart racing	palpitations	symptom
+heart pounding	palpitations	symptom
+heart skipping	palpitations	symptom
+fluttering in chest	palpitations	symptom
+irregular heartbeat	arrhythmia	symptom
+dizzy	dizziness	symptom
+room spinning	vertigo	symptom
+unsteady	imbalance	symptom
+off balance	imbalance	symptom
+feeling faint	presyncope	symptom
+almost fainted	presyncope	symptom
+passed out	syncope	symptom
+fainted	syncope	symptom
+blacked out	syncope	symptom
+pins and needles	paresthesia	symptom
+tingling	paresthesia	symptom
+numbness	numbness	symptom
+can't feel	numbness	symptom
+burning sensation	burning	symptom
+stinging	stinging pain	symptom
+shooting pain	radicular pain	symptom
+stabbing pain	sharp pain	symptom
+dull ache	dull pain	symptom
+throbbing pain	throbbing pain	symptom
+cramping	cramps	symptom
+spasm	muscle spasm	symptom
+stiff neck	neck stiffness	symptom
+stiff back	back stiffness	symptom
+locked jaw	trismus	symptom
+jaw pain	temporomandibular pain	symptom
+swollen glands	lymphadenopathy	symptom
+lumps in neck	cervical lymphadenopathy	symptom
+lump in breast	breast lump	symptom
+lump in armpit	axillary lymphadenopathy	symptom
+can't sleep	insomnia	symptom
+trouble sleeping	insomnia	symptom
+sleepy all day	excessive daytime sleepiness	symptom
+snoring	snoring	symptom
+waking up gasping	sleep apnea	symptom
+eye pain	ocular pain	symptom
+red eyes	conjunctival injection	symptom
+watery eyes	epiphora	symptom
+blurry vision	blurred vision	symptom
+double vision	diplopia	symptom
+seeing spots	floaters	symptom
+flashing lights	photopsia	symptom
+light sensitive	photophobia	symptom
+ear pain	otalgia	symptom
+ringing in ears	tinnitus	symptom
+ear discharge	otorrhea	symptom
+can't hear well	hearing loss	symptom
+itchy skin	pruritus	symptom
+skin rash	rash	symptom
+bumps on skin	papules	symptom
+blisters	vesicles	symptom
+peeling skin	desquamation	symptom
+dry skin	xerosis	symptom
+bruising easily	easy bruisability	symptom
+bleeding gums	gingival bleeding	symptom
+nose bleed	epistaxis	symptom
+blood in urine	hematuria	symptom
+painful urination	dysuria	symptom
+burning urine	dysuria	symptom
+frequent urination	urinary frequency	symptom
+urgent urination	urinary urgency	symptom
+leaking urine	urinary incontinence	symptom
+dribbling	urinary dribbling	symptom
+weak stream	decreased urinary stream	symptom
+blood in sputum	hemoptysis	symptom
+coughing blood	hemoptysis	symptom
+yellow skin	jaundice	symptom
+yellow eyes	icterus	symptom
+dark urine	choluria	symptom
+pale stool	acholic stool	symptom
+swollen feet	pedal edema	symptom
+swollen legs	leg edema	symptom
+puffy face	facial edema	symptom
+swollen belly	ascites	symptom
+hair falling	hair loss	symptom
+hair thinning	alopecia	symptom
+white patches on skin	hypopigmentation	symptom
+dark patches	hyperpigmentation	symptom
+mouth sores	oral ulcers	symptom
+canker sores	aphthous ulcers	symptom
+cold sores	herpes labialis	symptom
+feeling down	depressed mood	symptom
+feeling sad	depressed mood	symptom
+no interest	anhedonia	symptom
+can't concentrate	poor concentration	symptom
+feeling nervous	anxiety	symptom
+worried	anxiety	symptom
+panic attack	panic attack	symptom
+racing thoughts	racing thoughts	symptom
+mood swings	mood lability	symptom
+irritable	irritability	symptom
+forgetful	memory impairment	symptom
+confused	confusion	symptom
+memory loss	amnesia	symptom
+joint pain	arthralgia	symptom
+muscle pain	myalgia	symptom
+body ache	generalized body ache	symptom
+back pain	dorsalgia	symptom
+neck pain	cervicalgia	symptom
+shoulder pain	shoulder pain	symptom
+knee pain	gonalgia	symptom
+hip pain	coxalgia	symptom
+foot pain	podalgia	symptom
+heel pain	heel pain	symptom
+ankle swelling	ankle edema	symptom
+period pain	dysmenorrhea	symptom
+heavy periods	menorrhagia	symptom
+missed period	amenorrhea	symptom
+irregular periods	oligomenorrhea	symptom
+spotting	intermenstrual bleeding	symptom
+vaginal discharge	leucorrhea	symptom
+painful intercourse	dyspareunia	symptom

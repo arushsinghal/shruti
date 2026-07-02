@@ -1,13 +1,58 @@
 import { useState } from 'react';
 
+export interface EntityHighlight {
+  start: number;
+  end: number;
+  category: string;
+  value: string;
+}
+
+const HIGHLIGHT_COLORS: Record<string, string> = {
+  symptom:       'bg-blue-100/80 text-blue-900 border-b-2 border-blue-400',
+  vital:         'bg-purple-100/80 text-purple-900 border-b-2 border-purple-400',
+  medication:    'bg-green-100/80 text-green-900 border-b-2 border-green-400',
+  investigation: 'bg-orange-100/80 text-orange-900 border-b-2 border-orange-400',
+  diagnosis:     'bg-red-100/80 text-red-900 border-b-2 border-red-400',
+  allergy:       'bg-rose-100/80 text-rose-900 border-b-2 border-rose-500',
+  follow_up:     'bg-teal-100/80 text-teal-900 border-b-2 border-teal-400',
+};
+
+function highlightText(text: string, highlights: EntityHighlight[]) {
+  if (!highlights.length) return <span>{text}</span>;
+
+  // Sort and deduplicate spans
+  const sorted = [...highlights]
+    .filter(h => h.start >= 0 && h.end <= text.length && h.start < h.end)
+    .sort((a, b) => a.start - b.start);
+
+  const parts: React.ReactNode[] = [];
+  let cursor = 0;
+
+  for (const h of sorted) {
+    if (h.start < cursor) continue; // skip overlapping
+    if (h.start > cursor) parts.push(<span key={cursor}>{text.slice(cursor, h.start)}</span>);
+    const cls = HIGHLIGHT_COLORS[h.category] || 'bg-yellow-100/80 border-b-2 border-yellow-400';
+    parts.push(
+      <mark key={h.start} className={`${cls} rounded-sm px-0.5 not-italic`} title={`${h.category}: ${h.value}`}>
+        {text.slice(h.start, h.end)}
+      </mark>
+    );
+    cursor = h.end;
+  }
+  if (cursor < text.length) parts.push(<span key={cursor}>{text.slice(cursor)}</span>);
+  return <>{parts}</>;
+}
+
 interface Props {
   transcript: string;
   languageDetected?: string;
   isStub: boolean;
   diarizedTranscript?: string;
+  highlights?: EntityHighlight[];
+  compact?: boolean;
 }
 
-export default function TranscriptViewer({ transcript, languageDetected, isStub, diarizedTranscript }: Props) {
+export default function TranscriptViewer({ transcript, languageDetected, isStub, diarizedTranscript, highlights = [], compact }: Props) {
   const [showDiarized, setShowDiarized] = useState(!!diarizedTranscript);
 
   // Parse diarized transcript into labelled lines with color coding
@@ -55,6 +100,24 @@ export default function TranscriptViewer({ transcript, languageDetected, isStub,
         </div>
       );
     });
+  }
+
+  if (compact) {
+    return (
+      <div className="space-y-2">
+        {!isStub && (
+          <div className="flex items-center gap-1.5 text-[10px] text-emerald-400 bg-emerald-900/30 border border-emerald-700/40 rounded px-2 py-0.5 w-fit">
+            <svg className="w-3 h-3 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+            </svg>
+            <span className="font-semibold">PHI scrubbed</span>
+          </div>
+        )}
+        <p className="text-slate-300 leading-relaxed whitespace-pre-wrap text-[13px]">
+          {highlights.length > 0 ? highlightText(transcript, highlights) : transcript}
+        </p>
+      </div>
+    );
   }
 
   return (
@@ -108,7 +171,9 @@ export default function TranscriptViewer({ transcript, languageDetected, isStub,
             {renderDiarized(diarizedTranscript)}
           </div>
         ) : (
-          <p className="text-slate-800 leading-relaxed whitespace-pre-wrap text-sm">{transcript}</p>
+          <p className="text-slate-800 leading-relaxed whitespace-pre-wrap text-sm">
+            {highlights.length > 0 ? highlightText(transcript, highlights) : transcript}
+          </p>
         )}
       </div>
     </div>

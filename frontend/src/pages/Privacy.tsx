@@ -35,9 +35,9 @@ export default function Privacy() {
         <section className="border border-emerald-200 rounded-lg bg-emerald-50 p-5 space-y-2">
           <h2 className="text-sm font-bold text-emerald-800">The short version</h2>
           <ul className="text-sm text-emerald-700 space-y-1 list-disc list-inside">
-            <li>Audio is sent to Sarvam AI (India) for speech-to-text only.</li>
+            <li>Audio is sent to a third-party India-based speech-to-text provider for transcription only.</li>
             <li>Transcript identifiers (names, dates, locations) are scrubbed before storage.</li>
-            <li>Raw audio is deleted immediately after your SOAP note is generated.</li>
+            <li>Raw audio is deleted after successful transcription. Incomplete or failed sessions may be retained up to 48 hours.</li>
             <li>A doctor reviews every AI-generated note before it is used clinically.</li>
             <li>Your data is never sold or shared with advertisers.</li>
           </ul>
@@ -45,9 +45,9 @@ export default function Privacy() {
 
         <Section title="1. Who we are">
           <p>
-            Lipi is an AI-assisted clinical scribe developed for doctors practicing in India. It
+            Lipi is an OPD administration service developed for doctors practicing in India. It
             transcribes multilingual (Hindi / Hinglish / English) patient consultations and generates
-            structured SOAP notes to reduce documentation time.
+            doctor-reviewed SOAP notes, prescriptions, investigation orders, and follow-up messages.
           </p>
           <p className="mt-2">
             Lipi is a research prototype and is <strong>not a certified medical device</strong>.
@@ -59,9 +59,9 @@ export default function Privacy() {
           <dl className="space-y-3 text-sm">
             <DataRow term="Audio recordings">
               Captured during a consultation session when the doctor (and patient) provides consent.
-              Audio is transmitted to Sarvam AI's India-based servers for speech-to-text conversion and
-              is <strong>deleted from our systems immediately after the SOAP note is successfully
-              generated</strong>.
+              Audio is transmitted to a third-party India-based speech-to-text provider's servers for transcription and
+              is <strong>deleted from our systems after successful transcription</strong>. Files from
+              incomplete or failed sessions may be retained for up to 48 hours.
             </DataRow>
             <DataRow term="Transcripts">
               The text returned by the speech-to-text service. Before storage, a local PHI scrubber
@@ -83,11 +83,11 @@ export default function Privacy() {
 
         <Section title="3. Third-party services">
           <p className="text-sm">
-            <strong>Sarvam AI</strong> — We use Sarvam's multilingual ASR (automatic speech
-            recognition) API, operated from servers located in India, to convert audio to text.
-            Audio is sent to Sarvam only after the doctor confirms patient consent. Sarvam's
+            <strong>India-based speech recognition provider</strong> — We use a third-party multilingual ASR
+            (automatic speech recognition) API, operated from servers located in India, to convert audio to text.
+            Audio is sent only after the doctor confirms patient consent. The provider's
             processing is subject to its own data processing agreement; raw audio is not retained
-            by Sarvam beyond the duration of the API call as per their terms of service.
+            beyond the duration of the API call as per its terms of service.
           </p>
           <p className="text-sm mt-2">
             No other third-party AI services receive patient audio or transcript data.
@@ -117,7 +117,7 @@ export default function Privacy() {
 
         <Section title="6. Data retention">
           <dl className="space-y-3 text-sm">
-            <DataRow term="Raw audio">Deleted immediately after SOAP note generation succeeds.</DataRow>
+            <DataRow term="Raw audio">Deleted after successful transcription; incomplete or failed sessions may be retained up to 48 hours.</DataRow>
             <DataRow term="Scrubbed transcripts and SOAP notes">Retained for the duration of the session and deleted on doctor request.</DataRow>
             <DataRow term="Session metadata">Retained for 90 days after last access unless the doctor requests earlier deletion.</DataRow>
           </dl>

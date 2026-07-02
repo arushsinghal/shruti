@@ -154,19 +154,21 @@ export default function ReferralLetter({ results, patientName, doctorName, abhaN
 
           {/* Clinical summary table */}
           <table style={{ width: '100%', borderCollapse: 'collapse', marginBottom: '18px', fontSize: '12px' }}>
-            {[
-              ['Provisional Diagnosis', diagnosisRaw],
-              ['Chief Complaints', facts?.symptoms?.slice(0, 4).join(', ') || soap?.S?.split('.')[0] || '—'],
-              ['Vitals', vitals.length > 0 ? vitals.join(' · ') : '—'],
-              ['Allergies', allergies.length > 0 ? allergies.join(', ') : 'None reported'],
-              ['Treatment Given', meds.length > 0 ? meds.map(m => `${m.name}${m.dosage ? ' ' + m.dosage : ''}`).join(', ') : '—'],
-              ['Reason for Referral', details.reason || 'Further evaluation and speciality management'],
-            ].map(([label, value]) => (
-              <tr key={label} style={{ borderBottom: '1px solid #f0f0f0' }}>
-                <td style={{ padding: '7px 10px', fontWeight: 'bold', color: '#374151', width: '38%', verticalAlign: 'top' }}>{label}</td>
-                <td style={{ padding: '7px 10px', color: '#111', verticalAlign: 'top' }}>{value}</td>
-              </tr>
-            ))}
+            <tbody>
+              {[
+                ['Provisional Diagnosis', diagnosisRaw],
+                ['Chief Complaints', facts?.symptoms?.slice(0, 4).join(', ') || soap?.S?.split('.')[0] || '—'],
+                ['Vitals', vitals.length > 0 ? vitals.join(' · ') : '—'],
+                ['Allergies', allergies.length > 0 ? allergies.join(', ') : 'None reported'],
+                ['Treatment Given', meds.length > 0 ? meds.map(m => `${m.name}${m.dosage ? ' ' + m.dosage : ''}`).join(', ') : '—'],
+                ['Reason for Referral', details.reason || 'Further evaluation and speciality management'],
+              ].map(([label, value]) => (
+                <tr key={label} style={{ borderBottom: '1px solid #f0f0f0' }}>
+                  <td style={{ padding: '7px 10px', fontWeight: 'bold', color: '#374151', width: '38%', verticalAlign: 'top' }}>{label}</td>
+                  <td style={{ padding: '7px 10px', color: '#111', verticalAlign: 'top' }}>{value}</td>
+                </tr>
+              ))}
+            </tbody>
           </table>
 
           <p style={{ marginBottom: '14px' }}>

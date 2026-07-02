@@ -137,7 +137,7 @@ export default function PrintableReport({ results, patientName, doctorName, sess
           {/* Footer */}
           <div style={{ borderTop: '1px solid #e2e8f0', paddingTop: '16px', fontSize: '11px', color: '#94a3b8', textAlign: 'center' }}>
             <p>⚠️ This report was AI-generated and must be reviewed by a licensed physician before acting on it.</p>
-            <p>Lipi Health · Local clinical extraction + Sarvam ASR · Physician review required</p>
+            <p>Lipi Health · Local clinical extraction + on-shore ASR · Physician review required</p>
           </div>
         </div>
       </div>

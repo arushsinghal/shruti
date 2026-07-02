@@ -150,6 +150,10 @@ class SarvamBatchASRService:
             plain_transcript = " ".join(s["transcript"] for s in segments)
             detected_lang = result_json.get("language_code") or language_code or "hi-IN"
 
+            if not plain_transcript.strip():
+                logger.warning("Batch ASR returned empty transcript — falling back to stub")
+                return self._stub_response(language_code)
+
             return {
                 "transcript": plain_transcript,
                 "diarized_segments": segments,

@@ -1,0 +1,17 @@
+{
+  "_description": "Allergy safety + extractive safety — Sprint 2 Task 4. Penicillin stays in allergies (not meds). Steam not a medication.",
+  "_safety_rule": "penicillin must appear in allergies only — not in medications. 'steam inhalation' must not be a medication.",
+  "symptoms": ["cough", "sore throat"],
+  "diagnoses": [],
+  "vitals": [],
+  "medications": [
+    {"name": "azithromycin", "dosage": "500 mg", "frequency": "once a day"},
+    {"name": "ibuprofen",    "dosage": "400 mg", "frequency": "twice daily"}
+  ],
+  "investigations": ["Throat Swab Culture"],
+  "allergies": ["penicillin"],
+  "follow_up": ["review in 5 days"],
+  "labs": [],
+  "advice": [],
+  "red_flags": []
+}
