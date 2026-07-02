@@ -2,8 +2,9 @@
 
 > Date: 2026-06-27
 > Status: Build plan saved after implementation was undone
+> **Status update 2026-07-03: most of the hero feature described below is now built — see `12_IMPLEMENTATION_GAP_REGISTER.md`.** The file names differ from what this plan suggested (real implementation is `backend/app/api/routes_tasks.py` not `routes_admin.py`; `frontend/src/pages/OpsDashboard.tsx` not `OpsConsole.tsx`; `AssistantDashboard.tsx`/`AssistantIntake.tsx`/`ClinicInbox.tsx`/`Tasks.tsx` not a single `AdminWorkflowPanel.tsx`), but the functional shape matches: a real task queue with `task_type`/`status`/`owner`/`due`/`notes`, role-scoped so an assistant sees every doctor's queue in their clinic, plus a working investigation order generator and an ops dashboard. What's still genuinely missing versus this plan: the Cost-Per-Consultation Ledger and Flywheel Analytics Dashboard sections below (both confirmed not built), and a payer-specific TPA form (current TPA form is generic). Read this doc for the original design rationale, not as a live "what to build" list — check `12_IMPLEMENTATION_GAP_REGISTER.md` first.
 > Scope: Product and engineering plan only. No backend/frontend code lives in this note.
-> Related: [[00_HOME]], [[02_ARCHITECTURE_MAP]], [[05_VALIDATION_PLAN]], [[06_API_COSTS]], [[09_STRATEGIC_ROADMAP]], [[10_CONTINUAL_LEARNING_SYSTEM]]
+> Related: [[00_HOME]], [[02_ARCHITECTURE_MAP]], [[05_VALIDATION_PLAN]], [[06_API_COSTS]], [[09_STRATEGIC_ROADMAP]], [[10_CONTINUAL_LEARNING_SYSTEM]], [[12_IMPLEMENTATION_GAP_REGISTER]]
 
 ## One-Line Goal
 

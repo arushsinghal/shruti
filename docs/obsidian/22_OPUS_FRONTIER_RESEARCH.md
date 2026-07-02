@@ -8,7 +8,7 @@
 1. **Solve hard problems in Indian healthcare.** Real care outcomes for real patients, not papers.
 2. **Feed that R&D directly back into the product doctors use.** Every research track must terminate in a feature a doctor touches in Lipi. If a direction can't name the feature it becomes, it's not ours.
 
-Publication is a *byproduct* we take only when it buys funding or trust — never the goal, and never at the cost of the product loop (see §8). This is a research **lab inside a product company**, not a research company with a product.
+**Corrected 2026-07-03: we never publish, even novel findings.** An earlier version of this doc (and §8 below) framed publication as an occasional byproduct worth taking for funding/trust. That's superseded — the research exists to make the product and Indian healthcare better, full stop, never for citation credibility. §8 below is kept for its historical reasoning but its conclusion no longer holds. This is a research **lab inside a product company**, not a research company with a product, and it never becomes one that publishes.
 
 **Related:** [[00_HOME]] · [[10_CONTINUAL_LEARNING_SYSTEM]] · [[13_AGENTIC_SERVICE_RESEARCH_DIRECTION]] · [[21_FRONTIER_RESEARCH_DIRECTIONS]] · [[20_PRODUCT_VISION]] · [[18_YC_PITCH_STRATEGY]]
 
@@ -169,9 +169,9 @@ As genome sequencing and point-of-care diagnostics get cheap in India (the RFS's
 
 - **Pharmacogenomics dependency is backwards (doc 21, Direction 3).** Making a genomic-data partnership the *prerequisite* makes Lipi a downstream consumer of someone else's asset. Track A inverts it: infer phenotype from outcomes first, use genomics to validate. Stronger science, stronger product, stronger negotiating position — and it ships a feature without waiting on a partner.
 - **AMR "gap analysis" undersells the asset (doc 21, Direction 1).** The gap analysis is a warm-up. The product-bearing, only-Lipi contribution is *prescribing-as-leading-indicator* feeding locality-personalized empirical guidance (Track C).
-- **The correction flywheel is called a moat but is currently a leak (doc 09 §Technical Moats, doc 16 F2).** It's generating the exact signal personalized medicine needs and discarding it. Wiring it is the precondition for Tracks A, B, D-3.
+- **The correction flywheel was called a moat but was a leak (doc 09 §Technical Moats, doc 16 F2) — RESOLVED 2026-07-03.** It was generating the exact signal personalized medicine needs and discarding it. That write path is now wired (`record_correction()`/`record_false_positive()` called from every doctor action) — the precondition for Tracks A, B, D-3 is met, though the richer `LearningEvent`/`MemoryCandidate` schema those tracks eventually need is still future work.
 - **Ambient hardware (doc 21, Direction 4) is not research — agreed, keep it off this list.** It's a BOM/product exploration; don't let it absorb R&D attention.
-- **My own prior draft over-indexed on publication — corrected.** This version terminates every track in a doctor-facing feature. Papers are §8, a byproduct.
+- **My own prior draft over-indexed on publication — corrected, then corrected again.** This version terminates every track in a doctor-facing feature. §8's original "publish selectively" framing has since been overturned too (2026-07-03): Lipi never publishes, even novel findings.
 
 ---
 
@@ -211,9 +211,11 @@ Non-negotiable precondition under all three: **wire the correction ledger + pers
 
 ---
 
-## 8. Publication stance (byproduct, not goal)
+## 8. Publication stance — CORRECTED 2026-07-03: never publish
 
-Publish only when it directly buys funding, doctor trust, or a partnership — e.g., a validated AMR leading-indicator result that helps a government or grant conversation, or a Hinglish benchmark that recruits collaborators. Never delay a product feature to shape a paper. Never claim a result externally before it clears the *avoid-claiming* line. Credibility serves the two aims in the header; it does not replace them.
+**Superseded.** The original version of this section argued for publishing selectively when it buys funding, doctor trust, or a partnership (e.g. a validated AMR result or a Hinglish benchmark). That reasoning is overturned: Lipi does not publish, even when a finding is genuinely novel. The research exists to make the product and Indian healthcare better — never for citation credibility or external validation. Any credibility Lipi earns comes from what the product visibly does for a doctor and a patient, not from a paper. Kept below for historical record of the reasoning that was rejected, not as current policy.
+
+*Original text, for history:* "Publish only when it directly buys funding, doctor trust, or a partnership — e.g., a validated AMR leading-indicator result that helps a government or grant conversation, or a Hinglish benchmark that recruits collaborators. Never delay a product feature to shape a paper. Never claim a result externally before it clears the avoid-claiming line. Credibility serves the two aims in the header; it does not replace them."
 
 ---
 

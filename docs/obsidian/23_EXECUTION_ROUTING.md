@@ -195,16 +195,18 @@ Continual learning (the [[10_CONTINUAL_LEARNING_SYSTEM]] vision) is **~80% engin
 
 These are specified in doc 10's "First Implementation Tickets" and are engineering. Build order = dependency order.
 
+**Status update 2026-07-03:** item 1 (wire the correction ledger) is done — `record_correction()`/`record_false_positive()` are called from every doctor fact-review action, not just drug dose/frequency edits. Item 8 (ops console) is also done (`OpsDashboard.tsx`). Items 2-7 remain future work — see `12_IMPLEMENTATION_GAP_REGISTER.md` for the current authoritative status.
+
 | # | Component | What it is | Executor | Why |
 |---|---|---|---|---|
-| 1 | **Wire the correction ledger** | Call `record_correction()` / `record_false_positive()` from `routes_fact_review.py` for drug dose/frequency edits; add one test proving a correction lands in `fact_corrections`. | **Sonnet** | Narrow, fully specified. ~50 lines. THE urgent one — the tank is empty until this ships. |
+| 1 | **Wire the correction ledger** — DONE 2026-07-03 | Call `record_correction()` / `record_false_positive()` from `routes_fact_review.py` for drug dose/frequency edits; add one test proving a correction lands in `fact_corrections`. | **Sonnet** | Narrow, fully specified. ~50 lines. THE urgent one — the tank is empty until this ships. |
 | 2 | **LearningEvent ledger** | Persist the full `(before, after, evidence, actor, scope, reason)` delta on every fact/task/document edit. | **Sonnet→Opus** | Schema is specified in doc 10; scope-tagging needs a little judgment. |
 | 3 | **Longitudinal timeline persistence** | Ensure the per-patient timeline stitches cleanly across visits (this is the substrate for personalized medicine). | **Opus** | Cross-patient isolation is a safety concern — judgment. |
 | 4 | **Scoped memory stores** | Doctor / clinic / specialty preference stores with scope, confidence, rollback. | **Opus** | Scoping decisions are where unsafe generalization creeps in. |
 | 5 | **Retrieval context pack** | Inject only the relevant few memories into the next consultation/task. | **Fable or Opus** | The one place a mythos-class model earns its keep — coherent multi-part build (retrieval + scoping + injection + eval). |
 | 6 | **Shadow-mode playbooks** | Candidate lessons that propose, never auto-act. | **Opus** | Must not cross the clinical-fact boundary. |
 | 7 | **Promotion + eval workflow** | Scope→confidence→reviewer→rollback; the flywheel dashboard. | **Opus** | Promotion policy is safety-critical (one wrong correction must not go global). |
-| 8 | **Ops console** | Where Lipi humans complete/inspect service tasks while the system learns. | **Fable/Opus** | Frontend + backend surface; coherence-heavy. |
+| 8 | **Ops console** — DONE (`OpsDashboard.tsx`) | Where Lipi humans complete/inspect service tasks while the system learns. | **Fable/Opus** | Frontend + backend surface; coherence-heavy. |
 
 **Hard boundary on all of it (doc 10 / [[13_AGENTIC_SERVICE_RESEARCH_DIRECTION]]):** learning improves *extraction, vocabulary, workflow, formatting, routing* — never clinical facts, doses, diagnoses, or safety rules. No auto-promotion of anything clinical. No raw PHI in reusable memory.
 
@@ -235,9 +237,11 @@ One-liner: **Sonnet fixes the leak, Opus builds the machine, Fable optionally ca
 
 ## Part 3 — Full dispatch map (everything in one table)
 
+**Status update 2026-07-03:** "Wire correction ledger" below is done — see status note above Part 2's table. Rows below reflect the original plan; check `12_IMPLEMENTATION_GAP_REGISTER.md` for current status before treating any row as still open.
+
 | Work item | Kind | Executor | When |
 |---|---|---|---|
-| Wire correction ledger (`record_correction`) | Build | **Sonnet** | NOW — precondition for everything |
+| Wire correction ledger (`record_correction`) — DONE 2026-07-03 | Build | **Sonnet** | NOW — precondition for everything |
 | LearningEvent delta ledger | Build | Sonnet→Opus | NOW |
 | Longitudinal timeline persistence | Build | Opus | NOW |
 | Brief 1 — Indian PGx evidence map | Research | **Claude Science** | NOW |

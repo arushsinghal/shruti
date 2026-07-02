@@ -339,14 +339,16 @@ Forbidden uses:
 
 Build the concrete service surfaces first:
 
-1. Evidence Review UI.
-2. Assistant Work Queue.
-3. Investigation Order Generator.
-4. Referral Letter Generator.
-5. Cost-Per-Consultation Ledger.
-6. Flywheel Analytics Dashboard.
-7. One Insurance Pre-Auth Form.
-8. Internal Ops Console.
+1. Evidence Review UI. — **built**
+2. Assistant Work Queue. — **built** (`routes_tasks.py`, `AssistantDashboard.tsx`)
+3. Investigation Order Generator. — **built** (`investigation_order_renderer.py`)
+4. Referral Letter Generator. — partially built, see `12_IMPLEMENTATION_GAP_REGISTER.md` item #12
+5. Cost-Per-Consultation Ledger. — **not built** (confirmed 2026-07-03)
+6. Flywheel Analytics Dashboard. — **not built** as specified (confirmed 2026-07-03; `routes_analytics.py` covers billing/revenue, not fact-acceptance/edit-rate metrics)
+7. One Insurance Pre-Auth Form. — **built**, generic shape, not yet mapped to a specific real payer
+8. Internal Ops Console. — **built** (`OpsDashboard.tsx`)
+
+**Status verified 2026-07-03** — 5 of 8 are built. See `12_IMPLEMENTATION_GAP_REGISTER.md` for the current authoritative built/not-built register; this list is kept for the original design rationale.
 
 These are not separate from the research direction. They are how the learning data is created.
 
@@ -473,10 +475,12 @@ Avoid claiming:
 
 ## What To Do Next
 
+**Note (2026-07-03): items 1-2 below are built** (see Product Path section above). Item 3 (Experience Ledger) is the biggest remaining gap in this list — the flywheel write path exists (`record_correction`/`record_false_positive`) but the richer per-action ledger described here does not.
+
 Near-term product work:
 
-1. Ensure Evidence Review UI is fast and trusted.
-2. Build Assistant Work Queue with task owner, status, due time, notes, blocker, and completion reason.
+1. Ensure Evidence Review UI is fast and trusted. — built
+2. Build Assistant Work Queue with task owner, status, due time, notes, blocker, and completion reason. — built, verify field-by-field against this exact spec
 3. Add Experience Ledger events behind review, document, and task actions.
 4. Add Cost-Per-Consultation Ledger.
 5. Add Flywheel Analytics: accepted, edited, deleted, added facts; document edits; task outcomes.

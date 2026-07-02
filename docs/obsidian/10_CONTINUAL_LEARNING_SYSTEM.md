@@ -2,7 +2,8 @@
 
 > Date: 2026-06-27
 > Status: Future research direction
-> Related: [[00_HOME]], [[03_PRODUCT_STRATEGY]], [[05_VALIDATION_PLAN]], [[07_DECISIONS]], [[09_STRATEGIC_ROADMAP]], [[13_AGENTIC_SERVICE_RESEARCH_DIRECTION]]
+> **Status update 2026-07-03:** the basic write path this doc calls for is now live — `learning_service.record_correction()`/`record_false_positive()` are called from every doctor fact-review action and SOAP hallucination flag (see `07_DECISIONS.md` and `09_STRATEGIC_ROADMAP.md`). This is a simpler mechanism than the full `LearningEvent`/`MemoryCandidate`/`PlaybookRule` architecture described below — those richer objects, the Lesson Review Queue, doctor/clinic preference stores, and Stage 2+ model strategy remain future work, not built. Read this doc as "where the design is headed," not "what exists today."
+> Related: [[00_HOME]], [[03_PRODUCT_STRATEGY]], [[05_VALIDATION_PLAN]], [[07_DECISIONS]], [[09_STRATEGIC_ROADMAP]], [[13_AGENTIC_SERVICE_RESEARCH_DIRECTION]], [[12_IMPLEMENTATION_GAP_REGISTER]]
 
 ## One-Line Thesis
 

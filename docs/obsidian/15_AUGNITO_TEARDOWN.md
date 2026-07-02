@@ -59,7 +59,11 @@ This matches Gustaf Alströmer's AI-native service company framing exactly. Augn
 
 ### 4. Learning loop
 
-Every doctor correction in Lipi feeds into `extraction_knowledge` with Bayesian confidence scoring. After 3 clinics confirm an alias, it auto-promotes. `_canonical_med()` starts recognising "Telma" → Telmisartan across that clinic without retraining any model.
+Every doctor correction in Lipi feeds into `extraction_knowledge` with Bayesian confidence scoring. After 3 clinics confirm an alias, it auto-promotes.
+
+**Verified 2026-07-03: the correction write path is now live** — every accept/edit/reject/add action calls `record_correction()`/`record_false_positive()`. This claim can now be made externally with confidence, where it was aspirational as of the 2026-06-28 original teardown.
+
+**One honest caveat:** "Telma" → Telmisartan today works via a static brand-name map (`_indian_brands.py`, 334 entries, wired 2026-07-03), not via the dynamic per-clinic alias learning this section originally described. The dynamic version — a specific doctor's correction of an unmapped brand teaching the extractor permanently for that clinic — is Block 2.2 in `14_BUILD_PLAN.md` and is not yet built. Don't claim the "Telma" example specifically as a *learned* correction in a YC interview; claim static brand recognition (true) and the general correction flywheel (true) separately.
 
 Augnito ships a static model. You get what you get. Their accuracy does not improve from clinic usage data unless they release a new model version.
 

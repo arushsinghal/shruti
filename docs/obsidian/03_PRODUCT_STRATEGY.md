@@ -103,16 +103,16 @@ Proof:
 
 ## Immediate Product Roadmap
 
-Build these before advanced research work:
+**Status verified 2026-07-03** — 5 of 8 below are already built; see `12_IMPLEMENTATION_GAP_REGISTER.md` for the authoritative register.
 
-1. Evidence Review UI.
-2. Assistant Work Queue.
-3. Investigation Order Generator.
-4. Referral Letter Generator.
-5. Cost-Per-Consultation Ledger.
-6. Flywheel Analytics Dashboard.
-7. One Insurance Pre-Auth Form.
-8. Internal Ops Console.
+1. Evidence Review UI. — built
+2. Assistant Work Queue. — built (`routes_tasks.py`)
+3. Investigation Order Generator. — built (`investigation_order_renderer.py`)
+4. Referral Letter Generator. — partially built
+5. Cost-Per-Consultation Ledger. — not built
+6. Flywheel Analytics Dashboard. — not built as specified
+7. One Insurance Pre-Auth Form. — built, generic shape, not payer-specific
+8. Internal Ops Console. — built (`OpsDashboard.tsx`)
 
 Why this order:
 - Evidence review proves "no proof -> no fact."
@@ -192,3 +192,5 @@ Competitors can copy a scribe screen. It is harder to copy a compounding ledger 
 - [[11_OPD_ADMIN_WORKFLOW_IMPLEMENTATION_PLAN]]
 - [[12_IMPLEMENTATION_GAP_REGISTER]]
 - [[13_AGENTIC_SERVICE_RESEARCH_DIRECTION]]
+- [[14_BUILD_PLAN]]
+- [[24_HOW_TO_MOVE_AHEAD]]

@@ -15,6 +15,17 @@ Related: [[14_BUILD_PLAN]], [[15_AUGNITO_TEARDOWN]], [[09_STRATEGIC_ROADMAP]]
 
 ---
 
+## Status Update — Verified Against Running Code, 2026-07-03
+
+Read this before the 2026-07-02 update below it — it supersedes F2's remaining open item and corrects Section 6 / Final Deliverables, which were stale.
+
+- **F2 (learning flywheel) — NOW FULLY RESOLVED.** The 2026-07-02 update below still listed one open item: "`routes_fact_review.py` does not call `record_correction()`". That gap is closed. As of 2026-07-02/03, `routes_fact_review.py` (accept/edit/reject/add) and `routes_notes.py`'s SOAP hallucination flag all call `record_correction()`/`record_false_positive()`, confirmed by direct read of the current source. The flywheel is now a real write path, not dead infrastructure.
+- **Section 6, item 1 ("Service-company surfaces barely exist") — STALE, corrected.** Investigation order generator, assistant work queue, and internal ops console all exist and are substantial: `routes_tasks.py` (real task table with `task_type`/`status`/`owner`/`due`/`notes`, role-scoped for assistants), `investigation_order_renderer.py` (wired into both doctor-facing and patient-facing routes), `OpsDashboard.tsx` (189 lines). Frontend: `AssistantDashboard.tsx` (690 lines), `AssistantIntake.tsx`, `ClinicInbox.tsx`, `Tasks.tsx`. This was verified directly against the file system 2026-07-03, not assumed. See `12_IMPLEMENTATION_GAP_REGISTER.md` for the full corrected register.
+- **Final Deliverables → "Top 5 product gaps" #1 ("Assistant work queue doesn't exist") — STALE.** It exists, per above.
+- **GLiNER — decision made.** See `07_DECISIONS.md` D016 (2026-07-03): decided against wiring GLiNER into production. The ontology-based approach continues, now at ~6,882 hand-curated terms.
+- **Still genuinely open, confirmed 2026-07-03:** Cost-per-consultation ledger, flywheel analytics dashboard (fact acceptance/edit rate metrics — `routes_analytics.py` exists but covers billing/revenue, not this), dynamic per-clinic drug alias learning, payer-specific TPA form mapping, `LearningEvent` structured ledger with reason/scope categories (the current write path is simpler than that design).
+- Sections 2 (Security) and 3 (Data Integrity) were not re-checked this pass either — same caveat as 2026-07-02 applies, treat as open unless separately verified.
+
 ## Status Update — Verified Against Running Code, 2026-07-02
 
 Re-checked F1, F2, F3, S3, P5 directly against current source. Do not treat the findings below as still-open without reading this first.
@@ -156,13 +167,17 @@ Covered in F2 + S5. Summary: well-designed, completely unwired, table missing, g
 4. Prescription missing India-required fields.
 5. No metrics/analytics dashboard to prove value.
 
-### YC verdict
-Not ready to apply *on the technical story* yet — not because the ideas are wrong but because the two headline moats (zero-LLM extraction, compounding learning) are partially aspirational in code (F1, F2). The deterministic SOAP core is real and defensible. Close F1/F2/F3 and build the assistant work queue, and the pitch matches the code. Single biggest gap: **the flywheel must actually run.**
+### YC verdict — updated 2026-07-03
+The technical story has closed significantly since the 2026-06-28 verdict below was written. F1 (Ollama LLM in pipeline) and F3 (no confirmation gate) were resolved as of 2026-07-02; F2 (flywheel dead) is now fully resolved as of 2026-07-03 — every doctor correction feeds the learning system. The service-company surfaces this section originally said "barely exist" are built: investigation orders, assistant work queue, ops console. What's still missing before applying: real revenue (this is now the single biggest gap, not code), a cost-per-consultation ledger with real numbers, and a flywheel analytics dashboard to visibly prove the "gets better with use" claim rather than assert it. The deterministic SOAP core, extraction, and the flywheel write path are all real and defensible today.
 
-### Moat assessment
-Real and hard to replicate: Hinglish-native deterministic extraction + provenance + OPD-economic fit. Replicable in <12 months by a funded competitor IF they decide to enter Indian OPD — your defense is being in clinics first with live correction data. But that defense only exists once F2 (the learning loop) is actually wired and accumulating data. Today it accumulates nothing.
+**Original verdict (2026-06-28, for history):** "Not ready to apply *on the technical story* yet — not because the ideas are wrong but because the two headline moats (zero-LLM extraction, compounding learning) are partially aspirational in code (F1, F2)... Single biggest gap: the flywheel must actually run." This is resolved.
 
-### Readiness scores
-- Pilot safety: **5/10** (deterministic SOAP good; Ollama path, no confirmation gate, Indian PHI gaps drag it down)
-- YC application: **4/10** (great narrative, but DD would expose F1/F2; no service surfaces yet)
-- Technical defensibility: **6/10** (the architecture is genuinely differentiated; execution gaps are closable in 2-3 weeks)
+### Moat assessment — updated 2026-07-03
+Real and hard to replicate: Hinglish-native deterministic extraction + provenance + OPD-economic fit. Replicable in <12 months by a funded competitor IF they decide to enter Indian OPD — your defense is being in clinics first with live correction data. **That defense now exists in code** — F2 is wired and accumulating data from every doctor action, where the 2026-06-28 assessment below correctly noted it accumulated nothing. The moat is real starting now; whether it's *defensible* depends on getting real pilot volume flowing through it, which is a revenue/adoption problem, not a code problem anymore.
+
+### Readiness scores — updated 2026-07-03
+- Pilot safety: **7/10** (was 5/10 — F1/F3 resolved, memory→SOAP guardrail added, IU/frequency bug fixed; Indian PHI gaps in `phi_scrubber.py` C4 still unverified this pass, still drags the score down)
+- YC application: **6/10** (was 4/10 — F1/F2/F3 no longer expose in technical DD, service surfaces exist; still capped by zero revenue and no cost/analytics numbers to show)
+- Technical defensibility: **7/10** (was 6/10 — the flywheel now actually runs, closing the biggest gap the original review flagged)
+
+**Original scores (2026-06-28), for history:** Pilot safety 5/10, YC application 4/10, Technical defensibility 6/10.
