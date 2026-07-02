@@ -2,6 +2,7 @@
 
 Date: 2026-06-27
 Verified against running code: 2026-07-02 (see inline "verified 2026-07-02" notes for what changed)
+**Re-verified against running code: 2026-07-03** — several items below were marked "not built" in error; the code was already there and just never reconciled back into this register. See "verified 2026-07-03" notes. Read those before treating any "not built" status as current — check the code, not just this file, going forward.
 
 Purpose: single source of truth for what appears built, what is not built, and what must be verified before pilots, scale, or YC/service-company positioning.
 
@@ -49,6 +50,15 @@ These appear present in the codebase or prior inspection, but should be runtime-
 - JWT auth, session management, audit logging, and usage analytics.
 - Clinic management and clinic member APIs.
 - Note signing / audit hash.
+- **Investigation order generator — verified 2026-07-03: BUILT.** `investigation_order_renderer.py`, wired into `routes_notes.py` (`GET /sessions/{id}/investigation-order`) and `routes_public.py` (patient-facing HTML link, sent via WhatsApp in `diagnostic_dispatch.py`). Item #11 below was stale — do not treat it as "not built."
+- **Assistant work queue — verified 2026-07-03: BUILT.** `routes_tasks.py`: real task table (`task_type`, `status`, `owner`, `due`, `notes`, `completed_at`), role-scoped so an assistant sees every doctor's queue in their clinic (`_owner_clause`). `GET /tasks`, `PATCH /tasks/{id}`, `POST /tasks/{id}/send-followup`, `POST /tasks/{id}/dispatch-prescription`. Frontend: `Tasks.tsx` (235 lines), `AssistantDashboard.tsx` (690 lines), `AssistantIntake.tsx` (347 lines), `ClinicInbox.tsx` (242 lines). Item #10 below was stale.
+- **Internal ops console — verified 2026-07-03: BUILT.** `OpsDashboard.tsx` (189 lines). Item #16 below was stale.
+- **Patient follow-up WhatsApp message — verified 2026-07-03: BUILT.** `send-followup` / `dispatch-prescription` endpoints in `routes_tasks.py`.
+- **Assistant/service-company framing in product copy — verified 2026-07-03: present.** `Landing.tsx` testimonial: "My assistants now get a WhatsApp task list before the patient leaves... Lipi queues all of it" / "The assistant's queue builds itself." Not just internal docs — this is live marketing copy.
+- **Correction flywheel write path — verified 2026-07-03: NOW WIRED (was the single biggest gap, closed 2026-07-02/03).** `learning_service.record_correction()` / `record_false_positive()` are called from every doctor action in `routes_fact_review.py` (accept/edit/reject/add fact) and from SOAP hallucination flags in `routes_notes.py::post_soap_feedback()`. Previously built but never called — see [[07_DECISIONS]].
+- **Indian brand-name CDS resolution — verified 2026-07-03: BUILT 2026-07-03.** `backend/app/services/_indian_brands.py` merges the existing 280-entry `indian_brands.tsv` ontology with a curated FDC-component map (29 FDCs, e.g. Combiflam → ibuprofen+paracetamol). Wired into `cds_engine.py` so drug-drug interaction checks fire on real Indian brand-name prescriptions, not just generics.
+- **Memory→SOAP visit-boundary guardrail — verified 2026-07-03: BUILT 2026-07-03.** `resolve_memory()` now raises `ValueError` unless `allow_multi_visit=True` is explicitly passed when more than one fact-set is given. All 7 production call sites already pass single-item lists (verified), so behavior is unchanged today — this closes the risk described in item #3 below for any *future* multi-visit history feature. Item #3 is now a closed risk, not an open gap — the guardrail exists but the eventual `current_visit_state`/`past_context` split for a real timeline UI feature is still not built.
+- **Frequency extraction gap — verified 2026-07-03: FIXED.** "weekly", "monthly", and meal-relative timing ("before dinner" etc.) were missing from the frequency regex and normalization map — common for Vitamin D/insulin IU prescriptions. Fixed 2026-07-03. (Note: item #5 below, "IU dosage unit support," was already stale before this fix — IU dosage itself was already parsed correctly; only frequency around IU prescriptions was broken. Corrected inline at item #5.)
 - Billing: **verified 2026-07-02, table structure changed since this register was written.** `billing_records` was split into two clean tables: `billing_records` (Lipi's own SaaS plan billing — clinic_name/plan_name/amount_inr/status) and `consultation_billing` (per-consultation patient fee — session_id/user_id/amount/currency/notes). Previously these were incorrectly sharing one table with two incompatible schemas across SQLite/Postgres. Fixed live on Postgres with zero data loss.
 
 ## Immediate Engineering Hygiene
@@ -127,7 +137,7 @@ Acceptance:
 
 ### 5. IU Dosage Unit Support
 
-Status: not done.
+Status: **stale — verified 2026-07-03: IU dosage itself was already parsed correctly** (`clinical_extractor.py` regex already included `iu|units?`). The actual bug was that **frequency** extraction had no pattern for "weekly", "monthly", or meal-relative timing ("before dinner") — so "Vitamin D 60000 IU weekly" captured the dose but dropped the frequency. Fixed 2026-07-03.
 
 Problem:
 - Prescription extraction may cover `mg`, `ml`, `mcg`, and `g`, but Indian OPD commonly uses IU.
@@ -211,27 +221,13 @@ Acceptance:
 
 ### 10. Assistant Work Queue
 
-Status: not built.
+Status: **built, verified 2026-07-03** — this entry was stale. `backend/app/api/routes_tasks.py` implements a real task table (`task_type`, `status`, `owner`, `due`, `notes`, `completed_at`, `session_id`, `user_id`), role-scoped so an assistant sees every doctor's queue in their clinic via `_owner_clause()`. Routes: `GET /tasks`, `PATCH /tasks/{id}`, `POST /tasks/{id}/send-followup`, `POST /tasks/{id}/dispatch-prescription`. Frontend surfaces: `Tasks.tsx`, `AssistantDashboard.tsx` (690 lines), `AssistantIntake.tsx`, `ClinicInbox.tsx`.
 
-Required:
-- Session-level admin task creation.
-- Clinic/global work queue.
-- Task owner: doctor, assistant, or Lipi ops.
-- Task status: pending, needs_review, needs_info, blocked, in_progress, done, cancelled.
-- Due time/SLA, notes, blocker reason, completion reason.
-
-Why it matters:
-- This is the main transition from software tool to AI-native service company.
+Remaining gap versus the original ask: task `status` values and `owner_role` scoping should be double-checked against the exact enum this note originally specified (pending/needs_review/needs_info/blocked/in_progress/done/cancelled) — verify the actual status values in the DB schema before assuming full parity; the queue mechanics are real, but the precise status vocabulary hasn't been diffed against this spec.
 
 ### 11. Investigation Order Generator
 
-Status: not built, or only partially covered by printable outputs.
-
-Required:
-- Generate order only from approved investigation facts or doctor-entered items.
-- Include patient, doctor, and clinic fields.
-- Preserve evidence per investigation where useful.
-- Missing fields remain missing.
+Status: **built, verified 2026-07-03** — this entry was stale. `investigation_order_renderer.py` renders from approved investigation facts, wired into `routes_notes.py` (`GET /sessions/{id}/investigation-order`, doctor-facing) and `routes_public.py` (`GET /public/investigation-order/{session_id}`, patient-facing HTML, linked out via WhatsApp in `diagnostic_dispatch.py`).
 
 ### 12. Referral Letter Hardening
 
@@ -287,18 +283,9 @@ Remaining gap versus the original ask: still only one generic TPA form shape, no
 
 ### 16. Internal Ops Console
 
-Status: not built.
+Status: **built, verified 2026-07-03** — this entry was stale. `frontend/src/pages/OpsDashboard.tsx` (189 lines) exists.
 
-Required:
-- View clinic work items.
-- Assign owner.
-- Track SLA.
-- Add notes.
-- Escalate to doctor.
-- Track completion and failure reasons.
-
-Why it matters:
-- Lipi humans can complete service work while software learns.
+Remaining gap: verify feature-by-feature against the original spec (assign owner, SLA tracking, escalate to doctor, completion/failure reason capture) — confirmed the page exists and is substantial, not that every listed requirement is covered. Do that check before claiming full parity externally.
 
 ## Before Broader Scale
 
@@ -374,31 +361,33 @@ Acceptance:
 
 ## Priority Order
 
-### Today
+**Updated 2026-07-03 — reflects verified code state, not the original 2026-06-27 plan.**
 
-1. Commit the current known-good state.
-2. Create clean issues/backlog from this register.
-3. Reconcile public/docs privacy claims with actual Sarvam/WhatsApp/Gemini behavior.
+### Done as of 2026-07-03
 
-### Before Real Patients
+1. ✅ Commit the current known-good state — committed to `pilot-prod-hardening`.
+2. ✅ Memory→SOAP separation guardrail (`allow_multi_visit` opt-in on `resolve_memory()`).
+3. ✅ IU dosage / frequency extraction bug (weekly, monthly, meal-relative timing).
+4. ✅ D1 learning loop fix — correction flywheel write path wired into every doctor action.
+5. ✅ Indian brand-name CDS resolution (fixes DDI checks silently missing brand-name prescriptions).
+6. Assistant Work Queue, Investigation Order Generator, Internal Ops Console, One Insurance Pre-Auth Form — **discovered already built**, not actually completed today, but the register previously said "not built" in error.
 
-1. Memory to SOAP separation.
-2. GLiNER chunking.
-3. IU dosage support.
-4. Production diarization decision.
-5. D1 learning loop fix.
-6. Mobile core-flow check.
+### Still Before Real Patients
 
-### Before Scaling Clinics
+1. GLiNER chunking — moot unless GLiNER gets wired into the production path at all (currently bypassed entirely, see "Built Surface" note above).
+2. Production diarization decision — still unverified which ASR path runs in production.
+3. Mobile core-flow check — still unverified end-to-end on Android Chrome.
+4. Reconcile public/docs privacy claims with actual Sarvam/WhatsApp/Gemini behavior — still open.
 
-1. Assistant Work Queue.
-2. Cost-Per-Consultation Ledger.
-3. Investigation Order Generator.
-4. Referral Letter Hardening.
-5. Flywheel Analytics Dashboard.
-6. One Insurance Pre-Auth Form.
-7. Internal Ops Console.
-8. Billing self-serve and quotas.
+### Still Before Scaling Clinics
+
+1. Cost-Per-Consultation Ledger — confirmed not built (no `cost_per_consultation`/`CostLedger` code found).
+2. Referral Letter Hardening — status unchanged, still partial.
+3. Flywheel Analytics Dashboard — confirmed not built as specified. `routes_analytics.py` exists but covers billing/appointments/revenue, not fact-acceptance-rate / edit-rate / correction-reason metrics.
+4. TPA form is still one generic shape, not mapped to a specific real payer's exact fields.
+5. Billing self-serve and quotas — still manual, no Razorpay/Stripe integration.
+6. Dynamic drug alias learning (Telma → telmisartan, per-doctor) — confirmed not built.
+7. Specialty-specific extraction routing — confirmed not built as a real `SpecialtyEnum`-driven system (only a couple of hardcoded comments reference specialty, no actual routing logic).
 
 ## Relationship To Research Direction
 

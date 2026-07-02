@@ -37,21 +37,23 @@ Gustaf Alströmer's AI-native service company framing fits Lipi exactly — heal
 
 ## YC Ready Checklist
 
-Complete these in order. When all are checked, the application is ready to submit.
+**Updated 2026-07-03 — re-verified against running code, several items below were checked off in error before because the code already existed and this list wasn't reconciled.**
 
-- [ ] Clinical extraction accuracy at ~78/100 (GLiNER classification layer)
-- [ ] Branch committed, demo runs clean from transcript to SOAP
-- [ ] Memory → SOAP safety guard live and tested
-- [ ] LearningEvent correction ledger capturing every doctor action
-- [ ] Investigation order generator live (downstream service output #1)
-- [ ] Patient follow-up message generator live (downstream service output #2)
-- [ ] Assistant work queue live (the demo moment that proves service company)
+- [x] Branch committed, demo runs clean from transcript to SOAP
+- [x] Memory → SOAP safety guard live and tested (`allow_multi_visit` opt-in, 2026-07-03)
+- [x] Correction flywheel write path live (every doctor action feeds `learning_service`, 2026-07-02/03) — note: not yet the richer `LearningEvent` schema with reason/scope categories, see Block 2.1 below
+- [x] Investigation order generator live (verified 2026-07-03 — was already built, doc was stale)
+- [x] Patient follow-up message generator live (verified 2026-07-03 — was already built, doc was stale)
+- [x] Assistant work queue live (verified 2026-07-03 — was already built, doc was stale)
+- [x] One insurance pre-auth form live (generic shape, not payer-specific yet)
+- [ ] Clinical extraction accuracy re-baselined (GLiNER classification layer — re-verify premise first, see Block 0.1 note, ontology has grown to ~3,222 entries since this was scoped)
+- [ ] LearningEvent correction ledger with structured reason/scope categories (flywheel writes exist, this richer schema does not)
 - [ ] Cost per consultation: real number from real consultations
 - [ ] Augnito teardown written and accurate
 - [ ] Mobile core flow verified on Android Chrome
-- [ ] One insurance pre-auth form mapped to a real TPA
-- [ ] Flywheel analytics: acceptance rate, edit rate, review time visible
-- [ ] The killer demo runs end-to-end in under 5 minutes
+- [ ] One insurance pre-auth form mapped to a real TPA (currently generic)
+- [ ] Flywheel analytics: acceptance rate, edit rate, review time visible (routes_analytics.py exists but covers billing/revenue, not this)
+- [ ] The killer demo runs end-to-end in under 5 minutes — re-run and verify now that more of the demo already works than previously believed
 
 ---
 
