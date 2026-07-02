@@ -77,19 +77,16 @@ That is the service company demo. Everything below exists to make it real.
 
 ## Block 0 — Accuracy (In Progress, ~3 days)
 
-### 0.1 GLiNER classification layer — replace regex intent classification
+### 0.1 GLiNER classification layer — DECIDED AGAINST (D016, 2026-07-03)
 
-Model: Opus for design, Sonnet for implementation | Effort: 2-3 days
+**Status: closed, do not build.** See [[07_DECISIONS]] D016. Ontology grew to ~6,882 hand-curated terms since this block was scoped (from ~3,222 when the tradeoff was first flagged), shrinking the gap GLiNER would close. No accuracy baseline was ever measured to confirm the original 60→78/100 estimate still applies. GLiNER's cost (753MB model, cold-start latency, unverified merge/filter layer, and introducing a neural component into an otherwise fully deterministic/auditable pipeline) outweighs an unmeasured and shrinking benefit. Continue closing extraction gaps via ontology growth and targeted regex (the frequency/brand-name/Hinglish fixes from 2026-07-03 are the model to follow) instead. Re-open only with a fresh measured baseline if a specific extraction failure is found that this approach genuinely cannot address.
 
-**Status check 2026-07-02: verify this before starting.** GLiNER is currently NOT wired into the production request path at all — `routes_notes.py`'s live pipeline calls `ClinicalExtractorService.extract()` directly, bypassing `clinical_pipeline.py` (the only place GLiNER runs), which is currently exercised only by `test_e2e.py`. The ontology-based keyword/fuzzy layer has grown to ~3,222 hand-curated entries since this plan was written, which changes the marginal value case for GLiNER (smaller unknown-term gap than when this block was scoped) against its cost (753MB local model, cold-start latency, an unverified merge/filter layer). Confirm this tradeoff is still worth it before starting — see `21_FRONTIER_RESEARCH_DIRECTIONS.md` for the current thinking on the ontology size, and decide explicitly rather than assuming this block's premise still holds.
+The label taxonomy below is kept for reference only, in case a future decision reverses D016 — it is not an active work item.
 
-**This is the architectural change that was expected to take extraction from 60 → 78/100 — re-verify the current accuracy baseline before assuming that gap still exists.**
+<details>
+<summary>Archived design (not being built)</summary>
 
-The problem: regex-based classification of status, category, and negation cannot generalize across Hinglish variation. Every new phrasing requires a new pattern. A generative LLM call would break the zero-LLM guarantee. GLiNER is already in the pipeline and is purely extractive — spans must exist verbatim, no text generation possible.
-
-The change: extend GLiNER label set to cover classification, not just entity boundary detection.
-
-New labels to add alongside existing NER labels:
+New labels that would have been added alongside existing NER labels:
 ```
 MEDICATION_NEW          — shuru karo, naya prescription, start
 MEDICATION_CONTINUE     — jari rakho, continue karo, same
@@ -104,7 +101,7 @@ SYMPTOM_HISTORICAL      — pehle tha, purana
 DIAGNOSIS_CONFIRMED     — ki diagnosis hai, confirmed
 ```
 
-Keep regex only for structured vitals patterns (BP 138/86, weight 62 kg, HbA1c 8.2%) where the format is bounded and extraction IS the classification.
+</details>
 
 Register as D016 in 07_DECISIONS.md.
 

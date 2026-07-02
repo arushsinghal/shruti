@@ -238,3 +238,25 @@ No for pilot and pricing work.
 
 Related:
 [[06_API_COSTS]]
+
+## D016: Do Not Wire GLiNER Into Production Extraction
+
+Date: 2026-07-03
+Status: Accepted
+
+Decision:
+Keep the deterministic, ontology-based extraction pipeline as the sole production extraction path. Do not wire GLiNER (or any neural NER/classification layer) into `routes_notes.py`'s live request path.
+
+Reason:
+GLiNER was proposed to close a gap in Hinglish classification (medication status, negation, etc.) that regex could not generalize across. Since that proposal, the hand-curated ontology has grown from ~3,222 to ~6,882 terms across all TSVs, shrinking the marginal gap GLiNER would close. No accuracy baseline was ever re-measured to confirm the originally estimated 60→78/100 gain still applies. Meanwhile GLiNER adds a 753MB model, cold-start latency, and an unverified merge/filter layer — real operational cost for an unmeasured, shrinking benefit. It also introduces a neural component into what is otherwise a fully deterministic, auditable extraction path, which weakens the "zero-LLM, every fact traces to an evidence span" architectural story that is the actual technical moat.
+
+Implications:
+`ENABLE_GLINER` stays `False`. `clinical_pipeline.py` (the only code path that calls GLiNER) remains exercised only by `test_e2e.py`, not production. Continue growing the ontology and hand-tuned regex (frequency patterns, brand names, Hinglish epistemic/temporal markers) as the primary way to close extraction gaps. If a future accuracy problem is specifically traced to something regex/ontology genuinely cannot express — not just "an LLM would probably help" — re-open this decision with a fresh, measured baseline before reconsidering.
+
+Reversible:
+Yes — reversible if a specific, measured extraction failure is found that the ontology approach cannot address and GLiNER's extractive-only guarantee (span must exist verbatim) can be preserved.
+
+Related:
+[[14_BUILD_PLAN]]
+[[21_FRONTIER_RESEARCH_DIRECTIONS]]
+[[12_IMPLEMENTATION_GAP_REGISTER]]
