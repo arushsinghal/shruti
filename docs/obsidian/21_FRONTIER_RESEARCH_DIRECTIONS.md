@@ -15,7 +15,7 @@ Related:
 
 Anthropic publicly launched Claude Science on 2026-06-30 (a research-workbench product, same posture as Claude Code but for scientific research: autonomous literature search, dataset discovery, code execution on compute clusters, 60+ pre-configured scientific databases, reproducible/auditable outputs). We have paid access to it starting 2026-07-01.
 
-This is not exclusive access. It is available to any paid Claude subscriber. The edge it gives us is execution speed on research we are already positioned to do well, not a moat by itself. The moat is still what [[13_AGENTIC_SERVICE_RESEARCH_DIRECTION]] already says it is: the evidence-backed data trace Lipi generates from real consultations, which most AI-native research tooling has nothing to point at until a product is live.
+The edge it gives us is execution speed on research we are already positioned to do well, not a moat by itself. The moat is still what [[13_AGENTIC_SERVICE_RESEARCH_DIRECTION]] already says it is: the evidence-backed data trace Lipi generates from real consultations, which most AI-native research tooling has nothing to point at until a product is live.
 
 Rule carried over from [[13_AGENTIC_SERVICE_RESEARCH_DIRECTION]]: research jargon last, and only when the audience asks. Everything below is labeled by what's real versus what's a direction.
 

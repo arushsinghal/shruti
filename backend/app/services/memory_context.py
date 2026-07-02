@@ -1,5 +1,21 @@
 class MemoryContextService:
-    def resolve_memory(self, facts: list) -> dict:
+    def resolve_memory(self, facts: list, *, allow_multi_visit: bool = False) -> dict:
+        """Merge fact-sets into one state. No visit-boundary awareness by design —
+        callers pass exactly what should be merged. `facts` normally holds a single
+        current-visit fact-set; every call site in this codebase does. Passing more
+        than one item risks silently blending a prior visit's allergy/diagnosis into
+        the current SOAP with no indication of which visit it came from, so that
+        requires an explicit opt-in rather than happening by accident.
+        """
+        if len(facts) > 1 and not allow_multi_visit:
+            raise ValueError(
+                "resolve_memory() received multiple fact-sets without allow_multi_visit=True. "
+                "Merging facts across visits without an explicit decision risks silently "
+                "blending prior-visit allergies/diagnoses into the current SOAP. Pass a "
+                "single-item list for current-visit-only resolution, or pass "
+                "allow_multi_visit=True if a combined patient-history view is intentional."
+            )
+
         state = {
             "symptoms": [],
             "medications": {},

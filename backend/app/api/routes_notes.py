@@ -49,6 +49,7 @@ from app.services.fir_generator import FIRGeneratorService
 from app.services.legal_generator import LegalGeneratorService
 from app.services.investigation_order_renderer import render_investigation_order_html
 from app.services import provenance
+from app.services.learning_service import learning_service
 from app.services.memory_service import get_patient_memory
 
 logger = logging.getLogger(__name__)
@@ -438,6 +439,22 @@ async def post_soap_feedback(
         timestamp=timestamp,
     )
     
+    # Flywheel: if doctor edited the SOAP (not just accepted it), infer lexicon
+    # corrections from the diff. "hallucinated_fact" category → false positives.
+    if body.status == "edit" and diff_lines:
+        if "hallucinated_fact" in body.categories:
+            # Extract removed lines from the diff as false-positive signals
+            removed = [l[1:].strip() for l in diff_lines if l.startswith("-") and not l.startswith("---")]
+            clinic_id = str(current_user["clinic_id"]) if current_user.get("clinic_id") else None
+            for term in removed:
+                if term and len(term) > 2:
+                    await learning_service.record_false_positive(
+                        user_id=user_id,
+                        surface_form=term[:200],
+                        field="soap_section",
+                        clinic_id=clinic_id,
+                    )
+
     return SOAPFeedbackResponse(
         success=True,
         feedback_id=feedback_id,

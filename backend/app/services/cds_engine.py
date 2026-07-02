@@ -1,5 +1,7 @@
 import re
 
+from app.services._indian_brands import expand_med_names as _expand_brands
+
 _URGENCY_ORDER = {"critical": 0, "high": 1, "medium": 2, "low": 3}
 
 # Drug class cross-reactivity map.
@@ -235,7 +237,9 @@ class CDSEngineService:
         diagnoses_str = " ".join(state.get("diagnoses", [])).lower()
 
         # 2. Deterministic drug-drug interaction checks
-        med_names = [str(name) for name in medications.keys()]
+        # Expand brand names (e.g. "Combiflam" → ["combiflam", "ibuprofen", "paracetamol"])
+        # so interactions fire on brand-name prescriptions without touching allergy logic.
+        med_names = _expand_brands([str(name) for name in medications.keys()])
         interaction_keys: set[tuple[str, str, str]] = set()
         for interaction in _DRUG_INTERACTIONS:
             left_matches = _matching_med_names(med_names, interaction["left"])  # type: ignore[arg-type]

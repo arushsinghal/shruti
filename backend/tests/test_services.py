@@ -246,7 +246,7 @@ class TestMemoryContext:
             {"symptoms": ["fever"], "medications": [], "vitals": [], "allergies": [], "investigations": [], "contexts": {}},
             {"symptoms": ["fever"], "medications": [], "vitals": [], "allergies": [], "investigations": [], "contexts": {}},
         ]
-        state = memory.resolve_memory(facts)
+        state = memory.resolve_memory(facts, allow_multi_visit=True)
         assert state["symptoms"].count("fever") == 1
 
     def test_resolve_medication_override(self):
@@ -256,7 +256,7 @@ class TestMemoryContext:
             {"symptoms": [], "medications": [{"name": "amox", "dosage": "500 mg", "frequency": "TDS"}],
              "vitals": [], "allergies": [], "investigations": [], "contexts": {}},
         ]
-        state = memory.resolve_memory(facts)
+        state = memory.resolve_memory(facts, allow_multi_visit=True)
         assert state["medications"]["amox"]["dosage"] == "500 mg"
         assert state["medications"]["amox"]["frequency"] == "tds"
 

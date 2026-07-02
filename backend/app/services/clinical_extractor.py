@@ -1256,6 +1256,19 @@ _HINDI_FREQ_NORMALIZE: dict[str, str] = {
     "at night": "HS",
     "at bedtime": "HS",
     "before bed": "HS",
+    "once a week": "weekly",
+    "once weekly": "weekly",
+    "har hafte": "weekly",
+    "hafte mein ek baar": "weekly",
+    "once a month": "monthly",
+    "once monthly": "monthly",
+    "har mahine": "monthly",
+    "before dinner": "before dinner",
+    "after dinner": "after dinner",
+    "before lunch": "before lunch",
+    "after lunch": "after lunch",
+    "before breakfast": "before breakfast",
+    "after breakfast": "after breakfast",
 }
 
 # Normalize Hindi duration phrases for medication prescriptions
@@ -2357,7 +2370,10 @@ class ClinicalExtractorService:
             r'din\s+mein\s+char\s+baar|din\s+mein\s+teen\s+baar|din\s+mein\s+do\s+baar|'
             r'char\s+baar|teen\s+baar|do\s+baar|ek\s+baar|'
             r'khane\s+ke\s+baad|khana\s+ke\s+baad|khane\s+se\s+pehle|khana\s+se\s+pehle|'
-            r'raat\s+ko|roz)\b',
+            r'raat\s+ko|roz|'
+            r'once\s+(?:a\s+)?week(?:ly)?|weekly|har\s+hafte|hafte\s+mein\s+ek\s+baar|'
+            r'once\s+(?:a\s+)?month(?:ly)?|monthly|har\s+mahine|'
+            r'before\s+(?:dinner|lunch|breakfast)|after\s+(?:dinner|lunch|breakfast))\b',
             re.IGNORECASE,
         )
 

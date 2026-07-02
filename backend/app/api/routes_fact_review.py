@@ -19,6 +19,7 @@ from pydantic import BaseModel
 from app.api.routes_auth import get_current_user
 from app.schemas.consultation import ExtractedFact, StatusEnum
 from app.services import provenance
+from app.services.learning_service import learning_service
 from app.services.memory_context import MemoryContextService
 from app.services.soap_generator import SOAPGeneratorService
 from app.storage.repository import SessionRepository
@@ -95,13 +96,23 @@ async def review_fact(
     if target is None:
         raise HTTPException(status_code=404, detail="Fact not found")
 
+    clinic_id = str(current_user["clinic_id"]) if current_user.get("clinic_id") else None
+
     if body.action == "reject":
         target.review_status = "rejected"
         target.confirmed_by = None
+        # Flywheel: doctor rejected this extraction — lower its confidence
+        await learning_service.record_false_positive(
+            user_id=user_id,
+            surface_form=target.normalized_value,
+            field=target.category,
+            clinic_id=clinic_id,
+        )
     elif body.action == "edit":
         new_value = body.normalized_value or body.edited_value
         if not new_value:
             raise HTTPException(status_code=400, detail="edit requires normalized_value")
+        original_surface = target.raw_text or target.normalized_value
         target.normalized_value = new_value
         target.raw_text = new_value
         target.extractor = "doctor"
@@ -112,6 +123,15 @@ async def review_fact(
             target.metadata = {**target.metadata, **body.metadata}
         elif target.category == "medication":
             target.metadata = {**target.metadata, "name": new_value}
+        # Flywheel: extractor had original_surface, doctor corrected it to new_value
+        await learning_service.record_correction(
+            user_id=user_id,
+            knowledge_type="lexicon_term",
+            canonical_value=new_value,
+            surface_form=original_surface,
+            field=target.category,
+            clinic_id=clinic_id,
+        )
     elif body.action == "accept":
         target.review_status = "confirmed"
         target.confirmed_by = user_id
@@ -151,6 +171,20 @@ async def add_fact(
     facts.append(new_fact)
     response = _regenerate(session, facts)
     await repo.update_session(session)
+
+    # Flywheel: doctor added a fact the extractor missed — record as a correction.
+    # source_sentence is the surface form hint when provided; falls back to the
+    # canonical value itself (records the miss even without a surface form match).
+    clinic_id = str(current_user["clinic_id"]) if current_user.get("clinic_id") else None
+    await learning_service.record_correction(
+        user_id=user_id,
+        knowledge_type="lexicon_term",
+        canonical_value=body.normalized_value,
+        surface_form=body.source_sentence or body.normalized_value,
+        field=body.category,
+        clinic_id=clinic_id,
+    )
+
     return response
 
 
