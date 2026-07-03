@@ -95,7 +95,7 @@ export default function OnboardingFlow() {
             <span className="font-bold text-primary text-2xl">श</span>
             <span className="text-lg font-bold text-text-dark tracking-tight">Lipi</span>
           </div>
-          <p className="text-xs text-slate-400 mt-1">AI Clinical Scribe — welcome to Lipi</p>
+          <p className="text-xs text-slate-400 mt-1">AI-Native OPD Service — welcome to Lipi</p>
         </div>
 
         {/* Steps */}

@@ -111,8 +111,8 @@ const FAQS: { q: string; a: string }[] = [
     a: '40 patients/day × ₹7.50 × 22 working days = ₹6,600/month deposited by NHA into your clinic account. Lipi Pro is ₹1,499/month. You\'re up ₹5,100 just from DHIS — before anything else. At volume, one doctor\'s DHIS income covers multiple seats.',
   },
   {
-    q: 'Is Lipi just an AI scribe?',
-    a: 'No. The scribe is the entry point. Lipi is an AI-native healthcare service — from one consultation it produces reviewed records, prescriptions, referrals, investigation orders, patient follow-ups, payment collection, and the ABDM records that trigger your government income. All from speech.',
+    q: 'Does Lipi just take notes?',
+    a: 'No. Lipi is an AI-native OPD service — from one consultation it produces reviewed records, prescriptions, referrals, investigation orders, patient follow-ups, payment collection, and the ABDM records that trigger your government income. All from speech, all doctor-reviewed.',
   },
   {
     q: 'How does "zero hallucination" work?',
