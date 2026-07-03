@@ -84,9 +84,50 @@ Using Lipi today still requires a screen (phone or laptop) present during the co
 **Safe claim:** "We are exploring what a dedicated ambient-capture hardware device for the point of care would need to solve, including privacy, connectivity, and cost, before committing to build one."
 **Avoid claiming:** any specific device name, timeline, or "in development" language. This is pre-research, not even early research yet. Do not let external copy (research page, YC application, investor deck) imply more certainty than this section states.
 
+### 5. Fine-tuned multilingual medical ASR
+
+Sarvam's Saaras (the current default ASR path, see [[01_CURRENT_STATE]]) is a strong general-purpose Indic ASR, not a medical-domain model. It was not trained specifically on Indian clinical speech: doctor-patient code-switching, medical terminology in Hinglish, drug brand names spoken quickly, regional accent variation across specialties and states. Every transcription error at this layer becomes a downstream extraction risk, however good the deterministic extractor is at recovering from it.
+
+**What's real today:** nothing shipped. Using Sarvam's general ASR as-is, unmodified.
+
+**First achievable step:** fine-tune on Lipi's own accumulated, doctor-confirmed transcript corpus, where the "ground truth" is not a separately-labeled dataset but the doctor's own corrections during fact review, which already imply what the ASR should have heard. This is the ASR-layer equivalent of the correction flywheel already wired for extraction (see [[07_DECISIONS]] and [[09_STRATEGIC_ROADMAP]]) — a second, parallel flywheel at the transcription layer instead of the extraction layer.
+
+**Honest limitation:** needs real data volume first, same gate as every other data-hungry direction in this vault (see [[24_HOW_TO_MOVE_AHEAD]] Phase 2). Fine-tuning ASR before there's a meaningful, diverse corpus of confirmed transcripts risks overfitting to a handful of doctors' voices and accents rather than generalizing. Also: any fine-tuning must run on India-hosted infrastructure and training data must never leave India, same constraint as [[27_CLINICAL_MEMORY_ASSISTANT_SPEC]] Section 0 and [[07_DECISIONS]] D017 — this compounds with Sarvam already being an on-shore partner, since fine-tuning their open components or partnering directly with them avoids ever standing up separate foreign infrastructure for this.
+
+**Safe claim:** "We are exploring fine-tuning medical-domain ASR on our own doctor-confirmed transcript corpus, once volume supports it."
+**Avoid claiming:** any current accuracy improvement from this direction — nothing has been trained yet.
+
+### 6. A fine-tuned Indian clinical model for CDSS and the memory assistant
+
+The deterministic CDS engine (`cds_engine.py`) is the actual safety moat and does not change: no LLM, generative or otherwise, ever decides what constitutes a drug interaction, an allergy risk, or a dosing hazard. That boundary is non-negotiable (see D003/D004 in [[07_DECISIONS]] and the whole zero-LLM extraction architecture this vault keeps reinforcing). What this direction is about is different: a fine-tuned, self-hosted model that (a) explains a deterministic alert in plain language once it has already fired — narration, never generation of new facts, the same pattern `narrate_practice_insight()` already uses for practice-insight numbers — and (b) powers the retrieval/synthesis layer in [[27_CLINICAL_MEMORY_ASSISTANT_SPEC]], eventually as a fine-tuned replacement for the general-purpose Sarvam-30B currently used there.
+
+**What's real today:** the memory assistant (Phase 1) runs on unmodified, general-purpose Sarvam-30B via API, verified working 2026-07-03. No fine-tuning has happened. `cds_engine.py` remains 100% deterministic, unchanged, and this direction does not propose changing that.
+
+**Sarvam-M is the right base model for this, not a generic open-weight model.** It's open-weight (self-hostable, eliminating per-token API cost at scale) and already Indic-tuned, which beats starting a fine-tune from a generic Llama/Qwen checkpoint. This is the concrete instance of [[10_CONTINUAL_LEARNING_SYSTEM]]'s "Stage 3: Distillation" — the teacher is the whole experienced Lipi system (deterministic extractors, doctor corrections, CDS alert history), the student is a fine-tuned Sarvam-M serving both consumers named above.
+
+**First achievable step:** none yet — this is gated behind real data volume (same Phase 2 gate as Direction 5). The near-term, buildable-now piece is narrower: use Sarvam (API, not fine-tuned) to *narrate* deterministic CDS alerts in plain language, strictly forbidden from inventing a new alert or overriding a deterministic one. That's a small, safe, shippable slice of this direction available today, independent of fine-tuning.
+
+**Honest limitation, stated plainly because it's the one people get wrong:** "is Sarvam on par with a frontier model for CDSS" is the wrong question. The right question is whether *any* generative model, on-shore or not, frontier or not, should make clinical safety determinations at runtime — and the answer, given this product's entire architecture and the reason doctors can trust it, is no. Sarvam-30B tested well (2026-07-03) on retrieval-and-synthesis over *provided* evidence (the memory assistant's actual job). That is not evidence it would be safe generating clinical facts from its own parametric knowledge, and nothing in this vault proposes testing that, because the deterministic engine exists specifically so that question never has to be answered under pressure.
+
+**Safe claim:** "Our clinical safety layer stays fully deterministic; we're exploring a fine-tuned, self-hosted model to explain those alerts in plain language and to power retrieval over doctors' own confirmed history."
+**Avoid claiming:** "AI-powered CDSS," "our model detects drug interactions," or anything implying a generative model makes or could make a clinical safety call.
+
+### 7. Continual learning for the clinical memory assistant
+
+[[27_CLINICAL_MEMORY_ASSISTANT_SPEC]] Phase 1 shipped and was live-verified 2026-07-03. It is retrieval, not continual learning in the technical sense — the model's weights never change, and it "feels" like it's getting smarter only because more of a patient's confirmed history becomes available to recall as visits accumulate. That distinction matters and must stay precise in any external communication (see the spec's own caution on this and [[10_CONTINUAL_LEARNING_SYSTEM]]'s new note under Stage 3).
+
+**What's real today:** context-stuffing against Sarvam-30B, verified 2026-07-03 with real API calls against real patient data. Practical usable context ceiling through Sarvam's current API gateway is approximately 38,000-39,000 input tokens for both Sarvam-30B and Sarvam-105B (measured directly by binary-searching request size against the live API, not taken from published specs — third-party sources claimed 32K/128K respectively; the gateway enforces a lower, model-independent ceiling in practice today). At roughly 100 tokens per visit summary (measured from real test prompts), that ceiling comfortably fits several hundred visits for one patient, meaning Phase 1's single-patient scope will not hit this wall for the overwhelming majority of real patients. It becomes the binding constraint once Phase 2 (cross-patient search across a doctor's full patient base) is built, which is exactly why Phase 2 is scoped around `pgvector` retrieval instead of context-stuffing (see the spec, Section 5).
+
+**Rough cost burn at Phase 1 scope:** roughly ₹0.003 per query (sub-paisa) at a realistic ~10-visit history per question, using Sarvam-30B with reasoning disabled. Even at generous usage (20 queries/doctor/day, 22 working days/month), that's roughly ₹1.30/doctor/month — negligible against Sarvam ASR cost and not yet worth a dedicated line in [[06_API_COSTS]], but should be added once the cost-per-consultation ledger is actually built (still not built as of this writing, see [[12_IMPLEMENTATION_GAP_REGISTER]]).
+
+**The real continual-learning direction lives in Direction 6 above**, not here: this direction (7) is the retrieval mechanism that ships now and works within current model weights; Direction 6 is the actual weight-updating mechanism that requires real data volume first. Keep them conceptually and communicatively separate — conflating "the assistant recalls more history over time" with "the assistant is learning" is the exact overclaim this vault's discipline exists to prevent.
+
+**Safe claim:** "The assistant's usefulness compounds with usage because more of a doctor's own confirmed history becomes retrievable over time — this is retrieval, and we're explicit that it's not model retraining."
+**Avoid claiming:** "continual learning," "the AI learns from every consultation," or any language implying weight updates happen from this feature specifically. Reserve "continual learning" language for Direction 6, and only once something has actually been fine-tuned.
+
 ## Discipline Carried Forward From [[13_AGENTIC_SERVICE_RESEARCH_DIRECTION]]
 
-Applies to all four new directions above, not just the ones it was originally written for:
+Applies to all seven directions above, not just the ones it was originally written for:
 
 - Product first, service delivery second, learning moat third, research jargon last, and only when the audience asks.
 - Every external claim about a direction above should match its "Safe claim" line exactly, not an enthusiastic paraphrase of it.
@@ -98,3 +139,5 @@ Applies to all four new directions above, not just the ones it was originally wr
 2. Start the genomic-diagnostics partnership conversation (direction 3) in parallel; it's an outreach task, not a build task, so it doesn't compete for engineering time.
 3. Run the AMR public-data gap analysis (direction 1) using Claude Science once direction 2 ships, so there's already one shipped result to point to.
 4. Direction 4 (hardware) stays a written direction only until the open questions above have real answers. Do not let it appear on external pages as more than "we are exploring this."
+5. Direction 7 (memory assistant retrieval) is already shipped and live-verified — the buildable slice is done; treat it as "shipped," not "researching," in external copy from now on.
+6. Directions 5 and 6 (fine-tuned ASR, fine-tuned clinical model) both wait on real data volume — the same Phase 2 gate as [[24_HOW_TO_MOVE_AHEAD]]. Do not start either before that gate opens. The one piece of direction 6 buildable now (Sarvam narrating already-fired deterministic CDS alerts) can start independently, whenever CDS alert volume makes it worth doing.
