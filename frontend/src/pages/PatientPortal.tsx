@@ -47,14 +47,6 @@ interface Slot {
   label: string;
 }
 
-interface Visit {
-  session_id: string;
-  doctor_name: string | null;
-  created_at: string;
-  diagnosis: string | null;
-  medication_count: number;
-}
-
 function fmt(iso: string | null): string {
   if (!iso) return '';
   try {
@@ -67,8 +59,6 @@ function fmt(iso: string | null): string {
 export default function PatientPortal() {
   const { phone } = useParams<{ phone: string }>();
   const [summary, setSummary] = useState<PatientSummary | null>(null);
-  const [visits, setVisits] = useState<Visit[]>([]);
-  const [showHistory, setShowHistory] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -92,13 +82,6 @@ export default function PatientPortal() {
       .then(setSummary)
       .catch(e => setError(e.message))
       .finally(() => setLoading(false));
-
-    // History is a separate, non-blocking fetch — a patient with only one
-    // visit simply won't see the history section, no error shown for that.
-    fetch(`/api/public/patient-history?phone=${digits}`)
-      .then(async r => (r.ok ? (r.json() as Promise<{ visits: Visit[] }>) : { visits: [] }))
-      .then(data => setVisits(data.visits || []))
-      .catch(() => {});
   }, [phone]);
 
   async function handleShowBooking() {
@@ -234,36 +217,6 @@ export default function PatientPortal() {
                     <p className="text-[12px] text-slate-400">Dr. {summary.follow_up.doctor_name}</p>
                   )}
                 </div>
-              </div>
-            )}
-
-            {/* Visit history */}
-            {visits.length > 1 && (
-              <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
-                <button
-                  onClick={() => setShowHistory(!showHistory)}
-                  className="w-full px-5 py-4 border-b border-slate-100 flex items-center justify-between cursor-pointer"
-                >
-                  <p className="font-semibold text-[14px] text-text-dark">Your visit history</p>
-                  <span className="text-[12px] text-slate-400">{showHistory ? 'Hide' : `${visits.length} visits`}</span>
-                </button>
-                {showHistory && (
-                  <div className="px-5 py-2">
-                    {visits.map((v, i) => (
-                      <div key={v.session_id} className={`py-3 flex items-start justify-between gap-3 ${i > 0 ? 'border-t border-slate-100' : ''}`}>
-                        <div>
-                          <p className="text-[13px] font-medium text-text-dark">{v.diagnosis || 'Consultation'}</p>
-                          <p className="text-[11.5px] text-slate-400">
-                            {fmt(v.created_at)}{v.doctor_name ? ` · Dr. ${v.doctor_name}` : ''}
-                          </p>
-                        </div>
-                        {v.medication_count > 0 && (
-                          <span className="text-[11px] text-slate-400 shrink-0">{v.medication_count} medicine{v.medication_count !== 1 ? 's' : ''}</span>
-                        )}
-                      </div>
-                    ))}
-                  </div>
-                )}
               </div>
             )}
 

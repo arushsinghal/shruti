@@ -20,6 +20,7 @@ import Privacy from './pages/Privacy';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import PatientPortal from './pages/PatientPortal';
+import PatientRecords from './pages/PatientRecords';
 import ClinicInbox from './pages/ClinicInbox';
 import Signup from './pages/Signup';
 import Billing from './pages/Billing';
@@ -45,6 +46,11 @@ export default function App() {
           <Route path="/register" element={<Register />} />
           <Route path="/signup" element={<Signup />} />
           <Route path="/p/:phone" element={<PatientPortal />} />
+          {/* No-login patient records portal — patient_id-scoped signed token
+              in the URL is the access key, delivered only via the patient's
+              own verified WhatsApp number at sign-time. "/records/demo" is
+              the fixed-data demo variant, handled inside the component. */}
+          <Route path="/records/:token" element={<PatientRecords />} />
           {/* No-login doctor signing page — token in URL proves identity */}
           <Route path="/sign/:token" element={<DocSignPage />} />
           {/* No-login patient pre-visit form — appointment id in URL is the access key */}

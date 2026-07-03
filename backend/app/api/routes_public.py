@@ -114,6 +114,45 @@ def _decode_download_token(token: str) -> dict[str, Any]:
     return payload
 
 
+# Patient's own record portal. Possession of the token (delivered only via
+# the patient's own verified WhatsApp number at sign-time) is the proof of
+# identity, same trust model as the prescription share/download tokens above
+# -- but scoped to patient_id, not session_id, so it can aggregate every
+# visit across every clinic the patient has seen on Lipi. Long-lived since
+# this is meant to be the patient's durable "my records" link, not a
+# one-time download.
+_PATIENT_PORTAL_TOKEN_DAYS = 180
+
+
+def _encode_patient_token(patient_id: str) -> str:
+    now = datetime.now(timezone.utc)
+    payload = {
+        "sub": patient_id,
+        "patient_id": patient_id,
+        "scope": "patient_portal",
+        "iat": now,
+        "exp": now + timedelta(days=_PATIENT_PORTAL_TOKEN_DAYS),
+    }
+    return jwt.encode(payload, settings.secret_key, algorithm=settings.algorithm)
+
+
+def _decode_patient_token(token: str) -> str:
+    """Returns the verified patient_id, or raises."""
+    try:
+        payload = jwt.decode(token, settings.secret_key, algorithms=[settings.algorithm])
+    except ExpiredSignatureError:
+        raise HTTPException(status_code=410, detail="This link has expired. Please ask your clinic to resend it.")
+    except JWTError:
+        raise HTTPException(status_code=401, detail="Invalid or expired link")
+
+    if payload.get("scope") != "patient_portal":
+        raise HTTPException(status_code=401, detail="Invalid link")
+    patient_id = payload.get("patient_id") or payload.get("sub")
+    if not patient_id:
+        raise HTTPException(status_code=401, detail="Invalid link")
+    return patient_id
+
+
 @router.post("/public/verify-access/{token}")
 async def verify_patient_access(token: str, body: VerifyAccessRequest, request: Request):
     """Validates the signed share token and verifies the patient identity matches the record."""
@@ -347,36 +386,40 @@ async def get_patient_summary(phone: str, request: Request) -> dict:
     }
 
 
-@router.get("/public/patient-history")
-async def get_patient_history(phone: str, request: Request) -> dict:
-    """Cross-visit history for a patient, keyed by phone (last 10 digits,
-    same match convention as get_patient_summary above). Unlike that endpoint,
-    which returns only the most recent visit, this returns every signed
-    consultation so a patient can see their full record over time."""
-    digits = "".join(c for c in phone if c.isdigit())
-    if len(digits) < 10:
-        raise HTTPException(status_code=400, detail="Invalid phone number")
-    last10 = digits[-10:]
+@router.get("/public/patient-records/{token}")
+async def get_patient_records(token: str, request: Request) -> dict:
+    """Cross-visit, cross-clinic history for a patient, gated on a signed
+    patient_id-scoped token (see _decode_patient_token) rather than a bare
+    phone number. A phone number alone used to be sufficient to pull a
+    patient's full diagnosis/medication history across every clinic on
+    Lipi -- this closes that gap by requiring possession of a token that is
+    only ever delivered to the patient's own verified WhatsApp number."""
+    patient_id = _decode_patient_token(token)
 
-    check_rate_limit(request, f"patient_history:{last10}", max_attempts=20, window_seconds=3600)
+    check_rate_limit(request, f"patient_records:{patient_id}", max_attempts=30, window_seconds=3600)
 
     async with db_connect() as db:
         async with db.execute(
             """
-            SELECT id, doctor_name, status, created_at, clinical_facts
+            SELECT id, doctor_name, status, created_at, clinical_facts, clinic_id
             FROM sessions
-            WHERE patient_phone=? AND status='complete'
+            WHERE patient_id=? AND status='complete'
             ORDER BY created_at DESC LIMIT 25
             """,
-            (last10,),
+            (patient_id,),
         ) as cur:
             rows = await cur.fetchall()
 
-    if not rows:
-        raise HTTPException(status_code=404, detail="No visit history found for this number")
+        async with db.execute(
+            "SELECT name, phone_number FROM patients WHERE id=?", (patient_id,)
+        ) as cur:
+            patient_row = await cur.fetchone()
+
+    if not patient_row:
+        raise HTTPException(status_code=404, detail="Patient record not found")
 
     visits = []
-    for session_id, doctor_name, status, created_at, facts_json in rows:
+    for session_id, doctor_name, status, created_at, facts_json, clinic_id in rows:
         facts = _json_loads(facts_json)
         diagnosis = (facts.get("diagnosis") or facts.get("provisional_diagnosis")) if isinstance(facts, dict) else None
         medications = facts.get("medications", []) if isinstance(facts, dict) else []
@@ -385,10 +428,14 @@ async def get_patient_history(phone: str, request: Request) -> dict:
             "doctor_name": doctor_name,
             "created_at": created_at,
             "diagnosis": diagnosis,
-            "medication_count": len(medications) if isinstance(medications, list) else 0,
+            "medications": medications if isinstance(medications, list) else [],
         })
 
-    return {"phone_last4": last10[-4:], "visits": visits}
+    return {
+        "patient_name": patient_row[0],
+        "phone_last4": (patient_row[1] or "")[-4:],
+        "visits": visits,
+    }
 
 
 class BookViaPatientIdRequest(BaseModel):
@@ -551,7 +598,7 @@ async def doctor_sign_and_send(token: str) -> dict:
     async with db_connect() as db:
         async with db.execute(
             """SELECT patient_name, doctor_name, soap_note, clinical_facts,
-                      patient_phone, patient_age, patient_sex, signed_at
+                      patient_phone, patient_age, patient_sex, signed_at, patient_id
                FROM sessions WHERE id = ? AND user_id = ?""",
             (session_id, str(user_id)),
         ) as cur:
@@ -560,7 +607,7 @@ async def doctor_sign_and_send(token: str) -> dict:
     if not row:
         raise HTTPException(status_code=404, detail="Session not found or access denied")
 
-    patient_name, doctor_name, soap_raw, facts_raw, patient_phone, patient_age, patient_sex, signed_at = row
+    patient_name, doctor_name, soap_raw, facts_raw, patient_phone, patient_age, patient_sex, signed_at, patient_id = row
 
     if signed_at:
         return {"success": True, "already_signed": True, "message": "Already signed."}
@@ -677,6 +724,19 @@ async def doctor_sign_and_send(token: str) -> dict:
                 "",
                 "_Yeh link 24 ghante valid hai. Pharmacist ko dikhayein._",
             ]
+
+            # Patient's own durable records link (all visits, every clinic
+            # they've seen on Lipi) -- only issued if we have a stable
+            # patient_id for them, which get_or_create_patient assigns
+            # whenever a phone number is on file.
+            if patient_id:
+                records_token = _encode_patient_token(patient_id)
+                records_link = f"{base}/records/{records_token}"
+                msg_lines += [
+                    "",
+                    "🗂️ *Apke saare records ek jagah:*",
+                    records_link,
+                ]
 
             message = "\n".join(msg_lines)
             whatsapp_result = await WhatsAppService.send_text_message(patient_phone, message)

@@ -150,11 +150,11 @@ export default function Login() {
           </div>
 
           {/* Demo login */}
-          <div className="grid grid-cols-2 gap-2">
+          <div className="grid grid-cols-3 gap-2">
             <button
               onClick={handleDemoLogin}
               disabled={isLoading}
-              className="flex justify-center items-center gap-1.5 py-3 px-3 rounded-full text-[13px] font-semibold text-white bg-primary hover:bg-primary-dark shadow-[0_8px_24px_-8px_rgba(27,94,59,0.5)] active:scale-[0.98] transition-all disabled:opacity-70 cursor-pointer"
+              className="flex justify-center items-center gap-1.5 py-3 px-2.5 rounded-full text-[12.5px] font-semibold text-white bg-primary hover:bg-primary-dark shadow-[0_8px_24px_-8px_rgba(27,94,59,0.5)] active:scale-[0.98] transition-all disabled:opacity-70 cursor-pointer"
             >
               {isLoading ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Zap className="w-3.5 h-3.5" />}
               Doctor demo
@@ -162,10 +162,18 @@ export default function Login() {
             <button
               onClick={handleAssistantDemoLogin}
               disabled={isLoading}
-              className="flex justify-center items-center gap-1.5 py-3 px-3 rounded-full text-[13px] font-semibold text-primary bg-primary/8 border border-primary/20 hover:bg-primary/12 active:scale-[0.98] transition-all disabled:opacity-70 cursor-pointer"
+              className="flex justify-center items-center gap-1.5 py-3 px-2.5 rounded-full text-[12.5px] font-semibold text-primary bg-primary/8 border border-primary/20 hover:bg-primary/12 active:scale-[0.98] transition-all disabled:opacity-70 cursor-pointer"
             >
               {isLoading ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Zap className="w-3.5 h-3.5" />}
               Assistant demo
+            </button>
+            <button
+              onClick={() => navigate('/records/demo')}
+              disabled={isLoading}
+              className="flex justify-center items-center gap-1.5 py-3 px-2.5 rounded-full text-[12.5px] font-semibold text-primary bg-primary/8 border border-primary/20 hover:bg-primary/12 active:scale-[0.98] transition-all disabled:opacity-70 cursor-pointer"
+            >
+              <Zap className="w-3.5 h-3.5" />
+              Patient demo
             </button>
           </div>
 

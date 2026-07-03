@@ -3,10 +3,12 @@ import aiosqlite
 import logging
 import contextlib
 import sys
+from typing import Any
 
 from app.utils.config import settings
 
 logger = logging.getLogger(__name__)
+_pg_pool: Any = None
 
 # Always resolve relative to the backend/ directory so the path is stable
 _BACKEND_DIR = Path(__file__).resolve().parent.parent.parent
@@ -29,6 +31,45 @@ def is_postgresql() -> bool:
         return True
     return False
 
+
+async def open_db_pool() -> None:
+    """Create the shared PostgreSQL pool once per process.
+
+    SQLite remains file-backed and does not use this pool.
+    """
+    global _pg_pool
+    if not is_postgresql() or _pg_pool is not None:
+        return
+
+    import asyncpg
+
+    _pg_pool = await asyncpg.create_pool(
+        settings.database_url,
+        min_size=settings.postgres_pool_min_size,
+        max_size=settings.postgres_pool_max_size,
+    )
+    logger.info(
+        "PostgreSQL pool opened: min_size=%s max_size=%s",
+        settings.postgres_pool_min_size,
+        settings.postgres_pool_max_size,
+    )
+
+
+async def close_db_pool() -> None:
+    """Close the shared PostgreSQL pool on application shutdown."""
+    global _pg_pool
+    if _pg_pool is None:
+        return
+    await _pg_pool.close()
+    _pg_pool = None
+    logger.info("PostgreSQL pool closed")
+
+
+async def get_db_pool():
+    """Return a ready PostgreSQL pool, lazily opening for scripts/tests."""
+    await open_db_pool()
+    return _pg_pool
+
 # PostgreSQL tables schema
 PG_CREATE_SESSIONS_TABLE = """
 CREATE TABLE IF NOT EXISTS sessions (
@@ -50,7 +91,22 @@ CREATE TABLE IF NOT EXISTS sessions (
     abha_number TEXT,
     pmjay_beneficiary INTEGER DEFAULT 0,
     specialty TEXT,
-    clinic_id TEXT
+    clinic_id TEXT,
+    patient_phone TEXT,
+    patient_age TEXT,
+    patient_sex TEXT,
+    initiated_by TEXT DEFAULT 'doctor',
+    patient_consent_given INTEGER DEFAULT 0,
+    patient_consent_timestamp TEXT,
+    memory_enabled INTEGER DEFAULT 1,
+    signed_at TEXT,
+    received_at TEXT,
+    delivered_at TEXT,
+    hold_for_review INTEGER DEFAULT 0,
+    reviewer_id TEXT,
+    reviewer_action TEXT,
+    reviewer_note TEXT,
+    patient_id TEXT
 );
 """
 
@@ -71,7 +127,13 @@ CREATE TABLE IF NOT EXISTS users (
     hashed_password TEXT NOT NULL,
     full_name TEXT,
     is_active INTEGER DEFAULT 1,
-    role TEXT NOT NULL DEFAULT 'doctor'
+    role TEXT NOT NULL DEFAULT 'doctor',
+    nmc_number TEXT,
+    specialization TEXT,
+    plan TEXT DEFAULT 'trial',
+    trial_sessions_used INTEGER DEFAULT 0,
+    paid_until TEXT,
+    razorpay_payment_id TEXT
 );
 """
 
@@ -116,7 +178,8 @@ CREATE TABLE IF NOT EXISTS doctor_profiles (
     clinic_name TEXT,
     clinic_address TEXT,
     clinic_phone TEXT,
-    updated_at TEXT
+    updated_at TEXT,
+    whatsapp_phone TEXT
 );
 """
 
@@ -804,9 +867,10 @@ class ExecuteWrapper:
 
 
 class DBConnection:
-    def __init__(self, conn, is_pg: bool):
+    def __init__(self, conn, is_pg: bool, pool=None):
         self.conn = conn
         self.is_pg = is_pg
+        self.pool = pool
         self.tx = None
 
     @property
@@ -826,11 +890,16 @@ class DBConnection:
 
     async def __aexit__(self, exc_type, exc_val, exc_tb):
         if self.is_pg:
-            if exc_type is not None:
-                await self.tx.rollback()
-            else:
-                await self.tx.commit()
-            await self.conn.close()
+            try:
+                if exc_type is not None:
+                    await self.tx.rollback()
+                else:
+                    await self.tx.commit()
+            finally:
+                if self.pool is not None:
+                    await self.pool.release(self.conn)
+                else:
+                    await self.conn.close()
         else:
             # Closed externally for aiosqlite
             pass
@@ -846,14 +915,19 @@ class DBConnection:
 @contextlib.asynccontextmanager
 async def db_connect():
     if is_postgresql():
-        import asyncpg
-        conn = await asyncpg.connect(settings.database_url)
-        db_conn = DBConnection(conn, is_pg=True)
-        await db_conn.__aenter__()
+        pool = await get_db_pool()
+        conn = await pool.acquire()
+        db_conn = DBConnection(conn, is_pg=True, pool=pool)
+        entered = False
         try:
+            await db_conn.__aenter__()
+            entered = True
             yield db_conn
         except Exception:
-            await db_conn.__aexit__(*sys.exc_info())
+            if entered:
+                await db_conn.__aexit__(*sys.exc_info())
+            else:
+                await pool.release(conn)
             raise
         else:
             await db_conn.__aexit__(None, None, None)
@@ -868,8 +942,8 @@ async def db_connect():
 
 async def init_db() -> None:
     if is_postgresql():
-        import asyncpg
-        conn = await asyncpg.connect(settings.database_url)
+        pool = await get_db_pool()
+        conn = await pool.acquire()
         try:
             async with conn.transaction():
                 await conn.execute(PG_CREATE_SESSIONS_TABLE)
@@ -1022,7 +1096,7 @@ async def init_db() -> None:
                             settings.demo_username, f"{settings.demo_username}@example.com", hashed_pw, settings.demo_full_name
                         )
         finally:
-            await conn.close()
+            await pool.release(conn)
     else:
         _DB_FILE.parent.mkdir(parents=True, exist_ok=True)
         async with aiosqlite.connect(_DB_PATH) as db:
