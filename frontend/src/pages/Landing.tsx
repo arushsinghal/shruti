@@ -23,6 +23,8 @@ import {
   IndianRupee,
   ShieldCheck,
   BadgeCheck,
+  FileWarning,
+  Clock,
 } from 'lucide-react';
 import { ProductShowcase } from '../components/ProductShowcase';
 import SupportModal from '../components/SupportModal';
@@ -279,10 +281,10 @@ export default function Landing() {
                 <span className="block font-light text-slate-400">A doctor speaks once.</span>
               </RevealLine>
               <RevealLine immediate delay={0.17}>
-                <span className="block font-extrabold text-primary">The assistant</span>
+                <span className="block font-extrabold text-primary">Every record lands</span>
               </RevealLine>
               <RevealLine immediate delay={0.25}>
-                <span className="block font-extrabold text-primary">does the rest.</span>
+                <span className="block font-extrabold text-primary">in one place.</span>
               </RevealLine>
             </h1>
 
@@ -292,8 +294,8 @@ export default function Landing() {
               transition={{ duration: 0.6, delay: 0.45 }}
               className="text-[16px] md:text-[17px] text-slate-500 leading-relaxed mb-8 max-w-[44ch]"
             >
-              Lipi writes the note, orders the labs, messages the patient, and
-              chases the follow-up. You review and sign. You never manage it.
+              Notes, prescriptions, lab orders, and follow-ups — structured and
+              ABHA-linked automatically, the moment the consultation ends.
             </motion.p>
 
             <motion.div
@@ -372,7 +374,7 @@ export default function Landing() {
         <div className="max-w-6xl mx-auto">
           <Eyebrow>How it works</Eyebrow>
           <RevealHeading wrapClassName="mb-16" className="text-[2.4rem] md:text-[3.2rem] font-extrabold tracking-tight leading-[1.05] text-text-dark">
-            The work a great assistant does.<br className="hidden md:block" /> Every single visit.
+            One visit, structured.<br className="hidden md:block" /> Nothing left to file later.
           </RevealHeading>
 
           <div className="space-y-5">
@@ -401,7 +403,7 @@ export default function Landing() {
                   <p className="text-[10.5px] font-bold uppercase tracking-[0.18em] text-slate-400">Step 02</p>
                   <div className="w-10 h-10 rounded-2xl bg-primary/10 grid place-items-center"><Cpu className="w-5 h-5 text-primary" strokeWidth={1.8} /></div>
                   <h3 className="text-[1.35rem] font-bold leading-snug">Every fact extracted. Traced to source.</h3>
-                  <p className="text-[13.5px] text-slate-500 leading-relaxed">A good assistant never puts words in your mouth. Nothing you didn't say reaches the record.</p>
+                  <p className="text-[13.5px] text-slate-500 leading-relaxed">Nothing you didn't say reaches the record. Every entity links back to the exact sentence spoken.</p>
                 </div>
                 <motion.div variants={stagger} initial={reduce ? false : 'hidden'} whileInView="visible" viewport={{ once: true, amount: 0.4 }} className="grid grid-cols-2 md:grid-cols-4 gap-3">
                   {[
@@ -450,6 +452,56 @@ export default function Landing() {
                 })}
               </motion.div>
             </motion.div>
+          </div>
+        </div>
+      </section>
+
+      {/* ── Why now: the regulatory mandate ──────────────────────────── */}
+      {/* NOTE: verify "Clause 1.3" citation against the current NMC Registered
+          Medical Practitioner (Professional Conduct) Regulations before this
+          copy goes in front of a regulator, journalist, or legal reviewer. */}
+      <section className="py-28 px-6 bg-white border-t border-slate-200/60">
+        <div className="max-w-6xl mx-auto">
+          <RevealHeading wrapClassName="mb-5" className="text-[2.4rem] md:text-[3.2rem] font-extrabold tracking-tight leading-[1.05] text-text-dark max-w-[20ch]">
+            The paperwork stopped being optional.
+          </RevealHeading>
+          <motion.p variants={fadeUp} initial={reduce ? false : 'hidden'} whileInView="visible" viewport={{ once: true }} className="text-[14.5px] text-slate-500 mb-14 leading-relaxed max-w-[62ch]">
+            Structured medical records are a regulatory requirement now, not a courtesy. Most Indian OPD clinics still run on paper.
+          </motion.p>
+
+          <div className="grid md:grid-cols-[1fr_1.3fr] gap-6 items-stretch">
+            <motion.div
+              variants={fadeUp} initial={reduce ? false : 'hidden'} whileInView="visible" viewport={{ once: true, amount: 0.3 }}
+              className="rounded-3xl bg-text-dark text-white p-8 space-y-5 flex flex-col justify-between"
+            >
+              <div className="space-y-4">
+                <ShieldCheck className="w-7 h-7 text-white/70" strokeWidth={1.8} />
+                <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-white/50">NMC Code of Ethics, Clause 1.3</p>
+                <p className="text-[18px] font-semibold leading-snug">
+                  Every registered doctor must maintain structured patient records and produce them within 72 hours of a request.
+                </p>
+              </div>
+              <p className="text-[13px] text-white/50 leading-relaxed">Handwritten notes and loose paper files rarely meet that bar.</p>
+            </motion.div>
+
+            <div className="space-y-5">
+              <motion.div variants={fadeUp} initial={reduce ? false : 'hidden'} whileInView="visible" viewport={{ once: true, amount: 0.3 }} transition={{ delay: 0.08 }}
+                className="rounded-3xl border border-slate-200/80 bg-white p-7 flex gap-4">
+                <div className="w-10 h-10 rounded-2xl bg-slate-100 grid place-items-center flex-shrink-0"><FileWarning className="w-5 h-5 text-slate-500" strokeWidth={1.8} /></div>
+                <div>
+                  <h3 className="text-[1.05rem] font-bold leading-snug mb-1.5">Most clinics aren't ready</h3>
+                  <p className="text-[13.5px] text-slate-500 leading-relaxed">A drawer of handwritten charts can't be retrieved, searched, or produced on a 72-hour request. Adoption of structured records is still the exception in Indian OPD, not the norm.</p>
+                </div>
+              </motion.div>
+              <motion.div variants={fadeUp} initial={reduce ? false : 'hidden'} whileInView="visible" viewport={{ once: true, amount: 0.3 }} transition={{ delay: 0.16 }}
+                className="rounded-3xl border border-primary/25 bg-primary/[0.03] p-7 flex gap-4">
+                <div className="w-10 h-10 rounded-2xl bg-primary/10 grid place-items-center flex-shrink-0"><Clock className="w-5 h-5 text-primary" strokeWidth={1.8} /></div>
+                <div>
+                  <h3 className="text-[1.05rem] font-bold leading-snug mb-1.5">Enforcement is tightening, on a deadline</h3>
+                  <p className="text-[13.5px] text-slate-500 leading-relaxed">From July 2026, ABDM v3 compliance becomes mandatory for DHIS payouts. Clinics on non-compliant software don't just miss the convenience — they lose the incentive entirely, for themselves and their doctors.</p>
+                </div>
+              </motion.div>
+            </div>
           </div>
         </div>
       </section>
@@ -603,7 +655,7 @@ export default function Landing() {
             transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] as const }}
             className="text-[2.4rem] md:text-[3rem] font-extrabold text-white tracking-tight leading-[1.05]"
           >
-            An assistant for every consultation.
+            Every consultation, one complete record.
           </motion.h2>
           <motion.p
             initial={reduce ? false : { opacity: 0, y: 16 }}
@@ -650,7 +702,7 @@ export default function Landing() {
                 <span className="text-[20px] font-bold tracking-tight text-text-dark">Lipi</span>
               </div>
               <p className="text-[14px] text-slate-500 leading-relaxed">
-                Your clinical assistant drafts the note, prescription, and follow-up. The doctor reviews and signs. Every fact traces to the source sentence.
+                Every consultation becomes a structured, ABHA-linked record automatically: note, prescription, and follow-up in one place. The doctor reviews and signs.
               </p>
               <button
                 onClick={() => navigate('/dashboard')}

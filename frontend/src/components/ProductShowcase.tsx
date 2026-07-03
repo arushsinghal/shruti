@@ -1,10 +1,12 @@
 import { useEffect, useState } from 'react';
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
-import { Mic, ShieldCheck, ArrowRight, Sparkles } from 'lucide-react';
+import { Mic, ShieldCheck, ArrowRight, Sparkles, FlaskConical, MessageSquare, Database } from 'lucide-react';
 
 /**
  * Light, premium hero showcase of the Lipi flow:
- * spoken consultation → evidence-backed facts → reviewed note.
+ * spoken consultation → evidence-backed facts → every downstream record filed.
+ * Deliberately cycles past the SOAP note into investigation order, patient
+ * follow-up, and the ABDM record so the hero never reads as "just notes."
  * Auto-loops; settles to the final state under reduced-motion.
  */
 
@@ -18,6 +20,17 @@ const FACTS: Fact[] = [
   { label: 'Symptom', value: 'Cough', tone: 'primary', evidence: 'khaansi bhi hai' },
   { label: 'Medication', value: 'Paracetamol 500mg', tone: 'accent', evidence: 'suggested' },
 ];
+
+type OutputState = { icon: typeof ShieldCheck; label: string };
+
+const OUTPUTS: OutputState[] = [
+  { icon: ShieldCheck, label: 'Record ready · awaiting doctor sign-off' },
+  { icon: FlaskConical, label: 'Investigation order dispatched to lab' },
+  { icon: MessageSquare, label: 'Follow-up sent to patient on WhatsApp' },
+  { icon: Database, label: 'ABHA-linked record filed with ABDM' },
+];
+
+const OUTPUT_DWELL_MS = 1500;
 
 const TONE: Record<Fact['tone'], string> = {
   primary: 'bg-primary/8 text-primary-dark border-primary/15',
@@ -35,17 +48,21 @@ export function ProductShowcase() {
   const [typed, setTyped] = useState(reduce ? TRANSCRIPT : '');
   const [revealed, setRevealed] = useState(reduce ? FACTS.length : 0);
   const [done, setDone] = useState(reduce ? true : false);
+  const [outputIdx, setOutputIdx] = useState(reduce ? OUTPUTS.length - 1 : 0);
 
-  // Auto-play loop: type transcript → reveal facts → mark note ready → reset
+  // Auto-play loop: type transcript → reveal facts → cycle every downstream
+  // output (record, lab order, WhatsApp follow-up, ABDM filing) → reset.
   useEffect(() => {
     if (reduce) return;
     let timers: ReturnType<typeof setTimeout>[] = [];
     let typeInt: ReturnType<typeof setInterval>;
+    let outputInt: ReturnType<typeof setInterval>;
 
     const run = () => {
       setTyped('');
       setRevealed(0);
       setDone(false);
+      setOutputIdx(0);
       let i = 0;
       typeInt = setInterval(() => {
         i++;
@@ -55,21 +72,36 @@ export function ProductShowcase() {
           FACTS.forEach((_, idx) => {
             timers.push(setTimeout(() => setRevealed(idx + 1), 350 + idx * 480));
           });
-          timers.push(setTimeout(() => setDone(true), 350 + FACTS.length * 480 + 300));
+          timers.push(setTimeout(() => {
+            setDone(true);
+            let o = 0;
+            outputInt = setInterval(() => {
+              o++;
+              if (o >= OUTPUTS.length) {
+                clearInterval(outputInt);
+                return;
+              }
+              setOutputIdx(o);
+            }, OUTPUT_DWELL_MS);
+          }, 350 + FACTS.length * 480 + 300));
         }
       }, 34);
     };
+
+    const cycleMs = 350 + FACTS.length * 480 + 300 + TRANSCRIPT.length * 34 + OUTPUTS.length * OUTPUT_DWELL_MS + 900;
 
     run();
     const loop = setInterval(() => {
       timers.forEach(clearTimeout);
       timers = [];
+      clearInterval(outputInt);
       run();
-    }, 9000);
+    }, cycleMs);
 
     return () => {
       clearInterval(loop);
       clearInterval(typeInt);
+      clearInterval(outputInt);
       timers.forEach(clearTimeout);
     };
   }, [reduce]);
@@ -155,22 +187,30 @@ export function ProductShowcase() {
           </div>
         </div>
 
-        {/* Footer: reviewed note ready */}
+        {/* Footer: cycles through every downstream output, not just the note */}
         <div className="px-5 py-3.5 border-t border-slate-100">
           <AnimatePresence mode="wait">
             {done ? (
               <motion.div
-                key="done"
-                initial={reduce ? false : { opacity: 0 }}
-                animate={{ opacity: 1 }}
+                key={`output-${outputIdx}`}
+                initial={reduce ? false : { opacity: 0, y: 4 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -4 }}
+                transition={{ duration: 0.28 }}
                 className="flex items-center justify-between"
               >
                 <span className="flex items-center gap-2 text-[13px] font-semibold text-primary">
-                  <ShieldCheck className="w-4 h-4" /> SOAP note ready · awaiting doctor sign-off
+                  {(() => {
+                    const Icon = OUTPUTS[outputIdx].icon;
+                    return <Icon className="w-4 h-4" />;
+                  })()}
+                  {OUTPUTS[outputIdx].label}
                 </span>
-                <span className="hidden sm:flex items-center gap-1.5 text-[12px] font-semibold text-slate-400">
-                  Review <ArrowRight className="w-3.5 h-3.5" />
-                </span>
+                {outputIdx === 0 && (
+                  <span className="hidden sm:flex items-center gap-1.5 text-[12px] font-semibold text-slate-400">
+                    Review <ArrowRight className="w-3.5 h-3.5" />
+                  </span>
+                )}
               </motion.div>
             ) : (
               <motion.div key="working" className="flex items-center gap-2 text-[13px] font-medium text-slate-400">

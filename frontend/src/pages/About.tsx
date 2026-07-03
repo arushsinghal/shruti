@@ -58,7 +58,7 @@ export default function About() {
           </div>
 
           <p className="text-slate-300 leading-relaxed">
-            Lipi is the AI clinical assistant for Indian outpatient care. A doctor speaks once, and Lipi does the work a trained assistant does after every consultation: the note, the prescription, the lab orders, the patient follow-up, and the ABDM record. The doctor reviews and signs. Every clinical fact traces back to the exact sentence spoken.
+            Lipi is the AI-native OPD platform for Indian outpatient care. A doctor speaks once, and every record from that consultation — the note, the prescription, the lab orders, the patient follow-up, and the ABDM record — lands in one place, structured and ready. The doctor reviews and signs. Every clinical fact traces back to the exact sentence spoken.
           </p>
           <p className="text-slate-400 leading-relaxed">
             The mission is bigger than one clinic. India's outpatient system still runs on paper, memory, and overworked staff. Lipi exists to digitize it end to end and move Indian primary care toward self-sufficiency: a healthcare AI stack built in India, for India, that no imported system can replace.
@@ -66,7 +66,7 @@ export default function About() {
           <div className="rounded-lg border border-primary/30 bg-primary/10 p-4 text-xs text-slate-300 leading-relaxed">
             <p className="font-bold uppercase tracking-wider text-emerald-300 mb-1">Current access</p>
             <p>
-              Lipi is onboarding pilot doctors and clinics directly. The assistant is live today; the research that deepens it runs continuously alongside it.
+              Lipi is onboarding pilot doctors and clinics directly. The platform is live today; the research that deepens it runs continuously alongside it.
             </p>
           </div>
         </section>
@@ -74,20 +74,20 @@ export default function About() {
         <section className="space-y-4 border-t border-white/10 pt-8">
           <h2 className="text-2xl font-bold tracking-tight text-white">Why the OPD comes first</h2>
           <p className="text-slate-400 leading-relaxed">
-            Outpatient care is the highest-frequency workflow in Indian medicine. Every consultation creates a note, a prescription, follow-up instructions, and a record the system needs. An assistant that does that work earns a place in the clinic on day one, and builds the doctor-approved clinical record that everything else compounds on.
+            Outpatient care is the highest-frequency workflow in Indian medicine. Every consultation creates a note, a prescription, follow-up instructions, and a record the system needs. Centralizing that work earns Lipi a place in the clinic on day one, and builds the doctor-approved clinical record that everything else compounds on.
           </p>
           <p className="text-slate-400 leading-relaxed">
-            From there the assistant grows into the operating layer for the clinic: patient memory across visits, referrals, coding, insurance recovery, and the government-filed records that pay the clinic back. One consultation in, a full day's work handled.
+            From there Lipi grows into the operating layer for the clinic: patient memory across visits, referrals, coding, insurance recovery, and the government-filed records that pay the clinic back. One consultation in, a full day's records handled.
           </p>
         </section>
 
         <section className="space-y-4 border-t border-white/10 pt-8">
           <h2 className="text-2xl font-bold tracking-tight text-white">The research arm</h2>
           <p className="text-slate-400 leading-relaxed">
-            Underneath the assistant, Lipi runs its own research. Personalized prescribing safety tuned to Indian populations, early-detection signals read from a patient's own visit history, and India-specific antimicrobial resistance intelligence. It exists for one reason: to make the assistant smarter and Indian patients safer.
+            Underneath the product, Lipi runs its own research. Personalized prescribing safety tuned to Indian populations, early-detection signals read from a patient's own visit history, and India-specific antimicrobial resistance intelligence. It exists for one reason: to make the product smarter and Indian patients safer.
           </p>
           <p className="text-slate-400 leading-relaxed">
-            This research ships as product capability a doctor can use at the point of care, never as papers. The moat is what the assistant does in the room, not what gets written about it.
+            This research ships as product capability a doctor can use at the point of care, never as papers. The moat is what the product does in the room, not what gets written about it.
           </p>
         </section>
 

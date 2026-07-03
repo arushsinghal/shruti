@@ -95,7 +95,7 @@ export default function Login() {
         >
           <h1 className="text-[2.5rem] leading-[1.08] font-bold text-white tracking-tight">
             A doctor speaks once.<br />
-            <span className="text-white/70">The assistant does the rest.</span>
+            <span className="text-white/70">Every record lands in one place.</span>
           </h1>
           <ul className="mt-8 space-y-3.5">
             {VALUE_PROPS.map((p) => (
