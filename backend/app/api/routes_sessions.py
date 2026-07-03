@@ -7,9 +7,21 @@ from pydantic import BaseModel
 from app.schemas.consultation import ConsultationSession, CreateSessionRequest, ModeEnum
 from app.storage.repository import SessionRepository
 from app.api.routes_auth import get_current_user
+from app.services.patient_history_service import build_patient_timeline
 
 router = APIRouter()
 repo = SessionRepository()
+
+
+@router.get("/patients/{patient_name}/timeline")
+async def get_patient_timeline(
+    patient_name: str,
+    current_user: dict = Depends(get_current_user),
+) -> dict:
+    """Aggregated visit history for one patient, scoped to the calling doctor's own
+    sessions only. Confirmed facts only — never candidate/rejected data."""
+    user_id = str(current_user["id"])
+    return await build_patient_timeline(user_id, patient_name)
 
 
 class GrantConsentRequest(BaseModel):

@@ -122,6 +122,14 @@ export default function PatientProfile() {
         </button>
         <div className="h-5 w-px bg-slate-200" />
         <h1 className="text-[15px] font-semibold text-text-dark truncate">{decodedName || 'Patient Profile'}</h1>
+        {decodedName && (
+          <button
+            onClick={() => navigate(`/timeline/${encodeURIComponent(decodedName)}`)}
+            className="ml-auto text-[12.5px] font-semibold text-primary hover:text-primary-dark transition-colors cursor-pointer flex items-center gap-1.5"
+          >
+            View timeline →
+          </button>
+        )}
       </header>
 
       <main className="max-w-5xl mx-auto px-6 py-8">

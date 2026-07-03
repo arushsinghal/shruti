@@ -46,6 +46,13 @@ class Settings(BaseSettings):
     subscription_price_rupees: int = 999
     enable_gliner: bool = False
     gliner_model_path: str = ""
+    # Clinical memory assistant (per-doctor RAG over confirmed history). Uses Sarvam
+    # LLM only — see docs/obsidian/27_CLINICAL_MEMORY_ASSISTANT_SPEC.md Section 0.
+    # ABDM Health Data Management Policy requires India-hosted inference for this
+    # data; no foreign LLM key is ever read for this feature (enforced in code too,
+    # see clinical_memory_service.py).
+    memory_assistant_enabled: bool = False
+    sarvam_llm_api_key: str = ""  # falls back to sarvam_api_key if unset
     # When True: WhatsApp pipeline holds notes for reviewer approval before sending sign link.
     # Leave False (default) for demo — pipeline auto-sends as before.
     hold_for_review: bool = False

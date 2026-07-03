@@ -2,8 +2,8 @@
 
 **Author:** Opus (Claude)
 **Date:** 2026-07-03
-**Status:** Spec, not yet built. Ready to hand to an implementer.
-**Related:** [[02_ARCHITECTURE_MAP]] · [[10_CONTINUAL_LEARNING_SYSTEM]] · [[17_ABDM_DHIS_DSC_COMPLIANCE]] · [[07_DECISIONS]]
+**Status:** **Phase 1 built 2026-07-03** (context-stuffing, single-patient scope). Behind `memory_assistant_enabled` (default `False`) until Sarvam's model is benchmarked with a live test call — see Section 9. Backend: `clinical_memory_service.py`, `routes_memory_assistant.py`, `patient_history_service.py`. Frontend: `ClinicalMemoryAssistant.tsx`, mounted globally in `ProtectedRoute.tsx` for doctor-role users. Phase 2 (cross-patient search, pgvector) not started.
+**Related:** [[02_ARCHITECTURE_MAP]] · [[10_CONTINUAL_LEARNING_SYSTEM]] · [[17_ABDM_DHIS_DSC_COMPLIANCE]] · [[07_DECISIONS]] (see D017)
 
 ---
 

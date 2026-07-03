@@ -9,6 +9,7 @@ import Analytics from './pages/Analytics';
 import Tasks from './pages/Tasks';
 import Appointments from './pages/Appointments';
 import PatientProfile from './pages/PatientProfile';
+import PatientTimeline from './pages/PatientTimeline';
 import Pricing from './pages/Pricing';
 import About from './pages/About';
 import Research from './pages/Research';
@@ -52,6 +53,8 @@ export default function App() {
             <Route path="/assistant" element={<AssistantDashboard />} />
             <Route path="/assistant/intake" element={<AssistantIntake />} />
             <Route path="/patient/:name" element={<PatientProfile />} />
+            <Route path="/timeline/:patientName" element={<PatientTimeline />} />
+            <Route path="/timeline" element={<PatientTimeline />} />
             <Route path="/consultation/:id" element={<Consultation />} />
             <Route path="/review/:id" element={<ReviewNote />} />
             <Route path="/analytics" element={<Analytics />} />

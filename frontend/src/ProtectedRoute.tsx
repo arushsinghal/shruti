@@ -1,5 +1,6 @@
 import { Navigate, Outlet, useLocation } from 'react-router-dom';
 import { useAuth } from './context/AuthContext';
+import ClinicalMemoryAssistant from './components/ClinicalMemoryAssistant';
 
 export default function ProtectedRoute() {
   const { token, user, loading } = useAuth();
@@ -25,5 +26,12 @@ export default function ProtectedRoute() {
     return <Navigate to="/assistant" replace />;
   }
 
-  return <Outlet />;
+  return (
+    <>
+      <Outlet />
+      {/* Doctor-facing only — the memory assistant is scoped to one doctor's own
+          patients, not something an assistant-role user should have access to. */}
+      {!isAssistant && <ClinicalMemoryAssistant />}
+    </>
+  );
 }

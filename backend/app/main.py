@@ -34,6 +34,7 @@ from app.api.routes_auth import get_current_user
 from app.api.routes_audio import router as audio_router
 from app.api.routes_health import router as health_router
 from app.api.routes_sessions import router as sessions_router
+from app.api.routes_memory_assistant import router as memory_assistant_router
 from app.api.routes_notes import router as notes_router
 from app.api.routes_fact_review import router as fact_review_router
 from app.api.routes_analytics import router as analytics_router
@@ -151,6 +152,7 @@ app.include_router(auth_router, prefix="/api")
 # Protected Routes
 protected_dependencies = [Depends(get_current_user)]
 app.include_router(sessions_router, prefix="/api", dependencies=protected_dependencies)
+app.include_router(memory_assistant_router, prefix="/api", dependencies=protected_dependencies)
 app.include_router(audio_router, prefix="/api", dependencies=protected_dependencies)
 app.include_router(fact_review_router, prefix="/api")
 app.include_router(notes_router, prefix="/api", dependencies=protected_dependencies)

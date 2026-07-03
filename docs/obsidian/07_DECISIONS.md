@@ -260,3 +260,25 @@ Related:
 [[14_BUILD_PLAN]]
 [[21_FRONTIER_RESEARCH_DIRECTIONS]]
 [[12_IMPLEMENTATION_GAP_REGISTER]]
+
+## D017: Clinical Memory Assistant Runs Only On India-Hosted Inference
+
+Date: 2026-07-03
+Status: Accepted
+
+Decision:
+The per-doctor clinical memory assistant (`docs/obsidian/27_CLINICAL_MEMORY_ASSISTANT_SPEC.md`) never sends patient data — raw or retrieved — to a foreign-hosted inference API, under any circumstance. Inference runs on Sarvam (Indian company, on-shore) only. This is enforced in code (`clinical_memory_service.py` has an import-time assertion that the call target is a Sarvam URL), not just documented as policy.
+
+Reason:
+ABDM's Health Data Management Policy is already in force and states plainly that no personal data may be stored beyond India's borders. Every patient record this feature touches is ABHA-linked health data under that policy. DPDP Act 2023 is more permissive (blacklist model, transfer provisions not even effective until May 2027) but does not override the stricter, already-binding ABDM rule. Draft DPDP Rules also signal health data may be named for mandatory in-India-only storage regardless of the future cross-border regime, so building on-shore now avoids a rebuild later.
+
+Implications:
+No `OPENAI_API_KEY`, `ANTHROPIC_API_KEY`, or equivalent foreign provider key is ever read by `clinical_memory_service.py`. Phase 1 (shipped 2026-07-03) uses direct context-stuffing against Sarvam's chat API with no vector database. Phase 2 (cross-patient search) will add `pgvector` on the existing India-hosted Postgres instance, never a foreign vector-DB SaaS. The feature ships behind `memory_assistant_enabled` (default `False`) until Sarvam's model quality on retrieval-augmented clinical Q&A is benchmarked with a live test call.
+
+Reversible:
+No, not without a change in the underlying law/policy. This is a compliance floor, not a preference.
+
+Related:
+[[27_CLINICAL_MEMORY_ASSISTANT_SPEC]]
+[[17_ABDM_DHIS_DSC_COMPLIANCE]]
+[[10_CONTINUAL_LEARNING_SYSTEM]]
