@@ -445,6 +445,8 @@ expensive experienced system
 
 The "teacher" does not need to be one model. It can be the whole experienced Lipi system: deterministic extractors, retrieval, doctor corrections, assistant outcomes, evals, and human ops traces. The student model learns the repeatable parts of the job after they have been proven in production.
 
+**Concrete near-term instance of this (added 2026-07-03):** a self-hosted, India-region-hosted, fine-tuned Indian clinical model, trained on the accumulated corpus of doctor-confirmed corrections and consultation traces, serving two consumers at once: `cds_engine.py`'s safety-flag layer and the memory assistant in `27_CLINICAL_MEMORY_ASSISTANT_SPEC.md`. This is the honest version of "the assistant gets better over time" — not the retrieval-based context-stuffing in doc 27 (which is a real, valuable, but categorically different mechanism: it feels like learning because more history is available to recall, but the underlying model's weights never change), but actual fine-tuning on the flywheel's accumulated corpus. This requires real data volume first (see `24_HOW_TO_MOVE_AHEAD.md` Phase 2 gate) and must run on India-hosted infrastructure per the compliance constraint in doc 27 Section 0 — same reasoning applies here as to any inference touching patient-derived data. Do not conflate this with doc 27's Phase 1/2 retrieval assistant in external communication; they are different mechanisms with different maturity timelines.
+
 ### Stage 4: Narrow RL
 
 Only after the service workflow has clear rewards:

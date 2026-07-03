@@ -24,7 +24,20 @@ This is not a preference, it's a hard requirement, verified 2026-07-03 against c
 - **Retrieval index:** `pgvector` on the existing Postgres instance. No new vector-DB vendor, no new cross-border question, already India-hosted.
 - **PHI minimization regardless of hosting:** prompts reference patients by internal ID, not name/ABHA number. Retrieval pulls structured facts, not raw transcripts, wherever the summarized form is sufficient.
 
-Verify current Sarvam LLM model capability against this use case before committing; this spec assumes it's viable but that hasn't been benchmarked yet.
+### Sarvam LLM benchmark — 2026-07-03, first pass (desk research, not a live API test)
+
+Two chat/LLM models are live on Sarvam's API today, per `docs.sarvam.ai` and `sarvam.ai/api-pricing`:
+
+| Model | Params | Languages | Context window | Input | Cached input | Output |
+|---|---|---|---|---|---|---|
+| Sarvam-30B | 30B | 23 (22 Indian + English) | ~32K tokens (third-party estimate, not in first-party docs) | ₹2.5/1M | ₹1.5/1M | ₹10/1M |
+| Sarvam-105B | 105B | 23 (22 Indian + English) | ~128K tokens (third-party estimate, not in first-party docs) | ₹4/1M | ₹2.5/1M | ₹16/1M |
+
+Sarvam-105B was trained on IndiaAI Mission infrastructure (Nvidia hardware, Yotta datacenters) — genuinely sovereign, on-shore, no ambiguity there.
+
+**Not yet confirmed, needs a real test call before committing:** exact context window (only third-party numbers found, not in Sarvam's own docs), and quality on retrieval-augmented clinical Q&A specifically — neither model has a published benchmark for this use case. Run an actual API call with a realistic doctor-history prompt before locking the architecture below.
+
+**Prompt caching exists on both models**, which matters a lot for the design below.
 
 ---
 
@@ -55,7 +68,9 @@ No EMR or scribe competitor can ship this — they don't have the corpus. This o
 
 ## 4. Data model
 
-New tables (SQLite + Postgres, following the existing `db.py` migration pattern):
+**This section is Phase 2 (cross-patient search) work — see the correction in Section 5. Phase 1 needs no new tables at all; it queries `patients`/`sessions`/`patient_memory` directly.**
+
+New tables (SQLite + Postgres, following the existing `db.py` migration pattern), needed only once Phase 2 starts:
 
 ```sql
 CREATE TABLE IF NOT EXISTS clinical_memory_chunks (
@@ -79,13 +94,30 @@ Chunks are generated once, when a session's facts move to `confirmed` status (ho
 
 ---
 
-## 5. Retrieval architecture
+## 5. Retrieval architecture — two modes, chosen by scope, not by preference
 
+**Important scoping correction from the original draft of this spec:** context-stuffing (put the relevant history directly in the prompt, no vector search) is not a shortcut version of RAG — it's the right architecture for Phase 1, and pgvector is only needed once Phase 2 widens scope. Reasoning:
+
+- **Phase 1 (same-patient-only):** one patient's confirmed visit history is small — a handful to a few dozen visits for the overwhelming majority of patients. That fits comfortably inside even Sarvam-30B's context window without needing similarity search at all. Building pgvector for this case is solving a scale problem that doesn't exist yet.
+- **Phase 2 (cross-patient, one doctor's full patient base):** a doctor with years of practice and thousands of confirmed visits will exceed any context window, including Sarvam-105B's. This is where real retrieval (pgvector) becomes necessary, not optional.
+
+**Phase 1 flow (context-stuffing, no vector DB):**
 ```
-Doctor query ("how did I treat this before?")
+Doctor opens a patient session, asks "how did I treat this before?"
+  → pull that patient's confirmed visit history directly (SQL query, no embeddings)
+  → assemble into prompt: de-identified visit summaries, ordered by date
+  → mark the static history portion as a cacheable prefix (Sarvam supports prompt
+    caching — ₹2.5/1M vs ₹4/1M input on Sarvam-105B — so repeated queries in the
+    same session are cheap after the first call)
+  → on-shore LLM (Sarvam) generates answer
+  → UI resolves session_id → visit date for display, attaches "View visit" links
+```
+
+**Phase 2 flow (pgvector, only built when cross-patient search ships):**
+```
+Doctor query ("find a similar case I've seen before")
   → embed query (on-shore embedding model)
   → pgvector similarity search, WHERE doctor_id = current_doctor
-    (+ WHERE patient_id = current_patient if a session is open and doctor asks about "this patient")
   → top-k chunks retrieved, each carrying session_id + visit_date
   → assembled into prompt with de-identified IDs
   → on-shore LLM (Sarvam) generates answer
@@ -93,11 +125,14 @@ Doctor query ("how did I treat this before?")
 ```
 
 New backend service: `backend/app/services/clinical_memory_service.py`
-- `index_session(session_id)` — called on fact confirmation, generates chunks + embeddings
-- `query(doctor_id, query_text, patient_id=None, k=5)` — retrieval + generation, returns `{answer, citations: [{session_id, visit_date, snippet}]}`
+- Phase 1: `get_patient_history(patient_id)` — plain SQL, formats confirmed visits into a prompt-ready summary. No embeddings.
+- Phase 2: `index_session(session_id)` — generates chunks + embeddings, only built when Phase 2 starts.
+- `query(doctor_id, query_text, patient_id=None)` — routes to context-stuffing or pgvector retrieval depending on whether `patient_id` is scoped (Phase 1) or a full-history search (Phase 2). Returns `{answer, citations: [{session_id, visit_date, snippet}]}` either way — the caller doesn't need to know which mode served the answer.
 
 New routes: `backend/app/api/routes_memory_assistant.py`
 - `POST /assistant/query` — `{query, session_id?}` → answer + citations. `session_id` optional; when present, biases retrieval toward that patient first.
+
+This also means the `clinical_memory_chunks` table and `pgvector` extension in Section 4 are **Phase 2 work, not part of the first ship.** Build Phase 1 without them.
 
 ---
 
@@ -137,9 +172,9 @@ Matches the existing Lipi design language exactly — same tokens already used a
 
 ## 8. Build phases
 
-**Phase 1 (ship first, safest, most contained):** same-patient-only retrieval. Doctor opens a patient's session, asks "what did we try last time," gets an answer scoped only to that one patient's own history. No cross-patient search yet. This alone proves the retrieval + citation UX and de-risks the on-shore inference pipeline before widening scope.
+**Phase 1 (ship first, safest, most contained, no vector DB needed):** same-patient-only retrieval via direct context-stuffing (Section 5). Doctor opens a patient's session, asks "what did we try last time," gets an answer scoped only to that one patient's own confirmed history, assembled straight into the prompt with caching. This alone proves the citation UX and de-risks the on-shore inference pipeline before adding any retrieval infrastructure.
 
-**Phase 2:** cross-patient search within one doctor's full patient base ("find a similar case I've seen before"). Requires the doctor to explicitly search rather than it being ambient in every session — an intentional friction point so it's never confused with the current patient's own record.
+**Phase 2 (pgvector introduced here, not before):** cross-patient search within one doctor's full patient base ("find a similar case I've seen before"). This is where context size actually exceeds what fits in a prompt, so this is where `clinical_memory_chunks` + `pgvector` (Section 4) get built. Requires the doctor to explicitly search rather than it being ambient in every session — an intentional friction point so it's never confused with the current patient's own record.
 
 **Phase 3 (not in this spec, future):** anything cross-doctor or cross-clinic. This needs the flywheel's scope/promotion/safety-gating machinery from `10_CONTINUAL_LEARNING_SYSTEM.md`, not a simple RAG panel. Do not build this without that infrastructure existing first.
 
