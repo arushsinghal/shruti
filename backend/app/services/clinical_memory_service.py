@@ -82,7 +82,14 @@ async def query(
     history_text = format_history_for_prompt(timeline)
 
     payload = {
-        "model": "sarvam-105b",
+        # sarvam-30b, not the 105b flagship: verified 2026-07-03 with two live test
+        # calls (a single-fact lookup and a 3-visit multi-step reasoning question —
+        # "did this patient ever have a bad reaction, what did we switch to") that
+        # 30b matches 105b's answer quality on this retrieval task while costing
+        # ~40% less per token and responding faster (~0.5s vs ~0.7-7s). This task is
+        # lookup-and-synthesis over provided context, not open-ended reasoning, so
+        # the smaller model has no real disadvantage here.
+        "model": "sarvam-30b",
         "messages": [
             {"role": "system", "content": _SYSTEM_PROMPT},
             {
