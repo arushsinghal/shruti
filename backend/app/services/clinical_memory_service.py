@@ -25,7 +25,6 @@ import httpx
 from app.services.patient_history_service import (
     build_patient_timeline,
     format_history_for_prompt,
-    get_patient_sessions,
 )
 from app.utils.config import settings
 
@@ -38,9 +37,10 @@ _SYSTEM_PROMPT = (
     "You are a clinical memory assistant for an Indian doctor using Lipi. You answer "
     "questions about a patient's own visit history using ONLY the visit summaries "
     "provided below. Never invent a fact that is not in the provided history. If the "
-    "history doesn't answer the question, say so plainly. Always reference which "
-    "visit(s) your answer draws from by their date. This is decision support only — "
-    "the doctor makes all clinical decisions."
+    "history doesn't answer the question, say so plainly. Reference visit dates in "
+    "your answer, but never mention the visit ID string — the UI shows that "
+    "separately. This is decision support only — the doctor makes all clinical "
+    "decisions. Answer in 1-2 sentences, directly, no preamble."
 )
 
 
@@ -80,8 +80,6 @@ async def query(
         }
 
     history_text = format_history_for_prompt(timeline)
-    sessions = await get_patient_sessions(user_id, patient_name)
-    session_dates = {s.id[:8]: s.created_at.isoformat()[:10] for s in sessions if s.created_at}
 
     payload = {
         "model": "sarvam-105b",
@@ -93,6 +91,12 @@ async def query(
             },
         ],
         "temperature": 0.2,
+        # Verified 2026-07-03 against a live Sarvam-105B call: "medium" (default)
+        # reasoning burned 729-860 completion tokens and ~7s on trivial questions.
+        # Disabling reasoning entirely dropped that to ~34 tokens and ~0.7s with no
+        # loss of answer accuracy on the same test prompt. Live-demo latency matters
+        # more here than chain-of-thought quality for a single-fact lookup.
+        "reasoning_effort": None,
     }
 
     try:
@@ -108,7 +112,7 @@ async def query(
         _log.warning("clinical_memory_service: Sarvam call failed: %s", exc)
         raise ClinicalMemoryError(f"Assistant unavailable: {exc}") from exc
 
-    answer = data["choices"][0]["message"]["content"]
+    answer = data["choices"][0]["message"]["content"].strip()
 
     # Citations: every visit referenced in the prompt is a candidate citation. Phase 1
     # cites the whole visit set used, not per-sentence attribution — that refinement

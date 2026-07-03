@@ -2,7 +2,7 @@
 
 **Author:** Opus (Claude)
 **Date:** 2026-07-03
-**Status:** **Phase 1 built 2026-07-03** (context-stuffing, single-patient scope). Behind `memory_assistant_enabled` (default `False`) until Sarvam's model is benchmarked with a live test call — see Section 9. Backend: `clinical_memory_service.py`, `routes_memory_assistant.py`, `patient_history_service.py`. Frontend: `ClinicalMemoryAssistant.tsx`, mounted globally in `ProtectedRoute.tsx` for doctor-role users. Phase 2 (cross-patient search, pgvector) not started.
+**Status:** **Phase 1 built AND live-verified 2026-07-03.** Tested end-to-end against real Sarvam-105B API and real patient session data, not just import-checked. Confirmed: endpoint `https://api.sarvam.ai/v1/chat/completions` and model `sarvam-105b` are correct (200 response, correctly parsed). Found and fixed a real issue: default `reasoning_effort` ("medium") burned 729-860 completion tokens and ~7s per trivial question — set `reasoning_effort: null` instead, which dropped a real test query to ~34 tokens and ~0.7s with no loss of answer accuracy (verified on the same prompt both ways). `memory_assistant_enabled` is now `true` in `backend/.env`. Backend: `clinical_memory_service.py`, `routes_memory_assistant.py`, `patient_history_service.py`. Frontend: `ClinicalMemoryAssistant.tsx`, mounted globally in `ProtectedRoute.tsx` for doctor-role users. Phase 2 (cross-patient search, pgvector) not started.
 **Related:** [[02_ARCHITECTURE_MAP]] · [[10_CONTINUAL_LEARNING_SYSTEM]] · [[17_ABDM_DHIS_DSC_COMPLIANCE]] · [[07_DECISIONS]] (see D017)
 
 ---
@@ -35,7 +35,7 @@ Two chat/LLM models are live on Sarvam's API today, per `docs.sarvam.ai` and `sa
 
 Sarvam-105B was trained on IndiaAI Mission infrastructure (Nvidia hardware, Yotta datacenters) — genuinely sovereign, on-shore, no ambiguity there.
 
-**Not yet confirmed, needs a real test call before committing:** exact context window (only third-party numbers found, not in Sarvam's own docs), and quality on retrieval-augmented clinical Q&A specifically — neither model has a published benchmark for this use case. Run an actual API call with a realistic doctor-history prompt before locking the architecture below.
+**Confirmed 2026-07-03 with a real API call against real patient data:** Sarvam-105B correctly answers "what did I prescribe last time" against a multi-visit history, identifies the most recent visit correctly, and cites the right dates. Answer quality is good on this test case. Still unconfirmed: exact context window (only third-party numbers found, not in Sarvam's own docs) — not yet a problem at current data volumes, revisit before Phase 2.
 
 **Prompt caching exists on both models**, which matters a lot for the design below.
 
@@ -180,9 +180,10 @@ Matches the existing Lipi design language exactly — same tokens already used a
 
 ---
 
-## 9. Open questions before implementation starts
+## 9. Open questions
 
-- [ ] Benchmark Sarvam's current LLM offering against this use case — does it handle retrieval-augmented clinical Q&A well enough, or is a self-hosted fallback needed from day one?
-- [ ] Embedding model choice — must also be on-shore-inferable; confirm what's available before locking the `VECTOR(1536)` dimension in the schema above.
-- [ ] Chunk regeneration policy when a doctor edits a previously confirmed fact after the fact (rare, but the append-only chunk store needs a defined behavior — new chunk superseding old, not silent overwrite).
-- [ ] Rate/cost limits per doctor per day, since this is now a second LLM cost center alongside Sarvam ASR — needs to feed the cost-per-consultation ledger once that's built (see `12_IMPLEMENTATION_GAP_REGISTER.md`).
+- [x] Benchmark Sarvam's current LLM offering against this use case — **done 2026-07-03.** Confirmed accurate against real multi-visit data; `reasoning_effort: null` needed for demo-viable latency (0.7s vs 7s, no accuracy loss).
+- [ ] Embedding model choice — must also be on-shore-inferable; confirm what's available before locking the `VECTOR(1536)` dimension in the schema above. Still Phase 2 work, not urgent.
+- [ ] Chunk regeneration policy when a doctor edits a previously confirmed fact after the fact (rare, but the append-only chunk store needs a defined behavior — new chunk superseding old, not silent overwrite). Phase 2 work.
+- [ ] Rate/cost limits per doctor per day, since this is now a second LLM cost center alongside Sarvam ASR — needs to feed the cost-per-consultation ledger once that's built (see `12_IMPLEMENTATION_GAP_REGISTER.md`). Not yet built, worth doing before wide doctor rollout — today's usage is low enough this isn't urgent for a pitch demo.
+- [ ] Answer quality was only spot-checked on one realistic prompt against one patient's real data. Before relying on this in front of a doctor or investor live, run it against 3-5 more realistic questions (drug allergies, "did we ever try X", multi-visit trend questions) to catch failure modes early.
