@@ -36,3 +36,9 @@ transliteration = [
 dev = [
     "pytest>=9.0.3",
 ]
+
+[tool.pytest.ini_options]
+# test_full_flow.py at the backend root is a standalone manual smoke script
+# (needs a live server, run directly per its own docstring) -- not part of
+# the pytest suite. Scope discovery to tests/ so it isn't collected.
+testpaths = ["tests"]
