@@ -1,0 +1,143 @@
+acute nasopharyngitis	Acute Nasopharyngitis	J00
+acute sinusitis	Acute Sinusitis	J01
+acute pharyngitis	Acute Pharyngitis	J02
+acute tonsillitis	Acute Tonsillitis	J03
+acute laryngitis	Acute Laryngitis	J04
+acute upper respiratory infection	Acute Upper Respiratory Infection	J06.9
+influenza	Influenza	J11
+viral pneumonia	Viral Pneumonia	J12
+bacterial pneumonia	Bacterial Pneumonia	J15
+pneumonia unspecified	Pneumonia	J18.9
+acute bronchitis	Acute Bronchitis	J20
+bronchiolitis	Bronchiolitis	J21
+chronic obstructive pulmonary disease	COPD	J44
+asthma	Asthma	J45
+bronchiectasis	Bronchiectasis	J47
+pleural effusion	Pleural Effusion	J91
+gastroesophageal reflux	GERD	K21
+gastric ulcer	Gastric Ulcer	K25
+duodenal ulcer	Duodenal Ulcer	K26
+gastritis	Gastritis	K29
+functional dyspepsia	Functional Dyspepsia	K30
+irritable bowel syndrome	IBS	K58
+constipation	Constipation	K59.0
+liver cirrhosis	Liver Cirrhosis	K74
+cholelithiasis	Cholelithiasis	K80
+cholecystitis	Cholecystitis	K81
+pancreatitis	Pancreatitis	K85
+hemorrhoids	Hemorrhoids	K64
+anal fissure	Anal Fissure	K60.0
+type 1 diabetes mellitus	Type 1 Diabetes	E10
+type 2 diabetes mellitus	Type 2 Diabetes	E11
+diabetic nephropathy	Diabetic Nephropathy	E11.21
+diabetic retinopathy	Diabetic Retinopathy	E11.3
+diabetic neuropathy	Diabetic Neuropathy	E11.4
+hypothyroidism	Hypothyroidism	E03
+hyperthyroidism	Hyperthyroidism	E05
+obesity	Obesity	E66
+vitamin d deficiency	Vitamin D Deficiency	E55
+iron deficiency anemia	Iron Deficiency Anemia	D50
+vitamin b12 deficiency	Vitamin B12 Deficiency	E53.8
+hyperlipidemia	Hyperlipidemia	E78
+gout	Gout	M10
+hyperuricemia	Hyperuricemia	E79.0
+essential hypertension	Essential Hypertension	I10
+hypertensive heart disease	Hypertensive Heart Disease	I11
+angina pectoris	Angina Pectoris	I20
+acute myocardial infarction	Acute MI	I21
+heart failure	Heart Failure	I50
+atrial fibrillation	Atrial Fibrillation	I48
+deep vein thrombosis	DVT	I82
+pulmonary embolism	Pulmonary Embolism	I26
+migraine	Migraine	G43
+tension headache	Tension Headache	G44.2
+epilepsy	Epilepsy	G40
+parkinson disease	Parkinson's Disease	G20
+bell palsy	Bell's Palsy	G51.0
+carpal tunnel syndrome	Carpal Tunnel Syndrome	G56.0
+peripheral neuropathy	Peripheral Neuropathy	G62
+vertigo	Vertigo	H81
+stroke	Stroke	I63
+transient ischemic attack	TIA	G45
+rheumatoid arthritis	Rheumatoid Arthritis	M06
+osteoarthritis	Osteoarthritis	M15-M19
+osteoarthritis of knee	OA Knee	M17
+ankylosing spondylitis	Ankylosing Spondylitis	M45
+cervical spondylosis	Cervical Spondylosis	M47
+lumbar disc herniation	Lumbar Disc Herniation	M51
+osteoporosis	Osteoporosis	M81
+frozen shoulder	Frozen Shoulder	M75.0
+plantar fasciitis	Plantar Fasciitis	M72.2
+fibromyalgia	Fibromyalgia	M79.7
+systemic lupus erythematosus	SLE	M32
+atopic dermatitis	Atopic Dermatitis	L20
+contact dermatitis	Contact Dermatitis	L25
+psoriasis	Psoriasis	L40
+urticaria	Urticaria	L50
+acne vulgaris	Acne Vulgaris	L70
+alopecia areata	Alopecia Areata	L63
+vitiligo	Vitiligo	L80
+dermatophytosis	Dermatophytosis	B35
+scabies	Scabies	B86
+herpes zoster	Herpes Zoster	B02
+cellulitis	Cellulitis	L03
+acute kidney injury	AKI	N17
+chronic kidney disease	CKD	N18
+nephrotic syndrome	Nephrotic Syndrome	N04
+nephrolithiasis	Nephrolithiasis	N20
+urinary tract infection	UTI	N39.0
+pyelonephritis	Pyelonephritis	N10
+benign prostatic hyperplasia	BPH	N40
+tuberculosis	Tuberculosis	A15
+typhoid fever	Typhoid Fever	A01.0
+dengue fever	Dengue Fever	A97
+malaria	Malaria	B50-B54
+covid 19	COVID-19	U07.1
+hepatitis a	Hepatitis A	B15
+hepatitis b	Hepatitis B	B16
+hepatitis c	Hepatitis C	B17.1
+hiv	HIV	B20
+chickenpox	Chickenpox	B01
+measles	Measles	B05
+mumps	Mumps	B26
+amebiasis	Amebiasis	A06
+acute gastroenteritis	AGE	A09
+sepsis	Sepsis	A41
+conjunctivitis	Conjunctivitis	H10
+cataract	Cataract	H25-H26
+glaucoma	Glaucoma	H40
+diabetic retinopathy	Diabetic Retinopathy	H36
+refractive error	Refractive Error	H52
+blepharitis	Blepharitis	H01.0
+allergic rhinitis	Allergic Rhinitis	J30
+otitis media	Otitis Media	H66
+otitis externa	Otitis Externa	H60
+polycystic ovarian syndrome	PCOS	E28.2
+endometriosis	Endometriosis	N80
+uterine fibroids	Uterine Fibroids	D25
+pelvic inflammatory disease	PID	N73
+menopause	Menopause	N95
+major depressive disorder	Depression	F32
+generalized anxiety disorder	GAD	F41.1
+panic disorder	Panic Disorder	F41.0
+bipolar disorder	Bipolar Disorder	F31
+schizophrenia	Schizophrenia	F20
+ocd	OCD	F42
+insomnia	Insomnia	G47.0
+alcohol use disorder	Alcohol Use Disorder	F10
+febrile seizure	Febrile Seizure	R56.0
+bronchiolitis	Bronchiolitis	J21
+croup	Croup	J05.0
+hand foot and mouth disease	HFMD	B08.4
+dental caries	Dental Caries	K02
+periodontitis	Periodontitis	K05.3
+gingivitis	Gingivitis	K05.1
+periapical abscess	Periapical Abscess	K04.7
+breast cancer	Breast Cancer	C50
+lung cancer	Lung Cancer	C34
+colorectal cancer	Colorectal Cancer	C18-C20
+cervical cancer	Cervical Cancer	C53
+oral cancer	Oral Cancer	C00-C06
+prostate cancer	Prostate Cancer	C61
+leukemia	Leukemia	C91-C95
+lymphoma	Lymphoma	C81-C85

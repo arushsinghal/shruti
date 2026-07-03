@@ -5,7 +5,7 @@ services:
     plan: starter
     region: singapore
     branch: master
-    healthCheckPath: /health
+    healthCheckPath: /api/health
     disk:
       name: lipi-data
       mountPath: /app/data
@@ -17,9 +17,9 @@ services:
         value: /app/data/lipi.db
       - key: ASR_MODE
         value: cloud
-      - key: LIPI_ADMIN_USER
+      - key: SHRUTI_ADMIN_USER
         value: demo
-      - key: LIPI_ADMIN_PASSWORD
+      - key: SHRUTI_ADMIN_PASSWORD
         sync: false
       - key: SARVAM_API_KEY
         sync: false
@@ -28,4 +28,4 @@ services:
       - key: SECRET_KEY
         sync: false
       - key: CORS_ORIGINS
-        value: "http://localhost:5173,http://127.0.0.1:5173"
+        value: "http://localhost:5173,http://127.0.0.1:5173,https://lipi.onrender.com"

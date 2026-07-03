@@ -1,0 +1,169 @@
+bukhar	fever	symptom
+bukhaar	fever	symptom
+buhkhar	fever	symptom
+buhar	fever	symptom
+tez bukhar	high fever	symptom
+halka bukhar	low grade fever	symptom
+khasi	cough	symptom
+khansi	cough	symptom
+khaansi	cough	symptom
+sukhi khansi	dry cough	symptom
+balgam wali khansi	productive cough	symptom
+sir dard	headache	symptom
+sar dard	headache	symptom
+sirdard	headache	symptom
+sar mein dard	headache	symptom
+aadha sir dard	migraine	symptom
+pet dard	abdominal pain	symptom
+pet mein dard	abdominal pain	symptom
+pait dard	abdominal pain	symptom
+seena dard	chest pain	symptom
+seene mein dard	chest pain	symptom
+seene mein jalan	heartburn	symptom
+jalan	burning sensation	symptom
+chakkar	dizziness	symptom
+chakkar aana	dizziness	symptom
+sar ghoomna	dizziness	symptom
+ulti	vomiting	symptom
+ult	vomiting	symptom
+qai	vomiting	symptom
+jee machlana	nausea	symptom
+ji machlana	nausea	symptom
+kamzori	weakness	symptom
+kamjori	weakness	symptom
+thakan	fatigue	symptom
+thakaan	fatigue	symptom
+thaka hua	fatigue	symptom
+saans	breathlessness	symptom
+saans lene mein takleef	breathlessness	symptom
+saans phoolna	breathlessness	symptom
+haanfna	breathlessness	symptom
+hanf jana	breathlessness	symptom
+dast	diarrhea	symptom
+patli dast	watery diarrhea	symptom
+khoon ki dast	bloody diarrhea	symptom
+sardi	cold	symptom
+nazla	cold	symptom
+zukaam	cold	symptom
+naak beh rahi	runny nose	symptom
+naak band	nasal congestion	symptom
+gala kharab	sore throat	symptom
+gale mein dard	sore throat	symptom
+gale mein sujan	sore throat	symptom
+gale mein khraash	sore throat	symptom
+badan dard	body ache	symptom
+badan mein dard	body ache	symptom
+jism dard	body ache	symptom
+daant dard	toothache	symptom
+dant dard	toothache	symptom
+khujli	itching	symptom
+kharish	itching	symptom
+sujan	swelling	symptom
+kamar dard	back pain	symptom
+kamar mein dard	back pain	symptom
+ghutne mein dard	knee pain	symptom
+jodo mein dard	joint pain	symptom
+jodo mein akadna	joint stiffness	symptom
+haath mein dard	hand pain	symptom
+haath sunn	numbness	symptom
+haath pair sunn	numbness	symptom
+pair sunn	numbness	symptom
+jhanjhnahat	tingling	symptom
+haath kaanpna	tremor	symptom
+kaanpna	tremor	symptom
+bhookh nahi	loss of appetite	symptom
+bhukh nahi	loss of appetite	symptom
+khana nahi khaya	loss of appetite	symptom
+neend nahi	insomnia	symptom
+neend nahi aati	insomnia	symptom
+wajan kam	weight loss	symptom
+wajan badh raha	weight gain	symptom
+raat ko paseena	night sweats	symptom
+paseena aana	sweating	symptom
+aankhon mein dard	eye pain	symptom
+aankhon mein jalan	eye irritation	symptom
+aankhein lal	red eyes	symptom
+nazar dhundhli	blurred vision	symptom
+nazar kamzor	vision loss	symptom
+kaan mein dard	ear pain	symptom
+kaan se paani	ear discharge	symptom
+suni kam hona	hearing loss	symptom
+naak se khoon	epistaxis	symptom
+peeli aankhein	jaundice	symptom
+peela peshab	dark urine	symptom
+muh mein chaale	mouth ulcer	symptom
+chaale	mouth ulcer	symptom
+thand lagna	chills	symptom
+thand lag rahi	chills	symptom
+kapkapi	chills	symptom
+peshab mein jalan	dysuria	symptom
+peshab baar baar	urinary frequency	symptom
+peshab mein khoon	hematuria	symptom
+khoon aana	bleeding	symptom
+khoon ki ulti	hematemesis	symptom
+kala paikhana	melena	symptom
+pair mein sujan	pedal edema	symptom
+seedhi chadne mein saans	exertional dyspnea	symptom
+ghabrahat	anxiety	symptom
+bechaini	restlessness	symptom
+chinta	anxiety	symptom
+udaasi	depression	symptom
+daane	rash	symptom
+chehre par daane	facial rash	symptom
+baal girna	hair loss	symptom
+qabz	constipation	symptom
+gas	flatulence	symptom
+pet phoolna	bloating	symptom
+acidity	acidity	symptom
+khatti dakar	acid reflux	symptom
+dil ki dhadkan tez	palpitations	symptom
+sugar ki bimari	Diabetes Mellitus	diagnosis
+madhumeh	Diabetes Mellitus	diagnosis
+sugar	Diabetes Mellitus	diagnosis
+bp high	Hypertension	diagnosis
+bp badhna	Hypertension	diagnosis
+bp ki bimari	Hypertension	diagnosis
+lakwa	Paralysis	diagnosis
+motiyabind	Cataract	diagnosis
+safed daag	Vitiligo	diagnosis
+peelia	Jaundice	diagnosis
+dama	Asthma	diagnosis
+tb	Tuberculosis	diagnosis
+tapedik	Tuberculosis	diagnosis
+mirgi	Epilepsy	diagnosis
+pathri	Kidney Stones	diagnosis
+gurde ki pathri	Kidney Stones	diagnosis
+pitte ki pathri	Gallstones	diagnosis
+bawaseer	Hemorrhoids	diagnosis
+hernia	Hernia	diagnosis
+gathiya	Rheumatoid Arthritis	diagnosis
+chambal	Psoriasis	diagnosis
+safed chambal	Psoriasis	diagnosis
+बुखार	fever	symptom
+खांसी	cough	symptom
+सिर दर्द	headache	symptom
+पेट दर्द	abdominal pain	symptom
+सीने में दर्द	chest pain	symptom
+उल्टी	vomiting	symptom
+दस्त	diarrhea	symptom
+कमजोरी	weakness	symptom
+थकान	fatigue	symptom
+सांस फूलना	breathlessness	symptom
+चक्कर	dizziness	symptom
+जलन	burning sensation	symptom
+खुजली	itching	symptom
+सूजन	swelling	symptom
+कमर दर्द	back pain	symptom
+पेशाब में जलन	dysuria	symptom
+भूख नहीं	loss of appetite	symptom
+नींद नहीं	insomnia	symptom
+क़ब्ज़	constipation	symptom
+गैस	flatulence	symptom
+शुगर	Diabetes Mellitus	diagnosis
+मधुमेह	Diabetes Mellitus	diagnosis
+मोतियाबिंद	Cataract	diagnosis
+दमा	Asthma	diagnosis
+पीलिया	Jaundice	diagnosis
+पथरी	Kidney Stones	diagnosis
+बवासीर	Hemorrhoids	diagnosis
+गठिया	Rheumatoid Arthritis	diagnosis

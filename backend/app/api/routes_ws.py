@@ -1,5 +1,6 @@
 """WebSocket route for real-time audio chunk streaming from the browser."""
 
+import asyncio
 import os
 import uuid
 import logging
@@ -7,9 +8,8 @@ from pathlib import Path
 
 from fastapi import APIRouter, WebSocket, WebSocketDisconnect, Query
 from jose import JWTError, jwt
-import aiosqlite
+from app.storage.db import db_connect
 from app.utils.config import settings
-from app.storage.db import get_db_path
 from app.api.routes_auth import get_user
 from app.storage.repository import SessionRepository
 
@@ -17,6 +17,8 @@ logger = logging.getLogger(__name__)
 
 router = APIRouter()
 repo = SessionRepository()
+
+_MAX_WS_BYTES = 100 * 1024 * 1024  # 100 MB — prevents disk-fill from a single stream
 
 _DATA_DIR = Path(settings.data_dir) if settings.data_dir else Path(".")
 AUDIO_DIR = _DATA_DIR / "audio_uploads"
@@ -40,7 +42,7 @@ async def stream_audio_ws(websocket: WebSocket, session_id: str, token: str = Qu
         if username is None:
             raise ValueError("No sub in token")
             
-        async with aiosqlite.connect(get_db_path()) as db:
+        async with db_connect() as db:
             user = await get_user(db, username)
         if not user:
             raise ValueError("User not found")
@@ -61,10 +63,19 @@ async def stream_audio_ws(websocket: WebSocket, session_id: str, token: str = Qu
     try:
         with open(audio_path, "wb") as f:
             while True:
-                message = await websocket.receive()
+                try:
+                    message = await asyncio.wait_for(websocket.receive(), timeout=120.0)
+                except asyncio.TimeoutError:
+                    await websocket.send_json({"status": "error", "detail": "Stream timeout after 120s inactivity"})
+                    await websocket.close(code=4008)
+                    break
                 
                 if "bytes" in message:
                     chunk = message["bytes"]
+                    if total_bytes + len(chunk) > _MAX_WS_BYTES:
+                        await websocket.send_json({"status": "error", "detail": f"Stream exceeds {_MAX_WS_BYTES // (1024 * 1024)} MB limit"})
+                        await websocket.close(code=4009)
+                        break
                     f.write(chunk)
                     total_bytes += len(chunk)
                     # Acknowledge each chunk so frontend knows it arrived

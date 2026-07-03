@@ -1,0 +1,16 @@
+{
+  "_description": "Hindi/Hinglish OPD — bukhar→fever, khasi→cough, BP, weight, penicillin allergy, Hindi follow-up",
+  "symptoms": ["fever", "cough"],
+  "diagnoses": [],
+  "vitals": ["BP 140/90", "Weight 68 kg"],
+  "medications": [
+    {"name": "paracetamol",  "dosage": "500 mg", "frequency": ""},
+    {"name": "amoxicillin",  "dosage": "500 mg", "frequency": ""}
+  ],
+  "investigations": [],
+  "allergies": ["penicillin"],
+  "follow_up": ["after 3 days"],
+  "labs": [],
+  "advice": [],
+  "red_flags": []
+}

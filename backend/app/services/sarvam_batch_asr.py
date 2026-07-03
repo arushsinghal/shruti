@@ -148,7 +148,11 @@ class SarvamBatchASRService:
 
             segments = self._parse_segments(result_json, professional_speaker_id)
             plain_transcript = " ".join(s["transcript"] for s in segments)
-            detected_lang = result_json.get("language_code", language_code)
+            detected_lang = result_json.get("language_code") or language_code or "hi-IN"
+
+            if not plain_transcript.strip():
+                logger.warning("Batch ASR returned empty transcript — falling back to stub")
+                return self._stub_response(language_code)
 
             return {
                 "transcript": plain_transcript,
@@ -389,6 +393,6 @@ class SarvamBatchASRService:
         return {
             "transcript": plain,
             "diarized_segments": _STUB_SEGMENTS,
-            "language_code": language_code,
+            "language_code": language_code or "hi-IN",
             "is_stub": True,
         }

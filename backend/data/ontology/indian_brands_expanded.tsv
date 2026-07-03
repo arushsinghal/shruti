@@ -1,0 +1,198 @@
+oncotrex	methotrexate
+imatib	imatinib
+geftinat	gefitinib
+erlonat	erlotinib
+sorafenat	sorafenib
+sunitib	sunitinib
+bortenat	bortezomib
+lenalid	lenalidomide
+pomalidomide	pomalidomide
+rituximab	rituximab
+hertraz	trastuzumab
+bevatas	bevacizumab
+pemnat	pemetrexed
+gemcitabine	gemcitabine
+abraxane	nab-paclitaxel
+taxol	paclitaxel
+cytoplatin	cisplatin
+carbokem	carboplatin
+caelyx	liposomal doxorubicin
+adriamycin	doxorubicin
+oncocarbide	hydroxyurea
+endoxan	cyclophosphamide
+mabtas	rituximab
+ibrutinib	ibrutinib
+nivolumab	nivolumab
+pembrolizumab	pembrolizumab
+atezolizumab	atezolizumab
+humira	adalimumab
+exemptia	adalimumab
+infimab	infliximab
+etacept	etanercept
+wosulin	insulin
+insugen	insulin
+basalog	insulin glargine
+glaritus	insulin glargine
+ryzodeg	insulin degludec + aspart
+tresiba	insulin degludec
+carca	carvedilol
+cilacar	cilnidipine
+dilzem	diltiazem
+ismo	isosorbide mononitrate
+nitrocontin	nitroglycerin
+triolmesar	telmisartan + amlodipine + HCTZ
+tazloc	telmisartan + amlodipine
+amlokind	amlodipine
+telday	telmisartan
+losar	losartan
+losanorm	losartan
+ramistar	ramipril
+minipress	prazosin
+prazopress	prazosin
+hytrin	terazosin
+arkamin	clonidine
+catapres	clonidine
+verospir	spironolactone
+eplerenone	eplerenone
+amiodar	amiodarone
+cordarone	amiodarone
+mexiletine	mexiletine
+flecainide	flecainide
+acitrom	acenocoumarol
+warf	warfarin
+sintrom	acenocoumarol
+prasugrel	prasugrel
+brilinta	ticagrelor
+plavix	clopidogrel
+rybelsus	semaglutide
+ozempic	semaglutide
+victoza	liraglutide
+trulicity	dulaglutide
+invokana	canagliflozin
+glyxambi	empagliflozin + linagliptin
+trajenta	linagliptin
+onglyza	saxagliptin
+glucobay	acarbose
+ppg	acarbose
+meronem	meropenem
+merotrol	meropenem
+piptaz	piperacillin-tazobactam
+magnex	piperacillin-tazobactam
+invanz	ertapenem
+tienam	imipenem-cilastatin
+dalacin	clindamycin
+linid	linezolid
+vancoled	vancomycin
+vancotex	vancomycin
+colistop	colistin
+polymyxin	polymyxin b
+fosfomycin	fosfomycin
+tigecycline	tigecycline
+rifadin	rifampicin
+r cinex	rifampicin
+mycobutol	ethambutol
+pyrazinamide	pyrazinamide
+akurit	rifampicin + isoniazid + pyrazinamide + ethambutol
+combutol	ethambutol
+valcivir	valacyclovir
+acivir	acyclovir
+famciclovir	famciclovir
+tamiflu	oseltamivir
+fluvir	oseltamivir
+sofovir	sofosbuvir
+hepcinat	sofosbuvir
+myhep	sofosbuvir
+velpanat	sofosbuvir + velpatasvir
+tenofovir	tenofovir
+tenvir	tenofovir
+entecavir	entecavir
+baraclude	entecavir
+molnupiravir	molnupiravir
+paxlovid	nirmatrelvir + ritonavir
+udiliv	ursodeoxycholic acid
+ursocol	ursodeoxycholic acid
+heptral	ademethionine
+rifagut	rifaximin
+mesacol	mesalamine
+asacol	mesalamine
+pentasa	mesalamine
+colofac	mebeverine
+mebex	mebeverine
+librax	chlordiazepoxide + clidinium
+syndopa	levodopa + carbidopa
+sinemet	levodopa + carbidopa
+amantrel	amantadine
+ropark	ropinirole
+pramipex	pramipexole
+donep	donepezil
+aricept	donepezil
+rivastigmine	rivastigmine
+memantine	memantine
+admenta	memantine
+topamac	topiramate
+lacoset	lacosamide
+oxetol	oxcarbazepine
+zonegran	zonisamide
+clobazam	clobazam
+frisium	clobazam
+rivotril	clonazepam
+venlor	venlafaxine
+pristiq	desvenlafaxine
+bupron	bupropion
+wellbutrin	bupropion
+dulane	duloxetine
+cymbalta	duloxetine
+arip mt	aripiprazole
+abilify	aripiprazole
+quetiapine	quetiapine
+qutan	quetiapine
+clozaril	clozapine
+sizopin	clozapine
+modafinil	modafinil
+modalert	modafinil
+atomoxetine	atomoxetine
+axepta	atomoxetine
+tenovate	clobetasol
+lobate	clobetasol
+halobetasol	halobetasol
+betnovate	betamethasone
+fusicort	fusidic acid + betamethasone
+panderm	clobetasol + ofloxacin + miconazole
+kz cream	ketoconazole cream
+nizoral	ketoconazole
+sertaconazole	sertaconazole
+luliconazole	luliconazole
+tacromus	tacrolimus ointment
+pimecrolimus	pimecrolimus
+dapsone	dapsone
+moxiflox eye drops	moxifloxacin eye drops
+gatifloxacin eye drops	gatifloxacin eye drops
+pred forte	prednisolone eye drops
+timolol eye drops	timolol eye drops
+dorzolamide eye drops	dorzolamide eye drops
+latanoprost eye drops	latanoprost eye drops
+brimonidine eye drops	brimonidine eye drops
+cyclopentolate eye drops	cyclopentolate eye drops
+tropicamide eye drops	tropicamide eye drops
+saaz	sulfasalazine
+salazopyrin	sulfasalazine
+folitrax	methotrexate
+leflunomide	leflunomide
+arava	leflunomide
+hydroxychloroquine	hydroxychloroquine
+hcqs	hydroxychloroquine
+azoran	azathioprine
+imuran	azathioprine
+mycophenolate	mycophenolate mofetil
+cellcept	mycophenolate
+cyclophosphamide	cyclophosphamide
+tiova	tiotropium
+onbrez	indacaterol
+ultibro	indacaterol + glycopyrronium
+symbicort	budesonide + formoterol
+relvar	fluticasone + vilanterol
+montek	montelukast
+olopatadine	olopatadine
+doxophylline	doxophylline
+dabigatran	dabigatran
+pradaxa	dabigatran

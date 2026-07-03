@@ -23,8 +23,16 @@ except OSError:
     HAS_NER = False
 
 _PHONE_REGEX = re.compile(r'\b(?:\+\d{1,2}\s)?\(?\d{3}\)?[\s.-]\d{3}[\s.-]\d{4}\b')
+_INDIAN_PHONE_REGEX = re.compile(r'\b[6-9]\d{9}\b')
+_AADHAAR_REGEX = re.compile(r'\b\d{4}\s\d{4}\s\d{4}\b')
+_ABHA_REGEX = re.compile(r'\b\d{2}-\d{4}-\d{4}-\d{4}\b')
+_UHID_MRN_REGEX = re.compile(r'\b(?:UHID|MRN|UID|HN|PID)[:\s#-]*\d{4,12}\b', re.IGNORECASE)
+_PIN_CODE_REGEX = re.compile(r'(?i)(?:pin\s*(?:code)?|pincode)[:\s]*([1-9]\d{5})')
 _EMAIL_REGEX = re.compile(r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b')
-_TITLE_NAME_REGEX = re.compile(r'\b(?:Patient|Dr\.?|Doctor)\s+([A-Z][a-z]+(?:\s+[A-Z][a-z]+){0,2})\b')
+_TITLE_NAME_REGEX = re.compile(
+    r'\b(?:Patient|Dr\.?|Doctor|Shri|Smt\.?|Sri|Ku\.?|Kumari|Mr\.?|Mrs\.?|Ms\.?|मरीज़|मरीज|रोगी)\s+'
+    r'([A-Z][a-z]+(?:\s+[A-Z][a-z]+){0,2})\b'
+)
 _DATE_REGEX = re.compile(
     r'\b(?:'
     r'\d{1,2}[/-]\d{1,2}[/-]\d{2,4}'
@@ -62,8 +70,12 @@ class PHIScrubberService:
         # Hindi/Hinglish clinical text (tags BP values, Hindi words, lab
         # names like CBC as PHI). Regex catches real identifying info only.
         text = _PHONE_REGEX.sub("[REDACTED_PHONE]", text)
+        text = _INDIAN_PHONE_REGEX.sub("[REDACTED_PHONE]", text)
+        text = _AADHAAR_REGEX.sub("[REDACTED_AADHAAR]", text)
+        text = _ABHA_REGEX.sub("[REDACTED_ABHA]", text)
+        text = _UHID_MRN_REGEX.sub("[REDACTED_ID]", text)
+        text = _PIN_CODE_REGEX.sub("[REDACTED_PIN]", text)
         text = _EMAIL_REGEX.sub("[REDACTED_EMAIL]", text)
         text = _DATE_REGEX.sub("[REDACTED_DATE]", text)
         text = _TITLE_NAME_REGEX.sub(lambda m: m.group(0).replace(m.group(1), "[REDACTED_NAME]"), text)
         return text
-

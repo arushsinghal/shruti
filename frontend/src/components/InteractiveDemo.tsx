@@ -85,7 +85,7 @@ export function InteractiveDemo() {
           <div className="w-2.5 h-2.5 rounded-full bg-amber-500/80"></div>
           <div className="w-2.5 h-2.5 rounded-full bg-emerald-500/80"></div>
         </div>
-        <div className="text-[10px] text-slate-500 font-mono tracking-wider">VOICE2SOAP CONSOLE</div>
+        <div className="text-[10px] text-slate-500 font-mono tracking-wider">LIPI ASSISTANT CONSOLE</div>
         <div className="w-16"></div> {/* Spacer for centering */}
       </div>
 

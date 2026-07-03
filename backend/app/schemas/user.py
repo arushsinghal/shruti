@@ -6,6 +6,7 @@ class UserCreate(BaseModel):
     email: EmailStr
     password: str
     full_name: Optional[str] = None
+    role: str = 'doctor'
 
 class UserResponse(BaseModel):
     id: int
@@ -13,6 +14,7 @@ class UserResponse(BaseModel):
     email: str
     full_name: Optional[str] = None
     is_active: bool
+    role: str = 'doctor'
 
     class Config:
         from_attributes = True
@@ -20,6 +22,7 @@ class UserResponse(BaseModel):
 class Token(BaseModel):
     access_token: str
     token_type: str
+    role: str = 'doctor'
 
 class TokenData(BaseModel):
     username: Optional[str] = None

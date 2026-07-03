@@ -1,0 +1,16 @@
+{
+  "_description": "Vitals edge cases — Sprint 2 Task 2. 'degrees Celsius' plural, 'BP by', 'fasting sugar today is X'.",
+  "_safety_rule": "All three vitals must be captured: 38.5 degrees Celsius, 140 by 90, fasting sugar 160.",
+  "symptoms": ["fever", "fatigue"],
+  "diagnoses": [],
+  "vitals": ["Temp 38.5 C", "BP 140/90", "Blood Glucose 160 mg/dL"],
+  "medications": [
+    {"name": "paracetamol", "dosage": "500 mg", "frequency": "twice daily"}
+  ],
+  "investigations": ["Fasting Blood Glucose", "HbA1c", "Lipid Profile"],
+  "allergies": [],
+  "follow_up": ["follow up in 2 weeks"],
+  "labs": [],
+  "advice": [],
+  "red_flags": []
+}

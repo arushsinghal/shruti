@@ -1,0 +1,4 @@
+case_id,date,consultation_number,field_type,ground_truth_value,extracted_value,result,notes,sarvam_wer_note
+ex_01,2026-06-20,1,symptom,fever,fever (3 days),FP,Extractor added duration annotation; set normaliser in eval handles this,
+ex_01,2026-06-20,1,medication,paracetamol 500mg,paracetamol,TP,Dose mismatch warning generated,
+ex_02,2026-06-20,2,diagnosis,pharyngitis,not specified,FN,Doctor stated pharyngitis but extractor missed it,High background noise in ASR

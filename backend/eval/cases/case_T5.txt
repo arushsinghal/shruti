@@ -1,0 +1,6 @@
+Patient presents with high grade fever since 2 days.
+Temperature 39.2 C. BP 110/70. SpO2 98 percent.
+No nausea. No vomiting.
+Prescribed paracetamol 500 mg twice daily.
+Order CBC.
+Come back if fever above 39.5 or if not better in 3 days.

@@ -1,0 +1,7 @@
+Patient has fever and fatigue.
+Temperature is 38.5 degrees Celsius.
+Blood pressure 140 by 90 mmHg.
+Fasting sugar today is 160 mg/dL.
+Prescribed paracetamol 500 mg twice daily.
+Order HbA1c and lipid profile.
+Follow up in 2 weeks.

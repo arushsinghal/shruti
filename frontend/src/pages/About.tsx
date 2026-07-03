@@ -1,111 +1,302 @@
 import { useNavigate } from 'react-router-dom';
+import { motion, useReducedMotion } from 'framer-motion';
+import { ArrowRight, FileSearch, MapPin, Network, Pill, Radar, ShieldCheck } from 'lucide-react';
+import { RESEARCH_POSTS } from '../data/researchPosts';
+
+const fadeUp = {
+  hidden: { opacity: 0, y: 32 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.55, ease: [0.16, 1, 0.3, 1] as const } },
+};
+
+const TRACK_ICONS: Record<string, React.ElementType> = {
+  'drug-safety-indian-formularies': Pill,
+  'amr-surveillance-gap': Radar,
+  'hinglish-clinical-nlp': Network,
+  'indian-opd-ontology': FileSearch,
+};
+
+const PRINCIPLES = [
+  {
+    n: '01',
+    title: 'Workflow first',
+    body: 'Products must fit real clinical throughput before they can become intelligent systems. A tool that slows a 60-patient OPD down does not get a second consultation.',
+  },
+  {
+    n: '02',
+    title: 'Local by default',
+    body: 'Clinical extraction, memory resolution, and conflict detection run deterministically, with patient data on India-hosted infrastructure. Nothing clinical is invented by a generative model.',
+  },
+  {
+    n: '03',
+    title: 'Models with accountability',
+    body: 'The doctor is the final authority on everything. Every clinical fact links back to the exact sentence it came from, and nothing becomes a record until the doctor signs it.',
+  },
+];
 
 export default function About() {
   const navigate = useNavigate();
+  const reduce = useReducedMotion();
 
   return (
-    <div className="min-h-screen bg-[#05070b] font-sans text-slate-100 pb-20">
-      <nav className="w-full px-6 py-4 border-b border-white/10 flex items-center justify-between bg-[#05070b]/88 backdrop-blur-xl sticky top-0 z-50">
-        <div className="flex items-center gap-3">
-          <div className="w-8 h-8 bg-primary rounded-md flex items-center justify-center shadow-[0_0_24px_rgba(27,94,59,0.45)]">
-            <span className="text-white font-bold text-lg">श</span>
+    <div className="min-h-screen bg-bg-warm font-sans text-text-dark antialiased">
+
+      {/* ── Nav ─────────────────────────────────────────────────────── */}
+      <nav className="sticky top-0 z-[100] border-b border-slate-200/60 bg-bg-warm/85 backdrop-blur-md">
+        <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between gap-4">
+          <button onClick={() => navigate('/')} className="flex items-center gap-2.5 cursor-pointer group">
+            <span className="grid place-items-center w-8 h-8 rounded-xl bg-primary text-white font-bold text-sm shadow-sm group-hover:scale-105 transition-transform">श</span>
+            <span className="text-[17px] font-bold tracking-tight text-text-dark">Lipi</span>
+          </button>
+          <div className="hidden md:flex items-center gap-6">
+            <button onClick={() => navigate('/research')} className="text-[13.5px] font-medium text-slate-500 hover:text-primary transition-colors cursor-pointer">Research</button>
+            <button onClick={() => navigate('/pricing')} className="text-[13.5px] font-medium text-slate-500 hover:text-primary transition-colors cursor-pointer">Pricing</button>
           </div>
-          <div className="flex flex-col">
-            <span className="text-base font-bold text-white tracking-tight leading-none mb-1">Lipi Health</span>
-            <span className="text-[10px] text-slate-400 font-medium">Clinical AI infrastructure company</span>
-          </div>
+          <motion.a
+            href="mailto:arushsinghal98@gmail.com?subject=Lipi%20early%20access"
+            whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}
+            className="text-[13.5px] font-semibold bg-primary hover:bg-primary-dark text-white pl-4 pr-3.5 py-2 rounded-full flex items-center gap-1.5 cursor-pointer transition-colors shadow-sm"
+          >
+            Request early access <ArrowRight className="w-4 h-4" />
+          </motion.a>
         </div>
-        <button
-          onClick={() => navigate('/dashboard')}
-          className="text-xs font-semibold bg-white hover:bg-slate-200 text-slate-950 px-3.5 py-1.5 rounded-md transition-all cursor-pointer"
-        >
-          Launch Console
-        </button>
       </nav>
 
-      <main className="max-w-4xl mx-auto px-6 pt-12 space-y-12">
-        <button
-          onClick={() => navigate(-1)}
-          className="text-xs font-bold text-slate-500 hover:text-white transition-colors flex items-center gap-1 cursor-pointer"
-        >
-          <svg className="w-4 h-4 text-accent" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-          </svg>
-          Back
-        </button>
+      <main className="max-w-7xl mx-auto px-6">
 
-        <section className="space-y-6">
-          <div className="space-y-3">
-            <p className="text-xs font-bold text-accent uppercase tracking-widest">Company</p>
-            <h1 className="text-4xl md:text-6xl font-bold tracking-tight text-white leading-[0.95]">
-              About Lipi Health
+        {/* ── Hero ─────────────────────────────────────────────────── */}
+        <section className="py-20 md:py-28 max-w-4xl">
+          <motion.div initial={reduce ? false : 'hidden'} animate="visible" variants={fadeUp}>
+            <div className="flex items-center gap-3 mb-6">
+              <span className="h-px w-9 bg-gradient-to-r from-primary to-primary/20" />
+              <span className="text-[12px] font-bold uppercase tracking-[0.22em] text-primary">Company</span>
+            </div>
+            <h1 className="text-[2.6rem] md:text-[3.6rem] leading-[1.02] tracking-[-0.03em] font-extrabold mb-8">
+              The world's largest outpatient system{' '}
+              <span className="text-primary">still runs on paper.</span>
             </h1>
-          </div>
+            <p className="text-[1.1rem] md:text-[1.2rem] text-slate-500 leading-[1.7] max-w-[58ch]">
+              Lipi is the AI-native OPD platform for Indian outpatient care. A doctor speaks once,
+              and every record from that consultation — the note, the prescription, the lab orders,
+              the follow-up, and the ABDM record — lands in one place, structured and ready to sign.
+              Every clinical fact traces back to the exact sentence spoken.
+            </p>
+          </motion.div>
+        </section>
 
-          <div className="relative rounded-xl overflow-hidden shadow-2xl border border-white/10 bg-white/[0.04]">
-            <img
-              src="/lipi_app_mockup.png"
-              alt="Lipi clinician console showing SOAP documentation workflow"
-              className="w-full object-cover object-left-top"
-              style={{ maxHeight: '360px' }}
-            />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent" />
-            <div className="absolute bottom-0 left-0 right-0 p-4">
-              <p className="text-white text-[11px] font-bold uppercase tracking-wider drop-shadow-sm">
-                Voice2SOAP is live. The broader clinical AI platform is in build.
+        {/* ── Mission ──────────────────────────────────────────────── */}
+        <motion.section
+          initial={reduce ? false : 'hidden'}
+          whileInView="visible"
+          viewport={{ once: true, amount: 0.25 }}
+          variants={fadeUp}
+          className="py-16 border-t border-slate-200/60"
+        >
+          <div className="grid lg:grid-cols-[0.85fr_1.15fr] gap-10 lg:gap-16 items-start">
+            <h2 className="text-[1.9rem] md:text-[2.2rem] font-bold tracking-tight leading-[1.06] max-w-[16ch]">
+              Why the OPD comes first
+            </h2>
+            <div className="space-y-5 max-w-2xl">
+              <p className="text-[15px] text-slate-600 leading-relaxed">
+                Outpatient care is the highest-frequency workflow in Indian medicine. Every
+                consultation creates a note, a prescription, follow-up instructions, and a record
+                the system needs. Centralizing that work earns Lipi a place in the clinic on day
+                one, and builds the doctor-approved clinical record that everything else compounds
+                on.
+              </p>
+              <p className="text-[15px] text-slate-600 leading-relaxed">
+                From there Lipi grows into the operating layer for the clinic: patient memory across
+                visits, referrals, coding, insurance recovery, and the government-filed records that
+                pay the clinic back. The mission is bigger than one clinic — a healthcare AI stack
+                built in India, for India, that no imported system can replace.
               </p>
             </div>
           </div>
+        </motion.section>
 
-          <p className="text-slate-300 leading-relaxed">
-            Lipi Health is building clinical AI infrastructure for India. Voice2SOAP is the first live product: multilingual consultations become physician-reviewed SOAP records, CDS alerts, printable reports, and FHIR exports.
-          </p>
-          <p className="text-slate-400 leading-relaxed">
-            The bigger company is not a documentation wrapper. Lipi is building toward private clinical speech models, domain-specific documentation LLMs, local safety engines, and operating intelligence for clinics, hospitals, and provider networks.
-          </p>
-          <div className="rounded-lg border border-primary/30 bg-primary/10 p-4 text-xs text-slate-300 leading-relaxed">
-            <p className="font-bold uppercase tracking-wider text-emerald-300 mb-1">Current access</p>
-            <p>
-              Lipi is available for clinical teams and platform partners evaluating Voice2SOAP today and the broader clinical AI stack as it develops.
-            </p>
+        {/* ── Research credibility ─────────────────────────────────── */}
+        <section className="py-16 border-t border-slate-200/60">
+          <motion.div
+            initial={reduce ? false : 'hidden'}
+            whileInView="visible"
+            viewport={{ once: true, amount: 0.25 }}
+            variants={fadeUp}
+            className="mb-10 flex flex-col md:flex-row md:items-end md:justify-between gap-6"
+          >
+            <div>
+              <h2 className="text-[1.9rem] md:text-[2.2rem] font-bold tracking-tight leading-[1.06] mb-3">
+                The research arm
+              </h2>
+              <p className="text-[15px] text-slate-500 leading-relaxed max-w-[54ch]">
+                Underneath the product, Lipi runs its own research: prescribing safety tuned to
+                Indian populations, Hinglish clinical NLP, and India-specific AMR intelligence.
+                It ships as product capability at the point of care — never as papers.
+              </p>
+            </div>
+            <button
+              onClick={() => navigate('/research')}
+              className="group flex items-center gap-2 text-[13.5px] font-semibold text-primary shrink-0 cursor-pointer"
+            >
+              All research
+              <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" strokeWidth={2} />
+            </button>
+          </motion.div>
+
+          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            {RESEARCH_POSTS.map((post, i) => {
+              const Icon = TRACK_ICONS[post.slug] ?? FileSearch;
+              return (
+                <motion.div
+                  key={post.slug}
+                  initial={reduce ? false : { opacity: 0, y: 16 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true, amount: 0.2 }}
+                  transition={{ duration: 0.45, delay: i * 0.06, ease: [0.16, 1, 0.3, 1] }}
+                  whileHover={{ y: -4, transition: { duration: 0.2 } }}
+                  onClick={() => navigate(`/research/${post.slug}`)}
+                  className="group rounded-3xl border border-slate-200/80 bg-white p-6 cursor-pointer hover:border-primary/25 hover:shadow-[0_8px_40px_-16px_rgba(27,94,59,0.18)] transition-all duration-300 flex flex-col gap-4"
+                >
+                  <div className="w-9 h-9 rounded-xl bg-primary/8 grid place-items-center">
+                    <Icon className="w-4.5 h-4.5 text-primary" strokeWidth={1.8} />
+                  </div>
+                  <div className="flex-1">
+                    <p className="text-[10px] font-bold uppercase tracking-widest text-primary/60 mb-2">{post.tag}</p>
+                    <h3 className="text-[15px] font-bold leading-snug group-hover:text-primary transition-colors">{post.title}</h3>
+                  </div>
+                  <ArrowRight className="w-4 h-4 text-slate-300 group-hover:text-primary group-hover:translate-x-1 transition-all" strokeWidth={2} />
+                </motion.div>
+              );
+            })}
           </div>
         </section>
 
-        <section className="space-y-4 border-t border-white/10 pt-8">
-          <h2 className="text-2xl font-bold tracking-tight text-white">Why documentation is the wedge</h2>
-          <p className="text-slate-400 leading-relaxed">
-            Documentation is the highest-frequency workflow in outpatient care. Every consultation creates clinical notes, medication decisions, follow-up instructions, and interoperability needs. Owning this workflow creates the record layer that makes later products possible.
-          </p>
-          <p className="text-slate-400 leading-relaxed">
-            The expansion path is clinical memory, referrals, coding, population analytics, and private model infrastructure for provider networks. Voice2SOAP earns the workflow; the platform compounds around it.
-          </p>
-        </section>
+        {/* ── Founder ──────────────────────────────────────────────── */}
+        <motion.section
+          initial={reduce ? false : 'hidden'}
+          whileInView="visible"
+          viewport={{ once: true, amount: 0.25 }}
+          variants={fadeUp}
+          className="py-16 border-t border-slate-200/60"
+        >
+          <div className="grid lg:grid-cols-[0.85fr_1.15fr] gap-10 lg:gap-16 items-start">
+            <h2 className="text-[1.9rem] md:text-[2.2rem] font-bold tracking-tight leading-[1.06]">
+              Built by one person,<br />on purpose
+            </h2>
+            <div className="max-w-2xl">
+              <div className="flex items-start gap-5 mb-6">
+                <div className="w-16 h-16 rounded-2xl bg-primary text-white grid place-items-center text-[1.4rem] font-extrabold shrink-0 shadow-sm">
+                  AS
+                </div>
+                <div>
+                  <p className="text-[16px] font-bold text-text-dark">Arush Singhal</p>
+                  <p className="text-[13.5px] text-slate-500 mt-0.5">Founder</p>
+                  <p className="text-[12.5px] text-slate-400 mt-1 flex items-center gap-1.5">
+                    <MapPin className="w-3.5 h-3.5" strokeWidth={2} /> Building in Delhi, India
+                  </p>
+                </div>
+              </div>
+              <p className="text-[15px] text-slate-600 leading-relaxed mb-6">
+                Lipi is a solo-founder company by design: one person who writes the code, sits in
+                the clinics, reads the surveillance reports, and answers the doctors' WhatsApp
+                messages. Small enough to ship weekly, close enough to the OPD floor that the
+                product cannot drift from how Indian medicine actually works.
+              </p>
+              <a
+                href="mailto:arushsinghal98@gmail.com?subject=Working%20at%20Lipi"
+                className="group inline-flex items-center gap-2 text-[13.5px] font-semibold text-primary cursor-pointer"
+              >
+                We're hiring — write to us
+                <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" strokeWidth={2} />
+              </a>
+            </div>
+          </div>
+        </motion.section>
 
-        <section className="space-y-4 border-t border-white/10 pt-8">
-          <h2 className="text-2xl font-bold tracking-tight text-white">Operating principles</h2>
-          <ul className="grid md:grid-cols-3 gap-4 text-sm">
-            <li className="rounded-lg border border-white/10 bg-white/[0.035] p-4">
-              <strong className="text-white block mb-2">Workflow first</strong>
-              <span className="text-slate-400">Products must fit real clinical throughput before they can become intelligent systems.</span>
-            </li>
-            <li className="rounded-lg border border-white/10 bg-white/[0.035] p-4">
-              <strong className="text-white block mb-2">Local by default</strong>
-              <span className="text-slate-400">Clinical extraction, memory resolution, and conflict detection run locally before optional formatting.</span>
-            </li>
-            <li className="rounded-lg border border-white/10 bg-white/[0.035] p-4">
-              <strong className="text-white block mb-2">Models with accountability</strong>
-              <span className="text-slate-400">Lipi's model roadmap keeps physicians in control and links every clinical fact back to source evidence.</span>
-            </li>
-          </ul>
-        </section>
+        {/* ── Operating principles ─────────────────────────────────── */}
+        <motion.section
+          initial={reduce ? false : 'hidden'}
+          whileInView="visible"
+          viewport={{ once: true, amount: 0.2 }}
+          variants={fadeUp}
+          className="py-16 border-t border-slate-200/60"
+        >
+          <h2 className="text-[1.9rem] md:text-[2.2rem] font-bold tracking-tight leading-[1.06] mb-12">
+            Operating principles
+          </h2>
+          <div className="grid md:grid-cols-3 gap-x-10 gap-y-10">
+            {PRINCIPLES.map((p) => (
+              <div key={p.n} className="border-t-2 border-primary/80 pt-6">
+                <p className="text-[12px] font-bold font-mono text-primary/50 mb-3 tracking-wider">{p.n}</p>
+                <h3 className="text-[17px] font-bold mb-3 leading-snug">{p.title}</h3>
+                <p className="text-[14px] text-slate-500 leading-relaxed">{p.body}</p>
+              </div>
+            ))}
+          </div>
+        </motion.section>
 
-        <div className="rounded-md bg-red-950/25 border border-red-400/25 text-slate-300 p-4 text-xs space-y-1">
-          <p className="font-bold uppercase tracking-wider text-red-300">Clinical Safety Notice</p>
-          <p className="leading-relaxed">
-            Lipi is an assistive clinical AI platform. It is not a certified medical device and does not replace professional clinical evaluation. All diagnostics, prescriptions, and notes remain under the sole signature and authority of the attending licensed provider.
-          </p>
-        </div>
+        {/* ── Safety notice ────────────────────────────────────────── */}
+        <motion.section
+          initial={reduce ? false : 'hidden'}
+          whileInView="visible"
+          viewport={{ once: true, amount: 0.3 }}
+          variants={fadeUp}
+          className="pb-20"
+        >
+          <div className="rounded-3xl border border-slate-200/80 bg-white p-8 flex items-start gap-5 max-w-4xl">
+            <div className="w-10 h-10 rounded-2xl bg-slate-100 grid place-items-center shrink-0">
+              <ShieldCheck className="w-5 h-5 text-slate-500" strokeWidth={1.8} />
+            </div>
+            <div>
+              <p className="text-[11px] font-bold uppercase tracking-widest text-slate-400 mb-2">Clinical safety</p>
+              <p className="text-[13.5px] text-slate-600 leading-relaxed">
+                Lipi is an assistive clinical AI platform. It is not a certified medical device and
+                does not replace professional clinical evaluation. All diagnoses, prescriptions, and
+                notes remain under the sole signature and authority of the attending licensed
+                provider.
+              </p>
+            </div>
+          </div>
+        </motion.section>
       </main>
+
+      {/* ── Closing CTA ───────────────────────────────────────────── */}
+      <section className="py-20 px-6 bg-primary">
+        <div className="max-w-7xl mx-auto">
+          <div className="max-w-2xl space-y-6">
+            <motion.h2
+              initial={reduce ? false : { opacity: 0, y: 16 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.55, ease: [0.16, 1, 0.3, 1] }}
+              className="text-[2rem] md:text-[2.5rem] font-extrabold text-white tracking-tight leading-[1.06]"
+            >
+              Onboarding pilot doctors and clinics directly
+            </motion.h2>
+            <motion.p
+              initial={reduce ? false : { opacity: 0, y: 12 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5, delay: 0.08 }}
+              className="text-[15px] text-white/65 leading-relaxed max-w-[48ch]"
+            >
+              The platform is live today; the research that deepens it runs continuously alongside
+              it. Email us and we'll get you set up.
+            </motion.p>
+            <motion.div
+              initial={reduce ? false : { opacity: 0, y: 10 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.45, delay: 0.15 }}
+            >
+              <a
+                href="mailto:arushsinghal98@gmail.com?subject=Lipi%20early%20access"
+                className="inline-flex items-center gap-2 px-7 py-3.5 bg-white hover:bg-white/92 text-primary rounded-full font-bold text-[14.5px] transition-colors cursor-pointer"
+              >
+                Get in touch <ArrowRight className="w-4 h-4" />
+              </a>
+            </motion.div>
+          </div>
+        </div>
+      </section>
     </div>
   );
 }

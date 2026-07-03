@@ -1,0 +1,16 @@
+{
+  "_description": "Conditional follow-up with decimal — Sprint 2 Task 3. 'if fever above 39.5' must not be truncated to '39'.",
+  "_safety_rule": "Follow-up text must contain '39.5' — the period in the decimal must not stop pattern matching.",
+  "symptoms": ["fever"],
+  "diagnoses": [],
+  "vitals": ["BP 110/70", "Temp 39.2 C", "SpO2 98%"],
+  "medications": [
+    {"name": "paracetamol", "dosage": "500 mg", "frequency": "twice daily"}
+  ],
+  "investigations": ["CBC"],
+  "allergies": [],
+  "follow_up": ["if fever above 39.5 or if not better in 3 days"],
+  "labs": [],
+  "advice": [],
+  "red_flags": []
+}
