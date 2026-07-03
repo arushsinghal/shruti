@@ -204,7 +204,7 @@ export default function FactsReviewEditor({ results, sessionId, onConfirm, onSki
             <span className="text-slate-300">|</span>
             <button
               onClick={() => setAddingTo(addingTo === fieldKey ? null : fieldKey)}
-              className="text-[10px] text-indigo-600 hover:text-indigo-800 font-medium"
+              className="text-[10px] text-primary hover:text-primary-dark font-medium"
             >
               + Add
             </button>
@@ -234,10 +234,10 @@ export default function FactsReviewEditor({ results, sessionId, onConfirm, onSki
               onChange={(e) => setNewItem(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && addItem(items, setItems)}
               placeholder={`Add ${title.toLowerCase()}...`}
-              className="flex-1 text-xs border border-slate-200 rounded px-2 py-1.5 focus:outline-none focus:ring-1 focus:ring-indigo-400"
+              className="flex-1 text-xs border border-slate-200 rounded px-2 py-1.5 focus:outline-none focus:ring-1 focus:ring-primary/40"
               autoFocus
             />
-            <button onClick={() => addItem(items, setItems)} className="text-xs bg-indigo-600 text-white px-3 py-1.5 rounded hover:bg-indigo-700">
+            <button onClick={() => addItem(items, setItems)} className="text-xs bg-primary text-white px-3 py-1.5 rounded hover:bg-primary-dark">
               Add
             </button>
           </div>
@@ -248,16 +248,16 @@ export default function FactsReviewEditor({ results, sessionId, onConfirm, onSki
 
   return (
     <div className="space-y-6 animate-fade-in-up">
-      <section className="bg-white border border-indigo-200 rounded-xl shadow-sm overflow-hidden">
-        <div className="px-6 py-4 bg-indigo-50 border-b border-indigo-100 flex items-center justify-between">
+      <section className="bg-white border border-primary/20 rounded-2xl shadow-sm overflow-hidden">
+        <div className="px-6 py-4 bg-primary/[0.04] border-b border-primary/10 flex items-center justify-between">
           <div>
-            <h2 className="text-sm font-bold text-indigo-900 flex items-center gap-2">
+            <h2 className="text-sm font-bold text-text-dark flex items-center gap-2">
               <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
               </svg>
               Review Extracted Facts
             </h2>
-            <p className="text-[11px] text-indigo-600 mt-0.5">Add, remove, or correct items before generating the SOAP note.</p>
+            <p className="text-[11px] text-slate-500 mt-0.5">Add, remove, or correct items before generating the SOAP note.</p>
           </div>
           <span className="text-[10px] font-bold text-amber-700 bg-amber-50 border border-amber-200 px-2 py-1 rounded-full uppercase tracking-wider">
             Needs Review
@@ -292,18 +292,18 @@ export default function FactsReviewEditor({ results, sessionId, onConfirm, onSki
                         <span className="rounded bg-slate-100 px-1.5 py-0.5 font-bold uppercase text-slate-500">{fact.category.replace('_', ' ')}</span>
                         <span className="font-semibold text-slate-800">{fact.normalized_value}</span>
                         <span className={`rounded-full px-1.5 py-0.5 font-bold uppercase ${
-                          fact.review_status === 'confirmed' ? 'bg-emerald-50 text-emerald-700' :
+                          fact.review_status === 'confirmed' ? 'bg-primary/[0.06] text-primary' :
                           fact.review_status === 'rejected' ? 'bg-red-50 text-red-700' :
                           'bg-amber-50 text-amber-700'
                         }`}>
                           {fact.review_status}
                         </span>
                         {fact.certainty !== 'affirmed' && (
-                          <span className="rounded-full bg-violet-50 px-1.5 py-0.5 font-bold uppercase text-violet-700">{fact.certainty}</span>
+                          <span className="rounded-full bg-amber-50 px-1.5 py-0.5 font-bold uppercase text-amber-700">{fact.certainty}</span>
                         )}
                         <span className="font-mono text-[10px] text-slate-400">{fact.extractor} {(fact.confidence * 100).toFixed(0)}%</span>
                         <span className={`rounded-full px-1.5 py-0.5 font-bold uppercase ${
-                          factHasProof(fact) ? 'bg-emerald-50 text-emerald-700' : 'bg-red-50 text-red-700'
+                          factHasProof(fact) ? 'bg-primary/[0.06] text-primary' : 'bg-red-50 text-red-700'
                         }`}>
                           {factHasProof(fact) ? 'proof' : 'no proof'}
                         </span>
@@ -314,10 +314,10 @@ export default function FactsReviewEditor({ results, sessionId, onConfirm, onSki
                         )}
                       </div>
                       <div className="flex gap-1">
-                        <button onClick={() => handleFactReview(fact, 'accept')} disabled={saving} className="rounded border border-emerald-200 px-2 py-1 font-semibold text-emerald-700 hover:bg-emerald-50 disabled:opacity-50">
+                        <button onClick={() => handleFactReview(fact, 'accept')} disabled={saving} className="rounded border border-primary/25 px-2 py-1 font-semibold text-primary hover:bg-primary/[0.06] disabled:opacity-50">
                           Accept
                         </button>
-                        <button onClick={() => handleFactReview(fact, 'edit')} disabled={saving} className="rounded border border-indigo-200 px-2 py-1 font-semibold text-indigo-700 hover:bg-indigo-50 disabled:opacity-50">
+                        <button onClick={() => handleFactReview(fact, 'edit')} disabled={saving} className="rounded border border-slate-300 px-2 py-1 font-semibold text-slate-600 hover:bg-slate-50 disabled:opacity-50">
                           Edit
                         </button>
                         <button onClick={() => handleFactReview(fact, 'reject')} disabled={saving} className="rounded border border-red-200 px-2 py-1 font-semibold text-red-700 hover:bg-red-50 disabled:opacity-50">
@@ -352,8 +352,8 @@ export default function FactsReviewEditor({ results, sessionId, onConfirm, onSki
           {renderTagSection('Vitals', 'vitals', vitals, setVitals, 'bg-white border-slate-200 text-slate-700')}
           {renderTagSection('Allergies', 'allergies', allergies, setAllergies, 'bg-red-50 border-red-200 text-red-700')}
           {renderTagSection('Investigations', 'investigations', investigations, setInvestigations, 'bg-blue-50 border-blue-200 text-blue-700')}
-          {renderTagSection('Diagnoses', 'diagnoses', diagnoses, setDiagnoses, 'bg-purple-50 border-purple-200 text-purple-700')}
-          {renderTagSection('Follow-up', 'follow_up', followUp, setFollowUp, 'bg-teal-50 border-teal-200 text-teal-700')}
+          {renderTagSection('Diagnoses', 'diagnoses', diagnoses, setDiagnoses, 'bg-red-50 border-red-200 text-red-700')}
+          {renderTagSection('Follow-up', 'follow_up', followUp, setFollowUp, 'bg-slate-50 border-slate-200 text-slate-600')}
 
           {/* Medications — editable table */}
           <div>
@@ -367,7 +367,7 @@ export default function FactsReviewEditor({ results, sessionId, onConfirm, onSki
                   Flag issue
                 </button>
                 <span className="text-slate-300">|</span>
-                <button onClick={addMed} className="text-[10px] text-indigo-600 hover:text-indigo-800 font-medium">
+                <button onClick={addMed} className="text-[10px] text-primary hover:text-primary-dark font-medium">
                   + Add medication
                 </button>
               </div>
@@ -375,7 +375,7 @@ export default function FactsReviewEditor({ results, sessionId, onConfirm, onSki
             {medications.length > 0 ? (
               <div className="space-y-2">
                 {medications.map((med, i) => (
-                  <div key={i} className="group flex items-center gap-2 p-2 bg-white border border-slate-200 rounded-lg hover:border-indigo-200 transition-colors">
+                  <div key={i} className="group flex items-center gap-2 p-2 bg-white border border-slate-200 rounded-lg hover:border-primary/25 transition-colors">
                     <input
                       type="text"
                       value={med.name}
@@ -395,7 +395,7 @@ export default function FactsReviewEditor({ results, sessionId, onConfirm, onSki
                       value={med.frequency}
                       onChange={(e) => updateMed(i, 'frequency', e.target.value)}
                       placeholder="Freq"
-                      className="w-16 text-xs font-semibold text-indigo-600 border-0 outline-none bg-transparent placeholder-slate-300"
+                      className="w-16 text-xs font-semibold text-primary border-0 outline-none bg-transparent placeholder-slate-300"
                     />
                     <button
                       onClick={() => removeMed(i)}
@@ -448,7 +448,7 @@ export default function FactsReviewEditor({ results, sessionId, onConfirm, onSki
         )}
 
         {feedbackSent && (
-          <div className="mx-6 mb-4 p-3 bg-emerald-50 border border-emerald-200 rounded-lg text-xs text-emerald-700 font-semibold flex items-center gap-2">
+          <div className="mx-6 mb-4 p-3 bg-primary/[0.06] border border-primary/20 rounded-lg text-xs text-primary font-semibold flex items-center gap-2">
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
             </svg>
@@ -457,7 +457,7 @@ export default function FactsReviewEditor({ results, sessionId, onConfirm, onSki
         )}
 
         {correctionToast && (
-          <div className="mx-6 mb-4 p-3 bg-emerald-50 border border-emerald-200 rounded-lg text-xs text-emerald-700 font-semibold flex items-center gap-2 animate-fade-in-up">
+          <div className="mx-6 mb-4 p-3 bg-primary/[0.06] border border-primary/20 rounded-lg text-xs text-primary font-semibold flex items-center gap-2 animate-fade-in-up">
             <svg className="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
             </svg>
@@ -476,7 +476,7 @@ export default function FactsReviewEditor({ results, sessionId, onConfirm, onSki
           <button
             onClick={handleConfirm}
             disabled={saving}
-            className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-indigo-600 to-cyan-600 hover:from-indigo-700 hover:to-cyan-700 disabled:opacity-50 text-white text-sm font-bold transition-all shadow-md"
+            className="px-6 py-2.5 rounded-xl bg-primary hover:bg-primary-dark disabled:opacity-50 text-white text-sm font-bold transition-all shadow-sm"
           >
             {saving ? 'Regenerating SOAP...' : 'Confirm & Generate SOAP Note'}
           </button>

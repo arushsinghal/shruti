@@ -75,10 +75,11 @@ export default function About() {
               <span className="text-primary">still runs on paper.</span>
             </h1>
             <p className="text-[1.1rem] md:text-[1.2rem] text-slate-500 leading-[1.7] max-w-[58ch]">
-              Lipi is the AI-native OPD platform for Indian outpatient care. A doctor speaks once,
-              and every record from that consultation — the note, the prescription, the lab orders,
-              the follow-up, and the ABDM record — lands in one place, structured and ready to sign.
-              Every clinical fact traces back to the exact sentence spoken.
+              Lipi is a research-driven AI-native healthcare services company, starting with the
+              OPD assistant for Indian clinics. A doctor speaks once, and Lipi turns that visit into
+              doctor-reviewed records, prescriptions, test orders, follow-ups, patient communication,
+              assistant tasks, and ABDM-ready documentation. Every clinical fact traces back to the
+              exact sentence spoken.
             </p>
           </motion.div>
         </section>
@@ -104,10 +105,10 @@ export default function About() {
                 on.
               </p>
               <p className="text-[15px] text-slate-600 leading-relaxed">
-                From there Lipi grows into the operating layer for the clinic: patient memory across
-                visits, referrals, coding, insurance recovery, and the government-filed records that
-                pay the clinic back. The mission is bigger than one clinic — a healthcare AI stack
-                built in India, for India, that no imported system can replace.
+                The service wedge is OPD administration. The research engine is doctor-reviewed
+                clinical traces: what was spoken, what Lipi prepared, what the doctor corrected,
+                what was sent to the patient, and what happened at follow-up. That is how a narrow
+                clinic service becomes safer, more personalized healthcare AI over time.
               </p>
             </div>
           </div>
@@ -127,9 +128,10 @@ export default function About() {
                 The research arm
               </h2>
               <p className="text-[15px] text-slate-500 leading-relaxed max-w-[54ch]">
-                Underneath the product, Lipi runs its own research: prescribing safety tuned to
-                Indian populations, Hinglish clinical NLP, and India-specific AMR intelligence.
-                It ships as product capability at the point of care — never as papers.
+                Underneath the product, Lipi studies continual learning for doctor-gated healthcare
+                AI services: prescribing safety tuned to Indian OPDs, Hinglish clinical NLP,
+                antibiotic intelligence, and follow-up/outcome memory. Research earns its place
+                only when it improves the assistant doctors use.
               </p>
             </div>
             <button

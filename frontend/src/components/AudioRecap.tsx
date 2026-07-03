@@ -89,9 +89,9 @@ export default function AudioRecap({ results, patientName }: Props) {
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
         {bullets.map((b, i) => (
-          <div key={i} className={`flex items-start gap-2.5 rounded-lg border px-3 py-2.5 ${b.color}${i === bullets.length - 1 && bullets.length % 2 !== 0 ? ' sm:col-span-2' : ''}`}>
-            <span className="text-[10px] font-bold uppercase tracking-wider opacity-70 mt-0.5 shrink-0 w-20">{b.label}</span>
-            <span className="text-xs font-semibold leading-snug">{b.value}</span>
+          <div key={i} className={`grid grid-cols-[minmax(7.75rem,auto)_1fr] items-start gap-3 rounded-lg border px-3 py-2.5 ${b.color}${i === bullets.length - 1 && bullets.length % 2 !== 0 ? ' sm:col-span-2' : ''}`}>
+            <span className="text-[10px] font-bold uppercase tracking-wider opacity-70 leading-snug break-words">{b.label}</span>
+            <span className="text-xs font-semibold leading-snug min-w-0 break-words">{b.value}</span>
           </div>
         ))}
       </div>

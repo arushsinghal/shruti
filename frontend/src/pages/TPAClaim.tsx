@@ -73,7 +73,7 @@ export default function TPAClaim() {
           <p className="text-sm text-slate-500 mt-0.5">{consultation.date}</p>
         </div>
         <div className="flex items-center gap-3">
-          <span className={`text-xs font-semibold rounded-full px-3 py-1 border ${consultation.signed ? 'bg-emerald-50 border-emerald-200 text-emerald-700' : 'bg-amber-50 border-amber-200 text-amber-700'}`}>
+          <span className={`text-xs font-semibold rounded-full px-3 py-1 border ${consultation.signed ? 'bg-primary/[0.06] border-primary/20 text-primary' : 'bg-amber-50 border-amber-200 text-amber-700'}`}>
             {consultation.signed ? '✓ Doctor Signed' : '⚠ Awaiting Signature'}
           </span>
           <button

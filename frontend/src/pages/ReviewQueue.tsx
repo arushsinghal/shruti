@@ -41,7 +41,7 @@ function SlaChip({ seconds }: { seconds: number | null }) {
   const label = mins > 0 ? `${mins}m ${secs}s` : `${secs}s`;
   const color = seconds > 300 ? 'text-red-600 bg-red-50 border-red-200'
     : seconds > 180 ? 'text-amber-600 bg-amber-50 border-amber-200'
-    : 'text-emerald-700 bg-emerald-50 border-emerald-200';
+    : 'text-primary bg-primary/[0.06] border-primary/20';
   return (
     <span className={`text-xs font-semibold rounded-full px-2 py-0.5 border ${color}`}>{label}</span>
   );
@@ -49,7 +49,7 @@ function SlaChip({ seconds }: { seconds: number | null }) {
 
 function ConfidenceBar({ score }: { score: number }) {
   const pct = Math.round(score * 100);
-  const color = score >= 0.85 ? 'bg-emerald-500' : score >= 0.70 ? 'bg-amber-400' : 'bg-red-400';
+  const color = score >= 0.85 ? 'bg-primary' : score >= 0.70 ? 'bg-amber-400' : 'bg-red-400';
   return (
     <div className="flex items-center gap-1.5">
       <div className="flex-1 bg-slate-100 rounded-full h-1.5 overflow-hidden">
@@ -129,7 +129,7 @@ export default function ReviewQueue() {
   useEffect(() => { loadQueue(); }, []);
 
   const statusBadge = (s: QueueSession) => {
-    if (s.reviewer_action === 'approved') return <span className="text-xs text-emerald-700 bg-emerald-50 border border-emerald-200 rounded-full px-2 py-0.5">Approved</span>;
+    if (s.reviewer_action === 'approved') return <span className="text-xs text-primary bg-primary/[0.06] border border-primary/20 rounded-full px-2 py-0.5">Approved</span>;
     if (s.reviewer_action === 'rejected') return <span className="text-xs text-red-700 bg-red-50 border border-red-200 rounded-full px-2 py-0.5">Rejected</span>;
     if (s.signed_at) return <span className="text-xs text-blue-700 bg-blue-50 border border-blue-200 rounded-full px-2 py-0.5">Signed</span>;
     if (s.held) return <span className="text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded-full px-2 py-0.5">Held</span>;
@@ -219,7 +219,7 @@ export default function ReviewQueue() {
                     <button
                       onClick={() => approve(selected.id)}
                       disabled={actionLoading}
-                      className="px-4 py-2 text-sm font-medium text-white bg-emerald-600 rounded-lg hover:bg-emerald-700 disabled:opacity-50"
+                      className="px-4 py-2 text-sm font-medium text-white bg-primary rounded-lg hover:bg-primary-dark disabled:opacity-50"
                     >
                       Approve & Send
                     </button>

@@ -135,8 +135,8 @@ export default function AssistantIntake() {
           className="w-full max-w-sm text-center space-y-5"
         >
           <div className="flex justify-center">
-            <div className="w-16 h-16 rounded-full bg-emerald-50 border border-emerald-200 flex items-center justify-center">
-              <CheckCircle2 className="w-8 h-8 text-emerald-500" />
+            <div className="w-16 h-16 rounded-full bg-primary/[0.06] border border-primary/20 flex items-center justify-center">
+              <CheckCircle2 className="w-8 h-8 text-primary" />
             </div>
           </div>
           <div>
@@ -289,12 +289,12 @@ export default function AssistantIntake() {
             </div>
             <div>
               <label className="block text-[12px] font-semibold text-slate-600 mb-1.5 flex items-center gap-1.5">
-                <Phone className="w-3.5 h-3.5 text-emerald-500" />
+                <Phone className="w-3.5 h-3.5 text-primary" />
                 WhatsApp number
               </label>
               <input type="tel" required value={form.patient_phone} onChange={set('patient_phone')}
                 placeholder="e.g. 9876543210 or +91…"
-                className="w-full px-4 py-2.5 border border-slate-200 rounded-xl text-[14px] outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/15 bg-slate-50 focus:bg-white transition-all placeholder:text-slate-300" />
+                className="w-full px-4 py-2.5 border border-slate-200 rounded-xl text-[14px] outline-none focus:border-primary focus:ring-2 focus:ring-primary/15 bg-slate-50 focus:bg-white transition-all placeholder:text-slate-300" />
               <p className="text-[11px] text-slate-400 mt-1">Saved once — used for prescription dispatch. Never shared.</p>
             </div>
           </div>

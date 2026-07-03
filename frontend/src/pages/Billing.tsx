@@ -58,24 +58,24 @@ export default function Billing() {
 
       <div className="max-w-lg mx-auto px-4 py-10 space-y-6">
         {/* Plan card */}
-        <div className={`rounded-2xl border p-6 ${isPaid ? 'bg-emerald-50 border-emerald-200' : 'bg-white border-slate-200'}`}>
+        <div className={`rounded-2xl border p-6 ${isPaid ? 'bg-primary/[0.05] border-primary/25' : 'bg-white border-slate-200'}`}>
           <div className="flex items-start justify-between mb-4">
             <div>
-              <span className={`text-[11px] font-bold uppercase tracking-widest ${isPaid ? 'text-emerald-600' : 'text-slate-500'}`}>
+              <span className={`text-[11px] font-bold uppercase tracking-widest ${isPaid ? 'text-primary' : 'text-slate-500'}`}>
                 {isPaid ? 'Pro Plan' : 'Free Trial'}
               </span>
               <h2 className="text-2xl font-bold text-slate-900 mt-0.5">
                 {isPaid ? '₹999 / month' : `${status?.sessions_left} sessions left`}
               </h2>
               {isPaid && status?.paid_until && (
-                <p className="text-sm text-emerald-700 mt-1">
+                <p className="text-sm text-primary mt-1">
                   Active until {new Date(status.paid_until).toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' })}
                 </p>
               )}
             </div>
-            <div className={`w-10 h-10 rounded-full flex items-center justify-center ${isPaid ? 'bg-emerald-100' : 'bg-slate-100'}`}>
+            <div className={`w-10 h-10 rounded-full flex items-center justify-center ${isPaid ? 'bg-primary/10' : 'bg-slate-100'}`}>
               {isPaid ? (
-                <svg className="w-5 h-5 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <svg className="w-5 h-5 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
                 </svg>
               ) : (
@@ -118,7 +118,7 @@ export default function Billing() {
               'Learning engine — AI improves with your practice',
             ].map(f => (
               <li key={f} className="flex items-center gap-2.5 text-sm text-slate-700">
-                <svg className="w-4 h-4 text-emerald-500 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                <svg className="w-4 h-4 text-primary flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
                 </svg>
                 {f}

@@ -33,15 +33,15 @@ function ReferralModal({ sessionId }: { sessionId: string }) {
   return (
     <>
       <button onClick={() => setOpen(true)}
-        className="border border-violet-300 hover:bg-violet-50 text-violet-700 text-xs font-semibold px-3 py-1.5 rounded transition-all flex items-center gap-1.5 cursor-pointer print:hidden">
+        className="border border-primary/30 hover:bg-primary/[0.06] text-primary text-xs font-semibold px-3 py-1.5 rounded transition-all flex items-center gap-1.5 cursor-pointer print:hidden">
         <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
           <path strokeLinecap="round" strokeLinejoin="round" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
         </svg>
         Refer
       </button>
       {open && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30">
-          <div className="bg-white rounded-2xl shadow-xl border border-slate-200 w-full max-w-md mx-4 p-6">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 p-4">
+          <div className="bg-white rounded-2xl shadow-xl border border-slate-200 w-full max-w-md max-h-[calc(100dvh-2rem)] overflow-y-auto p-6">
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-[14px] font-bold text-slate-900">Referral Letter</h3>
               <button onClick={() => setOpen(false)} className="text-slate-400 hover:text-slate-600">✕</button>
@@ -51,24 +51,24 @@ function ReferralModal({ sessionId }: { sessionId: string }) {
                 <label className="block text-[11px] font-semibold text-slate-500 mb-1">Refer to Doctor *</label>
                 <input value={toDoctor} onChange={e => setToDoctor(e.target.value)}
                   placeholder="Dr. Sharma"
-                  className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-violet-400" />
+                  className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-primary" />
               </div>
               <div>
                 <label className="block text-[11px] font-semibold text-slate-500 mb-1">Specialty</label>
                 <input value={specialty} onChange={e => setSpecialty(e.target.value)}
                   placeholder="Cardiology, Neurology…"
-                  className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-violet-400" />
+                  className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-primary" />
               </div>
               <div>
                 <label className="block text-[11px] font-semibold text-slate-500 mb-1">Reason for referral</label>
                 <textarea value={reason} onChange={e => setReason(e.target.value)}
                   rows={2} placeholder="Further evaluation of…"
-                  className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-violet-400 resize-none" />
+                  className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-primary resize-none" />
               </div>
               <div className="flex items-center gap-3">
                 {(['routine', 'urgent'] as const).map(u => (
                   <button key={u} onClick={() => setUrgency(u)}
-                    className={`px-3 py-1.5 rounded-lg text-xs font-semibold border transition-all ${urgency === u ? (u === 'urgent' ? 'bg-red-50 border-red-300 text-red-700' : 'bg-violet-50 border-violet-300 text-violet-700') : 'border-slate-200 text-slate-500'}`}>
+                    className={`px-3 py-1.5 rounded-lg text-xs font-semibold border transition-all ${urgency === u ? (u === 'urgent' ? 'bg-red-50 border-red-300 text-red-700' : 'bg-primary/[0.06] border-primary/30 text-primary') : 'border-slate-200 text-slate-500'}`}>
                     {u.charAt(0).toUpperCase() + u.slice(1)}
                   </button>
                 ))}
@@ -77,7 +77,7 @@ function ReferralModal({ sessionId }: { sessionId: string }) {
             <div className="flex gap-2 mt-5">
               <button onClick={() => setOpen(false)} className="flex-1 border border-slate-200 text-slate-600 text-sm font-semibold py-2 rounded-lg hover:bg-slate-50">Cancel</button>
               <button onClick={generate} disabled={loading || !toDoctor.trim()}
-                className="flex-1 bg-violet-600 hover:bg-violet-700 disabled:opacity-40 text-white text-sm font-semibold py-2 rounded-lg transition-all">
+                className="flex-1 bg-primary hover:bg-primary-dark disabled:opacity-40 text-white text-sm font-semibold py-2 rounded-lg transition-all">
                 {loading ? 'Generating…' : 'Download PDF'}
               </button>
             </div>
@@ -194,9 +194,9 @@ function TypewriterText({ text }: { text?: string }) {
 
 const SOAP_SECTION_COLORS: Record<string, string> = {
   'S — Subjective': 'border-l-blue-400 bg-blue-50/30',
-  'O — Objective':  'border-l-purple-400 bg-purple-50/30',
+  'O — Objective':  'border-l-slate-400 bg-slate-100/40',
   'A — Assessment': 'border-l-red-400 bg-red-50/30',
-  'P — Plan':       'border-l-green-400 bg-green-50/30',
+  'P — Plan':       'border-l-primary/60 bg-primary/[0.03]',
 };
 
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
@@ -250,13 +250,13 @@ function SOAPView({
   return (
     <div className="space-y-4">
       {/* Disclaimer */}
-      <div className="border border-emerald-200 bg-emerald-50 rounded-lg p-4 flex items-start gap-3">
-        <svg className="w-5 h-5 text-emerald-600 mt-0.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <div className="border border-primary/20 bg-primary/[0.06] rounded-lg p-4 flex items-start gap-3">
+        <svg className="w-5 h-5 text-primary mt-0.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
         </svg>
         <div>
-          <p className="text-xs font-bold text-emerald-700 uppercase tracking-wide">SOAP Clinical Note</p>
-          <p className="text-xs text-emerald-600 mt-0.5">AI-generated draft — requires physician review and co-signature before clinical use.</p>
+          <p className="text-xs font-bold text-primary uppercase tracking-wide">SOAP Clinical Note</p>
+          <p className="text-xs text-primary mt-0.5">AI-generated draft — requires physician review and co-signature before clinical use.</p>
         </div>
       </div>
 
@@ -274,7 +274,7 @@ function SOAPView({
               <textarea
                 value={editedSoap.S}
                 onChange={(e) => setEditedSoap({ ...editedSoap, S: e.target.value })}
-                className="w-full min-h-[100px] text-sm text-slate-800 bg-white border border-slate-200 rounded p-2.5 outline-none focus:border-indigo-500/50"
+                className="w-full min-h-[100px] text-sm text-slate-800 bg-white border border-slate-200 rounded p-2.5 outline-none focus:border-primary"
               />
             ) : (
               <p className="text-sm text-slate-700 leading-relaxed whitespace-pre-wrap">
@@ -287,7 +287,7 @@ function SOAPView({
               <textarea
                 value={editedSoap.O}
                 onChange={(e) => setEditedSoap({ ...editedSoap, O: e.target.value })}
-                className="w-full min-h-[100px] text-sm text-slate-800 bg-white border border-slate-200 rounded p-2.5 outline-none focus:border-indigo-500/50"
+                className="w-full min-h-[100px] text-sm text-slate-800 bg-white border border-slate-200 rounded p-2.5 outline-none focus:border-primary"
               />
             ) : (
               <p className="text-sm text-slate-700 leading-relaxed whitespace-pre-wrap">
@@ -300,7 +300,7 @@ function SOAPView({
               <textarea
                 value={editedSoap.A}
                 onChange={(e) => setEditedSoap({ ...editedSoap, A: e.target.value })}
-                className="w-full min-h-[100px] text-sm text-slate-800 bg-white border border-slate-200 rounded p-2.5 outline-none focus:border-indigo-500/50"
+                className="w-full min-h-[100px] text-sm text-slate-800 bg-white border border-slate-200 rounded p-2.5 outline-none focus:border-primary"
               />
             ) : (
               <p className="text-sm text-slate-700 leading-relaxed whitespace-pre-wrap">
@@ -313,7 +313,7 @@ function SOAPView({
               <textarea
                 value={editedSoap.P}
                 onChange={(e) => setEditedSoap({ ...editedSoap, P: e.target.value })}
-                className="w-full min-h-[100px] text-sm text-slate-800 bg-white border border-slate-200 rounded p-2.5 outline-none focus:border-indigo-500/50"
+                className="w-full min-h-[100px] text-sm text-slate-800 bg-white border border-slate-200 rounded p-2.5 outline-none focus:border-primary"
               />
             ) : (
               <p className="text-sm text-slate-700 leading-relaxed whitespace-pre-wrap">
@@ -499,17 +499,17 @@ function LegalView({ doc, session: _session }: { doc: any; session: Consultation
 
   return (
     <div className="space-y-4">
-      <div className="border border-indigo-200 bg-indigo-50 rounded-lg p-4 flex items-start gap-3">
-        <svg className="w-5 h-5 text-indigo-600 mt-0.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <div className="border border-slate-200 bg-slate-50 rounded-lg p-4 flex items-start gap-3">
+        <svg className="w-5 h-5 text-slate-500 mt-0.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 6l3 1m0 0l-3 9a5.002 5.002 0 006.001 0M6 7l3 9M6 7l6-2m6 2l3-1m-3 1l-3 9a5.002 5.002 0 006.001 0M18 7l3 9m-3-9l-6-2m0-2v2m0 16V5m0 16H9m3 0h3" />
         </svg>
         <div>
-          <p className="text-xs font-bold text-indigo-700 uppercase tracking-wide">Legal Document — Draft</p>
-          <p className="text-xs text-indigo-600 mt-0.5">AI-generated draft — requires advocate review, notarisation, and court filing.</p>
+          <p className="text-xs font-bold text-slate-700 uppercase tracking-wide">Legal Document — Draft</p>
+          <p className="text-xs text-slate-500 mt-0.5">AI-generated draft — requires advocate review, notarisation, and court filing.</p>
         </div>
       </div>
 
-      <div className="border border-indigo-100 rounded-lg bg-white p-6 text-center shadow-sm">
+      <div className="border border-slate-200 rounded-lg bg-white p-6 text-center shadow-sm">
         <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Before The</p>
         <h2 className="text-base font-bold text-slate-800">{doc.court_name}</h2>
         <p className="text-xs text-slate-500 mt-1">Case No: {doc.case_number} · {doc.date}</p>
@@ -824,16 +824,16 @@ export default function ReviewNote() {
             {mode === 'health' ? (
               <nav className="flex items-center ml-2">
                 <button
-                  onClick={() => navigate('/')}
+                  onClick={() => navigate('/dashboard')}
                   className="px-4 h-14 text-xs font-semibold text-slate-400 hover:text-slate-700 transition-colors cursor-pointer border-b-2 border-transparent"
                 >
                   DASHBOARD
                 </button>
-                <button className="px-4 h-14 text-xs font-semibold text-emerald-700 border-b-2 border-emerald-600 cursor-pointer">
+                <button className="px-4 h-14 text-xs font-semibold text-primary border-b-2 border-primary cursor-pointer">
                   FACT REVIEW
                 </button>
                 <button
-                  onClick={() => navigate('/')}
+                  onClick={() => navigate('/dashboard')}
                   className="px-4 h-14 text-xs font-semibold text-slate-400 hover:text-slate-700 transition-colors cursor-pointer border-b-2 border-transparent"
                 >
                   PATIENT LIST
@@ -904,8 +904,10 @@ export default function ReviewNote() {
                     a.download = `lipi-legal-${(id || '').slice(0, 8)}.pdf`;
                     a.click();
                     URL.revokeObjectURL(url);
-                  } catch {
-                    alert('Legal export failed — session may not be complete yet.');
+                  } catch (e: any) {
+                    const detail = e.response?.data?.detail;
+                    setInlineError(typeof detail === 'string' ? detail : 'Legal export failed. Review the note, then try again.');
+                    setTimeout(() => setInlineError(null), 5000);
                   }
                 }}
                 className="border border-slate-300 hover:bg-amber-50 hover:border-amber-300 text-slate-700 hover:text-amber-700 text-xs font-semibold px-3 py-1.5 rounded transition-all flex items-center gap-1.5 cursor-pointer print:hidden"
@@ -931,7 +933,7 @@ export default function ReviewNote() {
                     alert('Could not generate prescription.');
                   }
                 }}
-                className="border border-emerald-300 hover:bg-emerald-50 text-emerald-700 text-xs font-semibold px-3 py-1.5 rounded transition-all flex items-center gap-1.5 cursor-pointer print:hidden"
+                className="border border-primary/30 hover:bg-primary/[0.06] text-primary text-xs font-semibold px-3 py-1.5 rounded transition-all flex items-center gap-1.5 cursor-pointer print:hidden"
               >
                 <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
@@ -950,12 +952,12 @@ export default function ReviewNote() {
                 href={`/internal/tpa/${id}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="border border-emerald-300 hover:bg-emerald-50 text-emerald-700 text-xs font-semibold px-3 py-1.5 rounded transition-all flex items-center gap-1.5 print:hidden"
+                className="border border-primary/30 hover:bg-primary/[0.06] text-primary text-xs font-semibold px-3 py-1.5 rounded transition-all flex items-center gap-1.5 print:hidden"
               >
                 Insurance Claim →
               </a>
             )}
-            <span className="bg-emerald-50 text-emerald-700 border border-emerald-200 px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider">
+            <span className="bg-primary/[0.06] text-primary border border-primary/20 px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider">
               {session.status.replace(/_/g, ' ')}
             </span>
           </div>
@@ -971,7 +973,7 @@ export default function ReviewNote() {
       <main className={`${mode === 'health' ? 'max-w-7xl' : 'max-w-3xl'} mx-auto px-6 py-6`}>
 
         {/* Printable Lipi Header */}
-        <div className="hidden print:block mb-6 border-b-2 border-emerald-600 pb-4">
+        <div className="hidden print:block mb-6 border-b-2 border-primary pb-4">
           <div className="flex justify-between items-center">
             <div>
               <h1 className="text-xl font-bold text-slate-900">Lipi Health Clinical Note</h1>
@@ -1072,7 +1074,7 @@ export default function ReviewNote() {
                       <span>{pct}%</span>
                     </div>
                     <div className="h-1.5 bg-slate-100 rounded-full overflow-hidden">
-                      <div className="h-1.5 bg-emerald-500 rounded-full transition-all duration-300" style={{ width: `${pct}%` }} />
+                      <div className="h-1.5 bg-primary rounded-full transition-all duration-300" style={{ width: `${pct}%` }} />
                     </div>
                   </div>
                 );
@@ -1082,18 +1084,18 @@ export default function ReviewNote() {
               {extractedFacts.length > 0 && (() => {
                 const pending = extractedFacts.filter((f: any) => f.review_status === 'candidate');
                 const CATEGORY_META: Record<string, { label: string; border: string; badge: string; labelColor: string }> = {
-                  symptom:       { label: 'Symptom',       border: 'border-l-blue-400',   badge: 'bg-blue-50 text-blue-600 border-blue-200',     labelColor: 'text-blue-600' },
-                  vital:         { label: 'Vital',         border: 'border-l-purple-400', badge: 'bg-purple-50 text-purple-600 border-purple-200', labelColor: 'text-purple-600' },
-                  medication:    { label: 'Medication',    border: 'border-l-green-400',  badge: 'bg-green-50 text-green-700 border-green-200',   labelColor: 'text-green-700' },
-                  investigation: { label: 'Investigation', border: 'border-l-amber-400',  badge: 'bg-amber-50 text-amber-700 border-amber-200',   labelColor: 'text-amber-700' },
-                  diagnosis:     { label: 'Diagnosis',     border: 'border-l-red-400',    badge: 'bg-red-50 text-red-600 border-red-200',         labelColor: 'text-red-600' },
-                  allergy:       { label: 'Allergy',       border: 'border-l-rose-400',   badge: 'bg-rose-50 text-rose-600 border-rose-200',      labelColor: 'text-rose-600' },
-                  follow_up:     { label: 'Follow-up',     border: 'border-l-teal-400',   badge: 'bg-teal-50 text-teal-700 border-teal-200',      labelColor: 'text-teal-700' },
+                  symptom:       { label: 'Symptom',       border: 'border-l-blue-400',    badge: 'bg-blue-50 text-blue-600 border-blue-200',       labelColor: 'text-blue-600' },
+                  vital:         { label: 'Vital',         border: 'border-l-slate-400',   badge: 'bg-slate-100 text-slate-600 border-slate-300',   labelColor: 'text-slate-600' },
+                  medication:    { label: 'Medication',    border: 'border-l-primary/60',  badge: 'bg-primary/[0.06] text-primary border-primary/20', labelColor: 'text-primary' },
+                  investigation: { label: 'Investigation', border: 'border-l-amber-400',   badge: 'bg-amber-50 text-amber-700 border-amber-200',    labelColor: 'text-amber-700' },
+                  diagnosis:     { label: 'Diagnosis',     border: 'border-l-red-400',     badge: 'bg-red-50 text-red-600 border-red-200',          labelColor: 'text-red-600' },
+                  allergy:       { label: 'Allergy',       border: 'border-l-red-500',     badge: 'bg-red-100 text-red-700 border-red-300',         labelColor: 'text-red-700' },
+                  follow_up:     { label: 'Follow-up',     border: 'border-l-slate-300',   badge: 'bg-slate-50 text-slate-600 border-slate-200',    labelColor: 'text-slate-600' },
                 };
                 const DEFAULT_META = { label: 'Fact', border: 'border-l-slate-300', badge: 'bg-slate-50 text-slate-500 border-slate-200', labelColor: 'text-slate-500' };
                 if (pending.length === 0) return (
-                  <div className="text-center py-12 border border-dashed border-emerald-200 rounded-lg bg-emerald-50/30">
-                    <p className="text-sm font-semibold text-emerald-700">All facts reviewed</p>
+                  <div className="text-center py-12 border border-dashed border-primary/20 rounded-lg bg-primary/[0.03]">
+                    <p className="text-sm font-semibold text-primary">All facts reviewed</p>
                     <p className="text-xs text-slate-400 mt-1">Click "Sign & Finalize" in the sidebar to complete.</p>
                   </div>
                 );
@@ -1119,11 +1121,11 @@ export default function ReviewNote() {
                                   if (e.key === 'Enter') handleFactEdit(fact.id, editingValue);
                                   if (e.key === 'Escape') setEditingFactId(null);
                                 }}
-                                className="text-sm font-semibold text-slate-800 border-b border-slate-300 focus:border-emerald-500 outline-none bg-transparent w-full pb-0.5"
+                                className="text-sm font-semibold text-slate-800 border-b border-slate-300 focus:border-primary outline-none bg-transparent w-full pb-0.5"
                               />
                             ) : (
                               <span
-                                className="text-sm font-semibold text-slate-800 leading-snug cursor-text hover:text-emerald-700 group"
+                                className="text-sm font-semibold text-slate-800 leading-snug cursor-text hover:text-primary group"
                                 title="Click to edit"
                                 onClick={() => { setEditingFactId(fact.id); setEditingValue(fact.normalized_value); }}
                               >
@@ -1148,11 +1150,11 @@ export default function ReviewNote() {
 
                       {/* Add Fact card */}
                       {showAddFact ? (
-                        <div className="flex flex-col gap-2 pl-3 pr-3 py-3 rounded-md border border-emerald-300 border-l-4 border-l-emerald-400 bg-emerald-50/30">
+                        <div className="flex flex-col gap-2 pl-3 pr-3 py-3 rounded-md border border-primary/30 border-l-4 border-l-primary/60 bg-primary/[0.03]">
                           <select
                             value={addFactCategory}
                             onChange={e => setAddFactCategory(e.target.value)}
-                            className="text-[10px] font-bold uppercase tracking-widest bg-transparent border-none outline-none text-emerald-700 cursor-pointer"
+                            className="text-[10px] font-bold uppercase tracking-widest bg-transparent border-none outline-none text-primary cursor-pointer"
                           >
                             {Object.entries(CATEGORY_META).map(([k, v]) => (
                               <option key={k} value={k}>{v.label}</option>
@@ -1164,13 +1166,13 @@ export default function ReviewNote() {
                             onChange={e => setAddFactValue(e.target.value)}
                             onKeyDown={e => { if (e.key === 'Enter') handleAddFact(); if (e.key === 'Escape') setShowAddFact(false); }}
                             placeholder="Enter value…"
-                            className="text-sm font-semibold text-slate-800 border-b border-emerald-300 focus:border-emerald-500 outline-none bg-transparent w-full pb-0.5 placeholder:font-normal placeholder:text-slate-400"
+                            className="text-sm font-semibold text-slate-800 border-b border-primary/30 focus:border-primary outline-none bg-transparent w-full pb-0.5 placeholder:font-normal placeholder:text-slate-400"
                           />
                           <div className="flex gap-2 mt-1">
                             <button
                               onClick={handleAddFact}
                               disabled={addingFact || !addFactValue.trim()}
-                              className="text-[11px] font-bold text-white bg-emerald-600 hover:bg-emerald-700 px-2.5 py-1 rounded disabled:opacity-50 cursor-pointer"
+                              className="text-[11px] font-bold text-white bg-primary hover:bg-primary-dark px-2.5 py-1 rounded disabled:opacity-50 cursor-pointer"
                             >
                               {addingFact ? '…' : 'Add'}
                             </button>
@@ -1185,7 +1187,7 @@ export default function ReviewNote() {
                       ) : (
                         <button
                           onClick={() => setShowAddFact(true)}
-                          className="flex items-center justify-center gap-1.5 pl-3 pr-3 py-3 rounded-md border border-dashed border-slate-300 hover:border-emerald-400 hover:bg-emerald-50/30 text-slate-400 hover:text-emerald-600 text-xs font-semibold transition-colors cursor-pointer"
+                          className="flex items-center justify-center gap-1.5 pl-3 pr-3 py-3 rounded-md border border-dashed border-slate-300 hover:border-primary/50 hover:bg-primary/[0.03] text-slate-400 hover:text-primary text-xs font-semibold transition-colors cursor-pointer"
                         >
                           <span className="text-base leading-none">+</span> Add Fact
                         </button>
@@ -1212,10 +1214,10 @@ export default function ReviewNote() {
               {/* Consent audit (compact, below facts) */}
               {session.cloud_ai_consent && (
                 <div className="mt-4 border border-slate-100 rounded-lg p-3 bg-slate-50/50 text-[11px] text-slate-500 print:hidden flex items-center gap-3 flex-wrap">
-                  <svg className="w-3.5 h-3.5 text-emerald-600 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <svg className="w-3.5 h-3.5 text-primary shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
                   </svg>
-                  <span className="font-semibold text-emerald-700">Consent ✓</span>
+                  <span className="font-semibold text-primary">Consent ✓</span>
                   <span className="text-slate-400">·</span>
                   <span>Mode: {session.consent_log?.consent_mode || 'verbal'}</span>
                   <span className="text-slate-400">·</span>
@@ -1231,7 +1233,7 @@ export default function ReviewNote() {
             <div className="w-72 shrink-0 sticky top-16 print:hidden">
               {/* Patient header */}
               <div className="bg-white border border-slate-200 border-b-0 rounded-t-lg px-4 py-3 flex items-center gap-3">
-                <div className="w-9 h-9 rounded-full bg-emerald-600 flex items-center justify-center text-white text-xs font-bold shrink-0">
+                <div className="w-9 h-9 rounded-full bg-primary flex items-center justify-center text-white text-xs font-bold shrink-0">
                   {(session.patient_name || 'P').split(' ').map((n: string) => n[0]).join('').slice(0, 2).toUpperCase()}
                 </div>
                 <div>
@@ -1247,9 +1249,9 @@ export default function ReviewNote() {
                 if (!simpleSOAP) return null;
                 const sections = [
                   { key: 'S', label: 'Subjective', accent: 'border-l-blue-400',   color: 'text-blue-600' },
-                  { key: 'O', label: 'Objective',  accent: 'border-l-purple-400', color: 'text-purple-600' },
+                  { key: 'O', label: 'Objective',  accent: 'border-l-slate-400',  color: 'text-slate-600' },
                   { key: 'A', label: 'Assessment', accent: 'border-l-red-400',    color: 'text-red-600' },
-                  { key: 'P', label: 'Plan',       accent: 'border-l-green-400',  color: 'text-green-700' },
+                  { key: 'P', label: 'Plan',       accent: 'border-l-primary/60', color: 'text-primary' },
                 ];
                 return (
                   <div className="bg-white border border-slate-200 border-t-0 border-b-0 divide-y divide-slate-100">
@@ -1261,7 +1263,7 @@ export default function ReviewNote() {
                             value={(editedSoap as any)[s.key] || ''}
                             onChange={e => setEditedSoap({ ...editedSoap, [s.key]: e.target.value })}
                             rows={3}
-                            className="w-full text-[12px] text-slate-700 leading-relaxed resize-none border border-slate-200 rounded px-2 py-1.5 focus:outline-none focus:border-emerald-400 bg-slate-50"
+                            className="w-full text-[12px] text-slate-700 leading-relaxed resize-none border border-slate-200 rounded px-2 py-1.5 focus:outline-none focus:border-primary bg-slate-50"
                           />
                         ) : (
                           <p className="text-[12px] text-slate-600 leading-relaxed">{(doc as any)[s.key] || 'Not specified'}</p>
@@ -1287,7 +1289,7 @@ export default function ReviewNote() {
                 <div className="flex gap-0 border border-slate-200 border-t-0 rounded-b-lg overflow-hidden">
                   <button
                     onClick={submitFeedback}
-                    className="flex-1 bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold py-3.5 tracking-wider uppercase transition-colors cursor-pointer"
+                    className="flex-1 bg-primary hover:bg-primary-dark text-white text-xs font-bold py-3.5 tracking-wider uppercase transition-colors cursor-pointer"
                   >
                     Save Edits
                   </button>
@@ -1302,14 +1304,14 @@ export default function ReviewNote() {
                 <button
                   onClick={handleAccept}
                   disabled={feedbackSubmitted}
-                  className="w-full bg-emerald-700 hover:bg-emerald-800 disabled:bg-emerald-400 text-white text-xs font-bold py-3.5 rounded-b-lg tracking-wider uppercase transition-colors cursor-pointer"
+                  className="w-full bg-primary hover:bg-primary-dark disabled:bg-primary/50 text-white text-xs font-bold py-3.5 rounded-b-lg tracking-wider uppercase transition-colors cursor-pointer"
                 >
                   {feedbackSubmitted ? '✓ Signed' : 'Sign & Finalize'}
                 </button>
               )}
 
               {feedbackSubmitted && (
-                <p className="text-[11px] text-emerald-700 text-center mt-2">{feedbackMessage}</p>
+                <p className="text-[11px] text-primary text-center mt-2">{feedbackMessage}</p>
               )}
 
               {/* Edit / Reject links */}
@@ -1432,7 +1434,7 @@ export default function ReviewNote() {
             {/* Consent */}
             {session.cloud_ai_consent && (
               <p className="text-[10px] text-slate-500 border-t border-slate-100 pt-2">
-                <span className="font-semibold text-emerald-700">Consent ✓</span>
+                <span className="font-semibold text-primary">Consent ✓</span>
                 {' · '}Mode: {session.consent_log?.consent_mode || 'verbal'}
                 {' · '}{session.consent_log?.timestamp ? new Date(session.consent_log.timestamp).toLocaleString('en-IN', { hour12: true }) : new Date(session.created_at).toLocaleString('en-IN', { hour12: true })}
               </p>
@@ -1462,7 +1464,7 @@ export default function ReviewNote() {
                     onClick={() => toggleCategory(catKey)}
                     className={`px-3 py-1.5 rounded-full text-xs font-semibold border transition-all cursor-pointer ${
                       isSelected
-                        ? 'bg-indigo-50 border-indigo-300 text-indigo-700'
+                        ? 'bg-primary/[0.06] border-primary/30 text-primary'
                         : 'bg-white border-slate-200 text-slate-600 hover:border-slate-300'
                     }`}
                   >

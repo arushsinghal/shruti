@@ -92,8 +92,8 @@ function DocumentReadyCard({ mode, soap, onReview }: { mode: SessionMode; soap: 
     { label: 'Summary', value: soap?.A || '—' },
   ];
 
-  const accent = isFir ? 'border-stone-300 bg-stone-50' : isLegal ? 'border-indigo-200 bg-indigo-50' : 'border-slate-200 bg-slate-50';
-  const iconColor = isFir ? 'text-stone-600' : isLegal ? 'text-indigo-600' : 'text-slate-500';
+  const accent = isFir ? 'border-slate-300 bg-slate-50' : isLegal ? 'border-slate-300 bg-slate-50' : 'border-slate-200 bg-slate-50';
+  const iconColor = isFir ? 'text-slate-600' : isLegal ? 'text-slate-600' : 'text-slate-500';
   const title = isFir ? 'FIR Draft Ready' : isLegal ? 'Legal Document Draft Ready' : 'Transcript Summary Ready';
 
   return (
@@ -592,9 +592,9 @@ function AiProgressSequencer() {
                   <div className="flex flex-wrap gap-1.5">
                     {[
                       { cat: 'symptom', label: 'Symptom', color: 'text-blue-700 bg-blue-50 border-blue-200' },
-                      { cat: 'medication', label: 'Medication', color: 'text-green-700 bg-green-50 border-green-200' },
-                      { cat: 'vital', label: 'Vital', color: 'text-purple-700 bg-purple-50 border-purple-200' },
-                      { cat: 'allergy', label: 'Allergy', color: 'text-rose-700 bg-rose-50 border-rose-200' },
+                      { cat: 'medication', label: 'Medication', color: 'text-primary bg-primary/[0.07] border-primary/20' },
+                      { cat: 'vital', label: 'Vital', color: 'text-slate-700 bg-slate-100 border-slate-300' },
+                      { cat: 'allergy', label: 'Allergy', color: 'text-red-700 bg-red-50 border-red-200' },
                     ].filter(({ cat }) => entityHighlights.some(h => h.category === cat)).map(({ cat, label, color }) => (
                       <span key={cat} className={`inline-flex items-center gap-1 text-[9px] font-bold px-1.5 py-0.5 rounded-md border tracking-wide ${color}`}>
                         <span className="w-1.5 h-1.5 rounded-full bg-current" /> {label}

@@ -28,10 +28,10 @@ interface TaskMeta {
 }
 
 const TASK_META: Record<string, TaskMeta> = {
-  review_prescription:  { icon: Pill,         color: 'text-emerald-600', bg: 'bg-emerald-50 border-emerald-100', label: 'Prescription', action: 'whatsapp', cta: 'Send on WhatsApp' },
+  review_prescription:  { icon: Pill,         color: 'text-primary', bg: 'bg-primary/[0.06] border-primary/15', label: 'Prescription', action: 'whatsapp', cta: 'Send on WhatsApp' },
   order_investigations: { icon: FlaskConical,  color: 'text-blue-600',    bg: 'bg-blue-50 border-blue-100',       label: 'Lab order',     action: 'done',     cta: 'Mark dispatched' },
   follow_up:            { icon: CalendarClock, color: 'text-amber-600',   bg: 'bg-amber-50 border-amber-100',     label: 'Follow-up',     action: 'followup', cta: 'Send reminder' },
-  document_allergy:     { icon: ShieldAlert,   color: 'text-rose-600',    bg: 'bg-rose-50 border-rose-100',       label: 'Allergy',       action: 'done',     cta: 'Mark documented' },
+  document_allergy:     { icon: ShieldAlert,   color: 'text-red-600',     bg: 'bg-red-50 border-red-100',         label: 'Allergy',       action: 'done',     cta: 'Mark documented' },
 };
 
 const DEFAULT_META: TaskMeta = {
@@ -279,8 +279,8 @@ function DispatchConfirmModal({
         className="relative w-full max-w-sm bg-white rounded-2xl shadow-2xl border border-slate-100 overflow-hidden"
       >
         <div className="px-5 py-4 border-b border-slate-100 flex items-center gap-2">
-          <div className="w-7 h-7 rounded-lg bg-emerald-50 border border-emerald-100 flex items-center justify-center">
-            <svg className="w-4 h-4 text-emerald-600" viewBox="0 0 24 24" fill="currentColor">
+          <div className="w-7 h-7 rounded-lg bg-primary/[0.06] border border-primary/15 flex items-center justify-center">
+            <svg className="w-4 h-4 text-primary" viewBox="0 0 24 24" fill="currentColor">
               <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/>
               <path d="M11.854 0h-.008A11.838 11.838 0 000 11.854c0 2.652.876 5.099 2.352 7.074L.813 23.187l4.345-1.391a11.843 11.843 0 006.688 2.04h.008A11.838 11.838 0 0023.708 11.99C23.708 5.365 18.479.136 11.854 0zm0 21.666a9.835 9.835 0 01-5.031-1.381l-.36-.214-3.74 1.198 1.168-3.646-.235-.374A9.853 9.853 0 012.01 11.854c0-5.437 4.42-9.857 9.854-9.857 5.431 0 9.849 4.42 9.849 9.857 0 5.434-4.418 9.812-9.859 9.812z"/>
             </svg>
@@ -296,14 +296,14 @@ function DispatchConfirmModal({
             </div>
             <div className="flex justify-between text-slate-500">
               <span>WhatsApp</span>
-              <strong className="text-emerald-600 font-semibold">{phone}</strong>
+              <strong className="text-primary font-semibold">{phone}</strong>
             </div>
           </div>
 
-          <label className="flex items-start gap-2.5 bg-emerald-50/70 border border-emerald-100 px-3 py-2.5 rounded-xl cursor-pointer">
+          <label className="flex items-start gap-2.5 bg-primary/[0.04] border border-primary/15 px-3 py-2.5 rounded-xl cursor-pointer">
             <input type="checkbox" checked={consent} onChange={e => setConsent(e.target.checked)}
-              className="mt-0.5 h-4 w-4 accent-emerald-600 cursor-pointer" />
-            <span className="text-[12px] text-emerald-800/90 leading-relaxed">
+              className="mt-0.5 h-4 w-4 accent-primary cursor-pointer" />
+            <span className="text-[12px] text-slate-600 leading-relaxed">
               Patient consents to receiving their prescription via WhatsApp.
             </span>
           </label>
@@ -313,7 +313,7 @@ function DispatchConfirmModal({
           <button
             onClick={handleDispatch}
             disabled={loading || !consent}
-            className="w-full flex items-center justify-center gap-2 bg-emerald-600 hover:bg-emerald-500 disabled:opacity-50 text-white text-[13px] font-semibold py-2.5 rounded-xl transition-all active:scale-[0.98] cursor-pointer"
+            className="w-full flex items-center justify-center gap-2 bg-primary hover:bg-primary-dark disabled:opacity-50 text-white text-[13px] font-semibold py-2.5 rounded-xl transition-all active:scale-[0.98] cursor-pointer"
           >
             <Send className="w-3.5 h-3.5" />
             {loading ? 'Sending…' : 'Send prescription'}
@@ -483,20 +483,20 @@ export default function AssistantDashboard() {
       <main className="max-w-2xl mx-auto px-4 py-6 space-y-6">
         {/* Revenue summary card */}
         {revenue && (revenue.dhis_transactions > 0 || revenue.lab_dispatches_sent > 0 || revenue.follow_ups_sent > 0) && (
-          <div className="rounded-2xl border border-emerald-200/80 bg-emerald-50/70 px-5 py-4">
-            <p className="text-[10.5px] font-bold uppercase tracking-wider text-emerald-700/70 mb-3">This month — clinic revenue activity</p>
+          <div className="rounded-2xl border border-primary/20 bg-primary/[0.03] px-5 py-4">
+            <p className="text-[10.5px] font-bold uppercase tracking-wider text-primary/60 mb-3">This month — clinic revenue activity</p>
             <div className="grid grid-cols-3 gap-3">
               <div>
-                <p className="text-[1.35rem] font-bold text-emerald-700 leading-none">₹{(revenue.dhis_clinic_amount + revenue.dhis_dsc_amount).toLocaleString('en-IN')}</p>
-                <p className="text-[11px] text-emerald-600/70 mt-0.5">DHIS income</p>
+                <p className="text-[1.35rem] font-bold text-primary leading-none">₹{(revenue.dhis_clinic_amount + revenue.dhis_dsc_amount).toLocaleString('en-IN')}</p>
+                <p className="text-[11px] text-slate-500 mt-0.5">DHIS income</p>
               </div>
               <div>
-                <p className="text-[1.35rem] font-bold text-emerald-700 leading-none">{revenue.lab_dispatches_sent}</p>
-                <p className="text-[11px] text-emerald-600/70 mt-0.5">lab orders sent</p>
+                <p className="text-[1.35rem] font-bold text-primary leading-none">{revenue.lab_dispatches_sent}</p>
+                <p className="text-[11px] text-slate-500 mt-0.5">lab orders sent</p>
               </div>
               <div>
-                <p className="text-[1.35rem] font-bold text-emerald-700 leading-none">{revenue.follow_ups_confirmed}</p>
-                <p className="text-[11px] text-emerald-600/70 mt-0.5">appts confirmed</p>
+                <p className="text-[1.35rem] font-bold text-primary leading-none">{revenue.follow_ups_confirmed}</p>
+                <p className="text-[11px] text-slate-500 mt-0.5">appts confirmed</p>
               </div>
             </div>
           </div>
@@ -511,7 +511,7 @@ export default function AssistantDashboard() {
             </p>
           </div>
           {!loading && pending.length === 0 && done.length > 0 && (
-            <span className="flex items-center gap-1.5 text-[12px] font-semibold text-emerald-600 bg-emerald-50 border border-emerald-100 px-3 py-1.5 rounded-full">
+            <span className="flex items-center gap-1.5 text-[12px] font-semibold text-primary bg-primary/[0.06] border border-primary/15 px-3 py-1.5 rounded-full">
               <CheckCircle2 className="w-3.5 h-3.5" />
               All caught up
             </span>
@@ -684,7 +684,7 @@ function DoneCard({ task, session }: { task: AssistantTask; session?: Consultati
         <p className="text-[12px] font-medium text-slate-500 truncate">{meta.label} · {patient}</p>
         <p className="text-[11px] text-slate-400 truncate">{task.notes || detailFor(task, session)}</p>
       </div>
-      <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0" />
+      <CheckCircle2 className="w-4 h-4 text-primary shrink-0" />
     </div>
   );
 }

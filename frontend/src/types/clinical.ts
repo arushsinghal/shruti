@@ -17,9 +17,9 @@ export const MODE_LABELS: Record<SessionMode, string> = {
 };
 
 export const MODE_COLORS: Record<SessionMode, string> = {
-  health:     'bg-emerald-50 text-emerald-700 border border-emerald-200',
-  government: 'bg-stone-100 text-stone-700 border border-stone-200',
-  legal:      'bg-indigo-50 text-indigo-700 border border-indigo-200',
+  health:     'bg-primary/10 text-primary border border-primary/20',
+  government: 'bg-slate-100 text-slate-700 border border-slate-200',
+  legal:      'bg-slate-100 text-slate-700 border border-slate-200',
   general:    'bg-slate-100 text-slate-600 border border-slate-200',
 };
 

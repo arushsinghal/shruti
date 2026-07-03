@@ -14,6 +14,7 @@ import {
   FileText,
   Receipt,
   MessageSquare,
+  CalendarCheck,
   FlaskConical,
   CreditCard,
   Database,
@@ -25,6 +26,8 @@ import {
   BadgeCheck,
   FileWarning,
   Clock,
+  Send,
+  Smartphone,
 } from 'lucide-react';
 import { ProductShowcase } from '../components/ProductShowcase';
 import SupportModal from '../components/SupportModal';
@@ -192,6 +195,36 @@ const TESTIMONIALS = [
   },
 ];
 
+const WHATSAPP_MESSAGES = [
+  { from: 'lipi', text: 'Dr. Mehra has signed your prescription. Download link is valid for 24 hours.' },
+  { from: 'lipi', text: 'Tests ordered: CBC, Thyroid Panel. Investigation order and lab booking links attached.' },
+  { from: 'lipi', text: 'Follow-up due on Jul 08. Reply HAAN to confirm or NAHI to reschedule.' },
+  { from: 'patient', text: 'HAAN' },
+  { from: 'lipi', text: 'Confirmed. The clinic will hold your follow-up slot and send a reminder.' },
+  { from: 'patient', text: 'Appointment book karna hai' },
+  { from: 'lipi', text: 'Available slots: 4:30 PM, 5:00 PM, 6:15 PM. Reply 1, 2, or 3 to book.' },
+] as const;
+
+const WHATSAPP_ACTIONS = [
+  { icon: FileText, label: 'Prescriptions', detail: 'Signed Rx links sent after review' },
+  { icon: FlaskConical, label: 'Test orders', detail: 'Investigation links dispatched' },
+  { icon: Clock, label: 'Follow-ups', detail: 'Timed reminders with HAAN / NAHI replies' },
+  { icon: CalendarCheck, label: 'Appointments', detail: 'Slots, booking, reminders' },
+] as const;
+
+const SERVICE_COMPARISON = [
+  { icon: FileText, label: 'Clinical scribes', detail: 'Primarily draft the SOAP note.' },
+  { icon: Database, label: 'EMR / OPD software', detail: 'Stores data after humans enter it.' },
+  { icon: Activity, label: 'Lipi assistant', detail: 'Uses the consult to trigger records, Rx, tests, follow-ups, patient messages, ABDM, and assistant queues after doctor review.' },
+] as const;
+
+const RESEARCH_TRACKS = [
+  { icon: Cpu, label: 'Continual learning', detail: 'Doctor corrections teach clinic-specific workflows without silently changing clinical facts.' },
+  { icon: MessageSquare, label: 'Hinglish clinical speech', detail: 'Real OPD language: code-switching, negation, self-correction, Indian drug and test names.' },
+  { icon: ShieldCheck, label: 'Drug safety', detail: 'Allergy conflicts, dose ambiguity, brand-generic confusion, and patient-specific risk signals.' },
+  { icon: FlaskConical, label: 'AMR intelligence', detail: 'Antibiotic patterns, OPD diagnoses, follow-up outcomes, and stewardship signals for India.' },
+] as const;
+
 // ── Page ──────────────────────────────────────────────────────────────────────
 export default function Landing() {
   const navigate = useNavigate();
@@ -233,7 +266,7 @@ export default function Landing() {
           </button>
 
           <div className="hidden md:flex items-center gap-6">
-            {[['how', 'How it works'], ['revenue', 'Revenue'], ['languages', 'Languages']].map(([id, label]) => (
+            {[['service', 'Service'], ['how', 'How it works'], ['revenue', 'Revenue'], ['languages', 'Languages']].map(([id, label]) => (
               <a key={id} href={`#${id}`} onClick={(e) => handleNavClick(e as MouseEvent<HTMLAnchorElement>, id)}
                 className="text-[13.5px] font-medium text-slate-500 hover:text-primary transition-colors cursor-pointer">{label}</a>
             ))}
@@ -255,35 +288,36 @@ export default function Landing() {
       </motion.nav>
 
       {/* ── Hero ────────────────────────────────────────────────────── */}
-      <section className="relative min-h-[calc(100dvh-4rem)] bg-bg-warm flex items-center overflow-hidden">
-        {/* Subtle dotted backdrop + soft brand glow fill the negative space */}
-        <div className="absolute inset-0 bg-dot-fade pointer-events-none" aria-hidden />
-        <div className="absolute -top-32 -left-40 w-[620px] h-[620px] rounded-full bg-primary/[0.05] blur-[130px] pointer-events-none" aria-hidden />
-        <div className="absolute top-1/3 right-[-10%] w-[520px] h-[520px] rounded-full bg-accent/[0.05] blur-[130px] pointer-events-none" aria-hidden />
+      <section className="relative isolate min-h-[calc(100dvh-4rem)] bg-bg-warm flex items-center overflow-hidden">
+        {/* Subtle dotted backdrop + quiet institutional depth */}
+        <div className="absolute inset-0 bg-dot-fade opacity-65 pointer-events-none" aria-hidden />
+        <div className="absolute left-[-24%] top-[-30%] h-[760px] w-[760px] rounded-full bg-[radial-gradient(circle_at_center,rgba(27,94,59,0.105),rgba(27,94,59,0)_68%)] blur-[8px] pointer-events-none" aria-hidden />
+        <div className="absolute right-[-18%] top-[18%] h-[620px] w-[620px] rounded-full bg-[radial-gradient(circle_at_center,rgba(18,63,39,0.07),rgba(18,63,39,0)_70%)] blur-[10px] pointer-events-none" aria-hidden />
+        <div className="absolute inset-x-0 bottom-0 h-px bg-slate-200/70 pointer-events-none" aria-hidden />
 
-        <div className="relative max-w-7xl mx-auto px-6 w-full grid lg:grid-cols-[1fr_1.08fr] gap-10 lg:gap-12 py-20 items-center">
+        <div className="relative max-w-7xl mx-auto px-6 w-full grid lg:grid-cols-[0.95fr_1.05fr] gap-12 lg:gap-8 py-16 md:py-20 lg:py-24 items-center">
           {/* Left */}
-          <motion.div style={reduce ? {} : { y: heroY, opacity: heroOpacity }} className="max-w-[560px]">
+          <motion.div style={reduce ? {} : { y: heroY, opacity: heroOpacity }} className="max-w-[590px]">
             {/* Badge */}
             <motion.div
-              initial={reduce ? false : { opacity: 0, y: 10 }}
+              initial={reduce ? false : { opacity: 0, y: 12 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.1 }}
-              className="inline-flex items-center gap-2 bg-primary/[0.07] border border-primary/20 text-primary text-[11.5px] font-semibold px-3.5 py-1.5 rounded-full mb-8 tracking-wide"
+              transition={{ duration: 0.58, delay: 0.08, ease: [0.16, 1, 0.3, 1] as const }}
+              className="inline-flex items-center gap-2 bg-white/68 border border-primary/16 text-primary text-[11.5px] font-semibold px-3.5 py-1.5 rounded-full mb-8 tracking-wide shadow-[0_14px_36px_-28px_rgba(18,63,39,0.55)] backdrop-blur-sm"
             >
-              <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
+              <span className="w-1.5 h-1.5 rounded-full bg-primary" />
               ABDM mandated · Government pays ₹20/consult
             </motion.div>
 
             {/* Headline */}
-            <h1 className="text-[3.1rem] md:text-[4.1rem] lg:text-[5rem] leading-[0.97] tracking-[-0.035em] mb-7">
-              <RevealLine immediate delay={0.06}>
+            <h1 className="text-[3.05rem] sm:text-[3.55rem] md:text-[4.25rem] lg:text-[5.05rem] leading-[0.96] tracking-[-0.035em] mb-7">
+              <RevealLine immediate delay={0.14}>
                 <span className="block font-light text-slate-400">A doctor speaks once.</span>
               </RevealLine>
-              <RevealLine immediate delay={0.17}>
+              <RevealLine immediate delay={0.24}>
                 <span className="block font-extrabold text-primary">Every record lands</span>
               </RevealLine>
-              <RevealLine immediate delay={0.25}>
+              <RevealLine immediate delay={0.32}>
                 <span className="block font-extrabold text-primary">in one place.</span>
               </RevealLine>
             </h1>
@@ -291,40 +325,43 @@ export default function Landing() {
             <motion.p
               initial={reduce ? false : { opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.45 }}
+              transition={{ duration: 0.72, delay: 0.56, ease: [0.16, 1, 0.3, 1] as const }}
               className="text-[16px] md:text-[17px] text-slate-500 leading-relaxed mb-8 max-w-[44ch]"
             >
-              Notes, prescriptions, lab orders, and follow-ups — structured and
-              ABHA-linked automatically, the moment the consultation ends.
+              Your AI OPD assistant turns one consultation into doctor-reviewed
+              notes, prescriptions, test orders, follow-ups, patient WhatsApp
+              updates, assistant tasks, and ABDM-ready records.
             </motion.p>
 
             <motion.div
               initial={reduce ? false : { opacity: 0, y: 16 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.55, delay: 0.58 }}
+              transition={{ duration: 0.66, delay: 0.68, ease: [0.16, 1, 0.3, 1] as const }}
               className="flex flex-col sm:flex-row gap-3"
             >
               <motion.button
                 onClick={() => navigate('/dashboard')}
-                whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}
-                className="px-7 py-3.5 bg-primary hover:bg-primary-dark text-white rounded-full font-bold text-[14.5px] flex items-center justify-center gap-2 transition-colors cursor-pointer shadow-sm"
+                whileHover={reduce ? undefined : { y: -2, scale: 1.015, transition: { duration: 0.2 } }}
+                whileTap={reduce ? undefined : { scale: 0.98 }}
+                className="px-7 py-3.5 bg-primary hover:bg-primary-dark text-white rounded-full font-bold text-[14.5px] flex items-center justify-center gap-2 transition-colors cursor-pointer shadow-[0_18px_42px_-28px_rgba(18,63,39,0.8)]"
               >
                 Open Lipi <ArrowRight className="w-4 h-4" />
               </motion.button>
               <motion.button
                 onClick={() => navigate('/pricing')}
-                whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}
-                className="px-7 py-3.5 border border-slate-200 hover:border-slate-300 text-slate-600 hover:text-text-dark rounded-full font-semibold text-[14.5px] transition-all cursor-pointer"
+                whileHover={reduce ? undefined : { y: -2, scale: 1.01, transition: { duration: 0.2 } }}
+                whileTap={reduce ? undefined : { scale: 0.98 }}
+                className="px-7 py-3.5 border border-slate-200 hover:border-primary/24 bg-white/52 hover:bg-white text-slate-600 hover:text-text-dark rounded-full font-semibold text-[14.5px] transition-all cursor-pointer shadow-[0_16px_38px_-32px_rgba(18,63,39,0.45)] backdrop-blur-sm"
               >
                 See pricing
               </motion.button>
             </motion.div>
 
             <motion.div
-              initial={reduce ? false : { opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.75 }}
-              className="mt-9 flex flex-wrap items-center gap-5 text-[12px] text-slate-400 font-medium"
+              initial={reduce ? false : { opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.55, delay: 0.82, ease: [0.16, 1, 0.3, 1] as const }}
+              className="mt-9 flex flex-wrap items-center gap-x-5 gap-y-2 text-[12px] text-slate-400 font-medium"
             >
               <span className="flex items-center gap-1.5"><BadgeCheck className="w-3.5 h-3.5 text-primary/60" strokeWidth={2} /> ABDM mandated</span>
               <span className="flex items-center gap-1.5"><ShieldCheck className="w-3.5 h-3.5 text-primary/60" strokeWidth={2} /> On-shore NLP</span>
@@ -335,12 +372,66 @@ export default function Landing() {
           {/* Right: showcase */}
           <motion.div
             style={reduce ? {} : { y: showcaseY }}
-            initial={reduce ? false : { opacity: 0, y: 36, scale: 0.96 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            transition={{ duration: 0.9, delay: 0.22, ease: [0.16, 1, 0.3, 1] as const }}
+            className="relative lg:-mr-6"
           >
-            <ProductShowcase />
+            <motion.div
+              initial={reduce ? false : { opacity: 0, y: 34, scale: 0.975 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              transition={{ duration: 0.86, delay: 0.24, ease: [0.16, 1, 0.3, 1] as const }}
+            >
+              <ProductShowcase />
+            </motion.div>
           </motion.div>
+        </div>
+      </section>
+
+      {/* ── Why now: the regulatory mandate ──────────────────────────── */}
+      {/* NOTE: verify "Clause 1.3" citation against the current NMC Registered
+          Medical Practitioner (Professional Conduct) Regulations before this
+          copy goes in front of a regulator, journalist, or legal reviewer. */}
+      <section className="py-24 px-6 bg-white border-t border-slate-200/60">
+        <div className="max-w-6xl mx-auto">
+          <RevealHeading wrapClassName="mb-5" className="text-[2.4rem] md:text-[3.2rem] font-extrabold tracking-tight leading-[1.05] text-text-dark max-w-[20ch]">
+            The paperwork stopped being optional.
+          </RevealHeading>
+          <motion.p variants={fadeUp} initial={reduce ? false : 'hidden'} whileInView="visible" viewport={{ once: true }} className="text-[14.5px] text-slate-500 mb-14 leading-relaxed max-w-[64ch]">
+            Structured records, ABDM filing, and DHIS-linked payouts are no longer back-office nice-to-haves. Lipi makes compliance and revenue recovery a byproduct of the consultation, not another task after clinic hours.
+          </motion.p>
+
+          <div className="grid md:grid-cols-[1fr_1.3fr] gap-6 items-stretch">
+            <motion.div
+              variants={fadeUp} initial={reduce ? false : 'hidden'} whileInView="visible" viewport={{ once: true, amount: 0.3 }}
+              className="rounded-3xl bg-text-dark text-white p-8 space-y-5 flex flex-col justify-between"
+            >
+              <div className="space-y-4">
+                <ShieldCheck className="w-7 h-7 text-white/70" strokeWidth={1.8} />
+                <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-white/50">NMC Code of Ethics, Clause 1.3</p>
+                <p className="text-[18px] font-semibold leading-snug">
+                  Every registered doctor must maintain structured patient records and produce them within 72 hours of a request.
+                </p>
+              </div>
+              <p className="text-[13px] text-white/50 leading-relaxed">Handwritten notes and loose paper files rarely meet that bar.</p>
+            </motion.div>
+
+            <div className="space-y-5">
+              <motion.div variants={fadeUp} initial={reduce ? false : 'hidden'} whileInView="visible" viewport={{ once: true, amount: 0.3 }} transition={{ delay: 0.08 }}
+                className="rounded-3xl border border-slate-200/80 bg-white p-7 flex gap-4">
+                <div className="w-10 h-10 rounded-2xl bg-slate-100 grid place-items-center flex-shrink-0"><FileWarning className="w-5 h-5 text-slate-500" strokeWidth={1.8} /></div>
+                <div>
+                  <h3 className="text-[1.05rem] font-bold leading-snug mb-1.5">Most clinics are still manual</h3>
+                  <p className="text-[13.5px] text-slate-500 leading-relaxed">A drawer of handwritten charts can't be searched, produced on demand, reused for ABDM filing, or converted into the next patient action. The OPD needs a service layer, not another blank form.</p>
+                </div>
+              </motion.div>
+              <motion.div variants={fadeUp} initial={reduce ? false : 'hidden'} whileInView="visible" viewport={{ once: true, amount: 0.3 }} transition={{ delay: 0.16 }}
+                className="rounded-3xl border border-primary/25 bg-primary/[0.03] p-7 flex gap-4">
+                <div className="w-10 h-10 rounded-2xl bg-primary/10 grid place-items-center flex-shrink-0"><Clock className="w-5 h-5 text-primary" strokeWidth={1.8} /></div>
+                <div>
+                  <h3 className="text-[1.05rem] font-bold leading-snug mb-1.5">Lipi turns compliance into the workflow</h3>
+                  <p className="text-[13.5px] text-slate-500 leading-relaxed">The doctor speaks and reviews. Lipi prepares the structured record, prescription, investigations, follow-up, patient message, and ABDM-ready filing path around that one consultation.</p>
+                </div>
+              </motion.div>
+            </div>
+          </div>
         </div>
       </section>
 
@@ -356,7 +447,7 @@ export default function Landing() {
           {[
             { to: 71, suffix: '+', label: 'Consultations processed' },
             { to: 100, suffix: '%', label: 'Facts traced to source' },
-            { to: 10, suffix: 'h+', label: 'Weekly hours saved' },
+            { to: 30, suffix: 'h+', label: 'Weekly hours saved' },
             { to: 11, suffix: '+', label: 'Indian languages' },
           ].map((s) => (
             <motion.div key={s.label} variants={fadeUp} className="space-y-1">
@@ -367,6 +458,162 @@ export default function Landing() {
             </motion.div>
           ))}
         </motion.div>
+      </section>
+
+      {/* ── Category definition ────────────────────────────────────── */}
+      <section id="service" className="border-b border-slate-200/60 bg-bg-warm px-6 py-24">
+        <div className="mx-auto grid max-w-6xl gap-10 lg:grid-cols-[0.9fr_1.1fr] lg:items-start">
+          <div>
+            <Eyebrow>AI-native service layer</Eyebrow>
+            <RevealHeading wrapClassName="mb-5" className="max-w-[12ch] text-[2.4rem] md:text-[3.2rem] font-extrabold tracking-tight leading-[1.05] text-text-dark">
+              Scribes write notes. Lipi runs the visit.
+            </RevealHeading>
+            <motion.p
+              variants={fadeUp}
+              initial={reduce ? false : 'hidden'}
+              whileInView="visible"
+              viewport={{ once: true, amount: 0.4 }}
+              className="max-w-[54ch] text-[14.5px] leading-relaxed text-slate-500"
+            >
+              Most scribing products primarily target documentation. Most clinic
+              software waits for staff to enter data. Lipi uses the consultation
+              as the trigger for the whole OPD service: prescriptions,
+              investigations, follow-ups, patient messages, ABDM filing,
+              billing/admin tasks, and assistant queues.
+            </motion.p>
+          </div>
+
+          <motion.div
+            variants={stagger}
+            initial={reduce ? false : 'hidden'}
+            whileInView="visible"
+            viewport={{ once: true, amount: 0.25 }}
+            className="grid gap-3"
+          >
+            {SERVICE_COMPARISON.map((item, index) => {
+              const Icon = item.icon;
+              const isLipi = item.label === 'Lipi assistant';
+              return (
+                <motion.div
+                  key={item.label}
+                  variants={fadeUp}
+                  className={`grid gap-4 rounded-3xl border p-5 sm:grid-cols-[auto_1fr] sm:items-start ${isLipi ? 'border-primary/25 bg-primary/[0.045]' : 'border-slate-200/80 bg-white'}`}
+                >
+                  <div className={`grid h-10 w-10 place-items-center rounded-2xl ${isLipi ? 'bg-primary text-white' : 'bg-slate-100 text-slate-500'}`}>
+                    <Icon className="h-5 w-5" strokeWidth={1.8} />
+                  </div>
+                  <div>
+                    <p className="mb-1 flex items-center gap-2 text-[14px] font-bold text-text-dark">
+                      <span className="font-mono text-[11px] text-slate-400">0{index + 1}</span>
+                      {item.label}
+                    </p>
+                    <p className="text-[13.5px] leading-relaxed text-slate-500">{item.detail}</p>
+                  </div>
+                </motion.div>
+              );
+            })}
+          </motion.div>
+        </div>
+      </section>
+
+      {/* ── WhatsApp care automation ───────────────────────────────── */}
+      <section className="relative overflow-hidden border-b border-slate-200/60 bg-bg-warm px-6 py-24">
+        <div className="absolute right-[-18%] top-[-20%] h-[520px] w-[520px] rounded-full bg-[radial-gradient(circle_at_center,rgba(27,94,59,0.11),rgba(27,94,59,0)_70%)] blur-[10px] pointer-events-none" aria-hidden />
+        <div className="absolute left-[-22%] bottom-[-34%] h-[520px] w-[520px] rounded-full bg-[radial-gradient(circle_at_center,rgba(244,164,53,0.11),rgba(244,164,53,0)_70%)] blur-[12px] pointer-events-none" aria-hidden />
+
+        <div className="relative mx-auto grid max-w-6xl items-center gap-12 lg:grid-cols-[0.9fr_1.1fr]">
+          <div>
+            <Eyebrow>WhatsApp care automation</Eyebrow>
+            <RevealHeading wrapClassName="mb-5" className="max-w-[12ch] text-[2.4rem] md:text-[3.2rem] font-extrabold tracking-tight leading-[1.05] text-text-dark">
+              The assistant keeps the visit moving after the patient leaves.
+            </RevealHeading>
+            <motion.p
+              variants={fadeUp}
+              initial={reduce ? false : 'hidden'}
+              whileInView="visible"
+              viewport={{ once: true, amount: 0.4 }}
+              className="max-w-[50ch] text-[14.5px] leading-relaxed text-slate-500"
+            >
+              After doctor review, Lipi can send the signed prescription, test order links, follow-up reminders, and appointment booking prompts on WhatsApp. The doctor stays the clinical authority.
+            </motion.p>
+
+            <motion.div
+              variants={stagger}
+              initial={reduce ? false : 'hidden'}
+              whileInView="visible"
+              viewport={{ once: true, amount: 0.25 }}
+              className="mt-8 grid gap-3 sm:grid-cols-2"
+            >
+              {WHATSAPP_ACTIONS.map((item) => {
+                const Icon = item.icon;
+                return (
+                  <motion.div key={item.label} variants={fadeUp} className="rounded-2xl border border-slate-200/80 bg-white p-4">
+                    <div className="mb-3 grid h-9 w-9 place-items-center rounded-xl bg-primary/[0.06]">
+                      <Icon className="h-4 w-4 text-primary" strokeWidth={1.9} />
+                    </div>
+                    <p className="text-[13.5px] font-bold text-text-dark">{item.label}</p>
+                    <p className="mt-0.5 text-[12px] font-medium text-slate-400">{item.detail}</p>
+                  </motion.div>
+                );
+              })}
+            </motion.div>
+          </div>
+
+          <motion.div
+            variants={fadeUp}
+            initial={reduce ? false : 'hidden'}
+            whileInView="visible"
+            viewport={{ once: true, amount: 0.25 }}
+            className="relative mx-auto w-full max-w-[430px]"
+          >
+            <div className="rounded-[2.25rem] border border-slate-200 bg-white p-3 shadow-[0_36px_100px_-58px_rgba(18,63,39,0.72)]">
+              <div className="overflow-hidden rounded-[1.75rem] border border-slate-100 bg-[#F6FAF7]">
+                <div className="flex items-center justify-between border-b border-slate-200/70 bg-white px-4 py-3">
+                  <div className="flex items-center gap-3">
+                    <span className="grid h-9 w-9 place-items-center rounded-xl bg-primary text-sm font-bold text-white shadow-sm">श</span>
+                    <div>
+                      <p className="text-[13px] font-bold text-text-dark">Lipi on WhatsApp</p>
+                      <p className="text-[10.5px] font-semibold text-slate-400">Post-visit patient updates</p>
+                    </div>
+                  </div>
+                  <span className="flex items-center gap-1.5 rounded-full border border-primary/15 bg-primary/[0.055] px-2.5 py-1 text-[10px] font-bold text-primary">
+                    doctor signed
+                  </span>
+                </div>
+
+                <div className="space-y-2.5 px-4 py-4">
+                  {WHATSAPP_MESSAGES.map((msg, index) => {
+                    const isPatient = msg.from === 'patient';
+                    return (
+                      <motion.div
+                        key={`${msg.text}-${index}`}
+                        initial={reduce ? false : { opacity: 0, y: 8 }}
+                        whileInView={{ opacity: 1, y: 0 }}
+                        viewport={{ once: true, amount: 0.8 }}
+                        transition={{ duration: 0.42, delay: index * 0.08, ease: [0.16, 1, 0.3, 1] as const }}
+                        className={`flex ${isPatient ? 'justify-end' : 'justify-start'}`}
+                      >
+                        <div className={`max-w-[82%] rounded-2xl px-3.5 py-2.5 text-[12.5px] font-medium leading-snug shadow-sm ${isPatient ? 'rounded-br-md bg-primary text-white' : 'rounded-bl-md border border-slate-200 bg-white text-slate-600'}`}>
+                          {msg.text}
+                        </div>
+                      </motion.div>
+                    );
+                  })}
+                </div>
+
+                <div className="border-t border-slate-200/70 bg-white px-4 py-3">
+                  <div className="flex items-center gap-2 rounded-full border border-slate-200 bg-slate-50 px-3 py-2">
+                    <Smartphone className="h-4 w-4 text-slate-400" strokeWidth={1.8} />
+                    <span className="flex-1 text-[11.5px] font-semibold text-slate-400">Patient replies HAAN, NAHI, or slot number...</span>
+                    <span className="grid h-7 w-7 place-items-center rounded-full bg-primary text-white">
+                      <Send className="h-3.5 w-3.5" strokeWidth={2} />
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </motion.div>
+        </div>
       </section>
 
       {/* ── How it works ────────────────────────────────────────────── */}
@@ -430,8 +677,8 @@ export default function Landing() {
                 <div className="w-10 h-10 rounded-2xl bg-accent/10 grid place-items-center flex-shrink-0"><Activity className="w-5 h-5 text-accent-dark" strokeWidth={1.8} /></div>
                 <div>
                   <p className="text-[10.5px] font-bold uppercase tracking-[0.18em] text-slate-400 mb-1.5">Step 03</p>
-                  <h3 className="text-[1.35rem] font-bold leading-snug">Sign once. Six things happen automatically.</h3>
-                  <p className="text-[13.5px] text-slate-500 mt-1">The assistant's queue builds itself.</p>
+                  <h3 className="text-[1.35rem] font-bold leading-snug">Doctor signs once. The service keeps going.</h3>
+                  <p className="text-[13.5px] text-slate-500 mt-1">No second back-office pass. The assistant queue builds itself.</p>
                 </div>
               </div>
               <motion.div variants={stagger} initial={reduce ? false : 'hidden'} whileInView="visible" viewport={{ once: true, amount: 0.3 }} className="grid grid-cols-2 md:grid-cols-3 gap-3">
@@ -452,56 +699,6 @@ export default function Landing() {
                 })}
               </motion.div>
             </motion.div>
-          </div>
-        </div>
-      </section>
-
-      {/* ── Why now: the regulatory mandate ──────────────────────────── */}
-      {/* NOTE: verify "Clause 1.3" citation against the current NMC Registered
-          Medical Practitioner (Professional Conduct) Regulations before this
-          copy goes in front of a regulator, journalist, or legal reviewer. */}
-      <section className="py-28 px-6 bg-white border-t border-slate-200/60">
-        <div className="max-w-6xl mx-auto">
-          <RevealHeading wrapClassName="mb-5" className="text-[2.4rem] md:text-[3.2rem] font-extrabold tracking-tight leading-[1.05] text-text-dark max-w-[20ch]">
-            The paperwork stopped being optional.
-          </RevealHeading>
-          <motion.p variants={fadeUp} initial={reduce ? false : 'hidden'} whileInView="visible" viewport={{ once: true }} className="text-[14.5px] text-slate-500 mb-14 leading-relaxed max-w-[62ch]">
-            Structured medical records are a regulatory requirement now, not a courtesy. Most Indian OPD clinics still run on paper.
-          </motion.p>
-
-          <div className="grid md:grid-cols-[1fr_1.3fr] gap-6 items-stretch">
-            <motion.div
-              variants={fadeUp} initial={reduce ? false : 'hidden'} whileInView="visible" viewport={{ once: true, amount: 0.3 }}
-              className="rounded-3xl bg-text-dark text-white p-8 space-y-5 flex flex-col justify-between"
-            >
-              <div className="space-y-4">
-                <ShieldCheck className="w-7 h-7 text-white/70" strokeWidth={1.8} />
-                <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-white/50">NMC Code of Ethics, Clause 1.3</p>
-                <p className="text-[18px] font-semibold leading-snug">
-                  Every registered doctor must maintain structured patient records and produce them within 72 hours of a request.
-                </p>
-              </div>
-              <p className="text-[13px] text-white/50 leading-relaxed">Handwritten notes and loose paper files rarely meet that bar.</p>
-            </motion.div>
-
-            <div className="space-y-5">
-              <motion.div variants={fadeUp} initial={reduce ? false : 'hidden'} whileInView="visible" viewport={{ once: true, amount: 0.3 }} transition={{ delay: 0.08 }}
-                className="rounded-3xl border border-slate-200/80 bg-white p-7 flex gap-4">
-                <div className="w-10 h-10 rounded-2xl bg-slate-100 grid place-items-center flex-shrink-0"><FileWarning className="w-5 h-5 text-slate-500" strokeWidth={1.8} /></div>
-                <div>
-                  <h3 className="text-[1.05rem] font-bold leading-snug mb-1.5">Most clinics aren't ready</h3>
-                  <p className="text-[13.5px] text-slate-500 leading-relaxed">A drawer of handwritten charts can't be retrieved, searched, or produced on a 72-hour request. Adoption of structured records is still the exception in Indian OPD, not the norm.</p>
-                </div>
-              </motion.div>
-              <motion.div variants={fadeUp} initial={reduce ? false : 'hidden'} whileInView="visible" viewport={{ once: true, amount: 0.3 }} transition={{ delay: 0.16 }}
-                className="rounded-3xl border border-primary/25 bg-primary/[0.03] p-7 flex gap-4">
-                <div className="w-10 h-10 rounded-2xl bg-primary/10 grid place-items-center flex-shrink-0"><Clock className="w-5 h-5 text-primary" strokeWidth={1.8} /></div>
-                <div>
-                  <h3 className="text-[1.05rem] font-bold leading-snug mb-1.5">Enforcement is tightening, on a deadline</h3>
-                  <p className="text-[13.5px] text-slate-500 leading-relaxed">From July 2026, ABDM v3 compliance becomes mandatory for DHIS payouts. Clinics on non-compliant software don't just miss the convenience — they lose the incentive entirely, for themselves and their doctors.</p>
-                </div>
-              </motion.div>
-            </div>
           </div>
         </div>
       </section>
@@ -564,6 +761,63 @@ export default function Landing() {
                   </div>
                 ))}
               </div>
+            </motion.div>
+          </div>
+        </div>
+      </section>
+
+      {/* ── Research engine ────────────────────────────────────────── */}
+      <section className="border-t border-slate-200/60 bg-white px-6 py-28">
+        <div className="mx-auto max-w-6xl">
+          <div className="grid gap-10 lg:grid-cols-[0.9fr_1.1fr] lg:items-start">
+            <div>
+              <Eyebrow>Research engine</Eyebrow>
+              <RevealHeading wrapClassName="mb-5" className="max-w-[13ch] text-[2.4rem] md:text-[3.2rem] font-extrabold tracking-tight leading-[1.05] text-text-dark">
+                Research is the engine. Service is the product.
+              </RevealHeading>
+              <motion.p
+                variants={fadeUp}
+                initial={reduce ? false : 'hidden'}
+                whileInView="visible"
+                viewport={{ once: true, amount: 0.35 }}
+                className="max-w-[58ch] text-[14.5px] leading-relaxed text-slate-500"
+              >
+                Lipi starts with one narrow job: run the OPD back office after a
+                doctor speaks. Because every output is doctor-reviewed and
+                source-traced, that service creates the trusted clinical data
+                needed for safer healthcare AI research.
+              </motion.p>
+              <motion.button
+                variants={fadeUp}
+                initial={reduce ? false : 'hidden'}
+                whileInView="visible"
+                viewport={{ once: true, amount: 0.4 }}
+                onClick={() => navigate('/research')}
+                className="mt-7 inline-flex items-center gap-2 text-[13.5px] font-bold text-primary"
+              >
+                Read the research direction <ArrowRight className="h-4 w-4" strokeWidth={2} />
+              </motion.button>
+            </div>
+
+            <motion.div
+              variants={stagger}
+              initial={reduce ? false : 'hidden'}
+              whileInView="visible"
+              viewport={{ once: true, amount: 0.25 }}
+              className="grid gap-3 sm:grid-cols-2"
+            >
+              {RESEARCH_TRACKS.map((track) => {
+                const Icon = track.icon;
+                return (
+                  <motion.div key={track.label} variants={fadeUp} className="rounded-3xl border border-slate-200/80 bg-bg-warm p-5">
+                    <div className="mb-4 grid h-10 w-10 place-items-center rounded-2xl bg-white text-primary shadow-sm">
+                      <Icon className="h-5 w-5" strokeWidth={1.8} />
+                    </div>
+                    <p className="text-[14px] font-bold text-text-dark">{track.label}</p>
+                    <p className="mt-2 text-[13px] leading-relaxed text-slate-500">{track.detail}</p>
+                  </motion.div>
+                );
+              })}
             </motion.div>
           </div>
         </div>

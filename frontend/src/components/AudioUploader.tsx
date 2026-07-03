@@ -274,9 +274,17 @@ export default function AudioUploader({ sessionId, onTranscript, onAutoProcess, 
           ].join(' ')}
         >
           <input ref={inputRef} type="file" accept={ACCEPTED} className="hidden" onChange={(e) => handleFiles(e.target.files)} />
-          <div className="text-3xl mb-2">{file ? '🎵' : '📁'}</div>
+          <div className="mb-2 flex justify-center">
+            <svg className="w-8 h-8 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+              {file ? (
+                <path strokeLinecap="round" strokeLinejoin="round" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2z" />
+              ) : (
+                <path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5" />
+              )}
+            </svg>
+          </div>
           {file ? (
-            <p className={`text-sm font-medium ${d('text-emerald-400', 'text-green-700')}`}>{file.name}</p>
+            <p className={`text-sm font-medium ${d('text-white/85', 'text-primary')}`}>{file.name}</p>
           ) : (
             <>
               <p className={`text-sm font-medium ${d('text-slate-300', 'text-slate-700')}`}>Drop audio here, or click to browse</p>
@@ -335,8 +343,8 @@ export default function AudioUploader({ sessionId, onTranscript, onAutoProcess, 
             </div>
           )}
           {!isRecording && isAutoFlow && (
-            <div className="w-12 h-12 rounded-full border-2 border-indigo-500/40 flex items-center justify-center">
-              <svg className="w-5 h-5 text-indigo-400 animate-spin" fill="none" viewBox="0 0 24 24">
+            <div className="w-12 h-12 rounded-full border-2 border-primary/30 flex items-center justify-center">
+              <svg className="w-5 h-5 text-primary/70 animate-spin" fill="none" viewBox="0 0 24 24">
                 <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/>
                 <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
               </svg>
@@ -345,7 +353,7 @@ export default function AudioUploader({ sessionId, onTranscript, onAutoProcess, 
           {file && !isRecording && !isAutoFlow && (
             <div className="text-center">
               <div className="text-3xl mb-2">🎤</div>
-              <p className={`text-sm font-medium ${d('text-emerald-400', 'text-green-700')}`}>Recording Captured</p>
+              <p className={`text-sm font-medium ${d('text-white/85', 'text-primary')}`}>Recording Captured</p>
               <button
                 onClick={() => { setFile(null); setFromRecording(false); }}
                 className={`text-xs mt-2 underline ${d('text-slate-500 hover:text-red-400', 'text-slate-500 hover:text-red-500')}`}
@@ -381,7 +389,7 @@ export default function AudioUploader({ sessionId, onTranscript, onAutoProcess, 
       )}
 
       {status === 'transcribing' && !isAutoFlow && (
-        <div className={`flex items-center gap-2 text-sm ${d('text-indigo-400', 'text-indigo-600')}`}>
+        <div className={`flex items-center gap-2 text-sm ${d('text-white/80', 'text-primary')}`}>
           <svg className="w-4 h-4 animate-spin shrink-0" fill="none" viewBox="0 0 24 24">
             <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/>
             <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
@@ -391,7 +399,7 @@ export default function AudioUploader({ sessionId, onTranscript, onAutoProcess, 
       )}
 
       {status === 'done' && (
-        <p className={`text-sm font-medium ${d('text-emerald-400', 'text-green-600')}`}>Transcription complete.</p>
+        <p className={`text-sm font-medium ${d('text-white/85', 'text-primary')}`}>Transcription complete.</p>
       )}
 
       {/* Speech-processing trust disclosure */}

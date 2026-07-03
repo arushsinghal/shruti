@@ -2,11 +2,13 @@ import { useNavigate } from 'react-router-dom';
 import { motion, useReducedMotion } from 'framer-motion';
 import {
   ArrowRight,
+  Activity,
   FileSearch,
   FlaskConical,
   Network,
   Pill,
   Radar,
+  ShieldCheck,
 } from 'lucide-react';
 import { RESEARCH_POSTS } from '../data/researchPosts';
 
@@ -17,8 +19,31 @@ const fadeUp = {
 
 const SECONDARY_STATS = [
   { value: '80', label: 'Drug-drug interaction pairs', sublabel: 'openFDA · PubMed · India NLEM' },
-  { value: '85.2%', label: 'Hinglish clinical NLP F1', sublabel: '200-sentence benchmark · no prior work existed' },
+  { value: '85.2%', label: 'Hinglish clinical NLP F1', sublabel: 'Internal 200-sentence benchmark · deterministic rules' },
   { value: '150', label: 'Indian OPD diagnoses mapped', sublabel: '435 lookup terms · ICD-10-CM and ICD-10-WHO' },
+];
+
+const CORE_RESEARCH_TRACKS = [
+  {
+    icon: Activity,
+    title: 'Continual learning for healthcare services',
+    body: 'How an AI-native OPD assistant improves from doctor corrections, task completion, follow-up responses, and signed workflows without silently changing clinical facts.',
+  },
+  {
+    icon: Network,
+    title: 'Multilingual clinical understanding',
+    body: 'Hindi, Hinglish, English, code-switching, self-corrections, negations, Indian brand names, lab terms, and real OPD speech patterns.',
+  },
+  {
+    icon: ShieldCheck,
+    title: 'Drug safety and personalization',
+    body: 'Allergy conflicts, dose ambiguity, brand-generic confusion, repeat medication history, and doctor-gated patient-specific risk signals.',
+  },
+  {
+    icon: Radar,
+    title: 'AMR and antibiotic intelligence',
+    body: 'OPD antibiotic patterns, suspected diagnosis, follow-up outcomes, and stewardship signals for Indian primary care.',
+  },
 ];
 
 const TRACK_META: Record<string, { icon: React.ElementType; stat: string }> = {
@@ -74,13 +99,13 @@ export default function Research() {
               Applied AI research
             </div>
             <h1 className="text-[2.6rem] md:text-[3.4rem] leading-[1.02] tracking-[-0.03em] font-extrabold mb-6">
-              A frontier AI research lab.{' '}
-              <span className="text-primary">Healthcare is the problem we chose.</span>
+              Healthcare AI that learns from reviewed care,{' '}
+              <span className="text-primary">not scraped text.</span>
             </h1>
             <p className="text-[16px] md:text-[17px] text-slate-500 leading-relaxed max-w-[50ch] mb-10">
-              We work on the gaps that Western clinical AI has not had to think about: Indian
-              formularies, Indian population genetics, Hinglish medical speech, and the surveillance
-              blind spot that covers 80% of India's antibiotic prescribing.
+              Lipi is a research-driven AI-native healthcare service company. The product starts
+              with the OPD assistant; the research program studies how doctor-reviewed clinical
+              traces can make healthcare AI safer, more multilingual, and more useful over time.
             </p>
 
             {/* Featured 80pp stat — in the hero copy itself */}
@@ -94,7 +119,8 @@ export default function Research() {
               <p className="text-[12.5px] text-slate-500 leading-relaxed max-w-[46ch]">
                 ~80% of India's antibiotic consumption happens in primary care. 0% of ICMR AMRSN and
                 NCDC NARS-Net specimens come from primary-care settings. Quantified across 12
-                site-years of primary-source reports.
+                site-years of source reports. Treat this as a gap analysis, not a deployed
+                surveillance claim.
               </p>
             </div>
           </motion.div>
@@ -143,6 +169,60 @@ export default function Research() {
           </div>
         </motion.section>
 
+        {/* ── Research thesis ──────────────────────────────────────── */}
+        <section className="py-16 border-t border-slate-200/60">
+          <motion.div
+            initial={reduce ? false : 'hidden'}
+            whileInView="visible"
+            viewport={{ once: true, amount: 0.25 }}
+            variants={fadeUp}
+            className="grid lg:grid-cols-[0.85fr_1.15fr] gap-10 lg:gap-16 items-start mb-10"
+          >
+            <div>
+              <p className="text-[10.5px] font-bold uppercase tracking-widest text-primary/60 mb-3">Core AI research</p>
+              <h2 className="text-[1.9rem] md:text-[2.35rem] font-bold tracking-tight leading-[1.06] max-w-[16ch]">
+                Continual learning for doctor-gated healthcare AI services
+              </h2>
+            </div>
+            <div className="space-y-5 max-w-2xl">
+              <p className="text-[15px] text-slate-600 leading-relaxed">
+                Personalized care needs longitudinal, trustworthy clinical context. In India, that
+                context is fragmented across speech, paper, WhatsApp, prescriptions, test orders,
+                and follow-ups. Lipi's first job is to structure that reality through doctor-reviewed
+                workflows.
+              </p>
+              <p className="text-[15px] text-slate-600 leading-relaxed">
+                Once every visit is source-traced and doctor-gated, we can research safer
+                personalization: drug safety, antibiotic stewardship, follow-up risk, chronic-care
+                memory, and clinic-specific workflow learning. These are research directions, not
+                autonomous clinical claims.
+              </p>
+            </div>
+          </motion.div>
+
+          <div className="grid md:grid-cols-2 gap-5">
+            {CORE_RESEARCH_TRACKS.map((track, i) => {
+              const Icon = track.icon;
+              return (
+                <motion.div
+                  key={track.title}
+                  initial={reduce ? false : { opacity: 0, y: 18 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true, amount: 0.2 }}
+                  transition={{ duration: 0.48, delay: i * 0.06, ease: [0.16, 1, 0.3, 1] }}
+                  className="rounded-3xl border border-slate-200/80 bg-white p-7"
+                >
+                  <div className="mb-4 grid h-10 w-10 place-items-center rounded-2xl bg-primary/8">
+                    <Icon className="h-5 w-5 text-primary" strokeWidth={1.8} />
+                  </div>
+                  <h3 className="text-[16px] font-bold text-text-dark leading-snug">{track.title}</h3>
+                  <p className="mt-3 text-[13.5px] leading-relaxed text-slate-500">{track.body}</p>
+                </motion.div>
+              );
+            })}
+          </div>
+        </section>
+
         {/* ── Shipped result ───────────────────────────────────────── */}
         <motion.section
           initial={reduce ? false : 'hidden'}
@@ -154,7 +234,7 @@ export default function Research() {
           <div className="rounded-3xl border border-primary/20 bg-primary/[0.03] p-8 md:p-10">
             <p className="text-[10.5px] font-bold uppercase tracking-widest text-primary/60 mb-3">Shipped result</p>
             <h2 className="text-[1.9rem] md:text-[2.2rem] font-bold tracking-tight leading-[1.06] mb-6 max-w-[30ch]">
-              Zero-hallucination clinical documentation
+              Zero-hallucination clinical documentation is the first proof point
             </h2>
             <div className="grid lg:grid-cols-2 gap-6 max-w-4xl">
               <p className="text-[15px] text-slate-600 leading-relaxed">
@@ -186,8 +266,8 @@ export default function Research() {
               Research outcomes
             </h2>
             <p className="text-[15px] text-slate-500 leading-relaxed max-w-[52ch]">
-              Completed work with full source citations and gap audits — ready to wire into the
-              clinical pipeline.
+              Completed and in-progress work with source citations, gap audits, and explicit
+              product-readiness boundaries.
             </p>
           </motion.div>
 

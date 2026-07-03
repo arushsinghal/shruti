@@ -48,7 +48,7 @@ function IcdBadge({ code }: { code?: string }) {
 function SpecialtyBadge({ specialty }: { specialty: string }) {
   if (!specialty) return null;
   return (
-    <span className="bg-indigo-50 text-indigo-700 text-[10px] font-semibold px-2 py-0.5 rounded border border-indigo-100">
+    <span className="bg-primary/[0.06] text-primary text-[10px] font-semibold px-2 py-0.5 rounded border border-primary/15">
       {specialty.replace(/_/g, ' ')}
     </span>
   );
@@ -240,7 +240,7 @@ export default function PatientTimeline() {
             >
               <div className="px-6 py-4 bg-slate-50 border-b border-slate-200 flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 bg-gradient-to-br from-indigo-600 to-cyan-500 rounded-full flex items-center justify-center shadow-sm">
+                  <div className="w-10 h-10 bg-primary rounded-full flex items-center justify-center shadow-sm">
                     <span className="font-bold text-white text-sm">
                       {timeline.patient_name.charAt(0).toUpperCase()}
                     </span>
@@ -337,10 +337,10 @@ export default function PatientTimeline() {
                       const isNormal = systolic < 120 && diastolic < 80;
                       return (
                         <div key={i} className="flex flex-col items-center min-w-[60px]">
-                          <span className={`text-sm font-bold ${isElevated ? 'text-red-600' : isNormal ? 'text-emerald-600' : 'text-amber-600'}`}>
+                          <span className={`text-sm font-bold ${isElevated ? 'text-red-600' : isNormal ? 'text-primary' : 'text-amber-600'}`}>
                             {reading.bp}
                           </span>
-                          <div className={`w-2 rounded-full mt-1 ${isElevated ? 'bg-red-400' : isNormal ? 'bg-emerald-400' : 'bg-amber-400'}`}
+                          <div className={`w-2 rounded-full mt-1 ${isElevated ? 'bg-red-400' : isNormal ? 'bg-primary/70' : 'bg-amber-400'}`}
                             style={{ height: `${Math.max(20, (systolic - 80) * 0.6)}px` }}
                           ></div>
                           <span className="text-[10px] text-slate-400 mt-1 whitespace-nowrap">{reading.date}</span>
@@ -360,7 +360,7 @@ export default function PatientTimeline() {
                   </div>
                   <div className="flex gap-4 mt-3 text-[10px] text-slate-400">
                     <span className="flex items-center gap-1">
-                      <span className="w-2 h-2 rounded-full bg-emerald-400"></span>
+                      <span className="w-2 h-2 rounded-full bg-primary/70"></span>
                       Normal (&lt;120/80)
                     </span>
                     <span className="flex items-center gap-1">
@@ -515,7 +515,7 @@ export default function PatientTimeline() {
                                 <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Investigations</p>
                                 <div className="flex flex-wrap gap-1.5">
                                   {visit.investigations.map((inv, j) => (
-                                    <span key={j} className="bg-cyan-50 text-cyan-700 text-[11px] font-medium px-2 py-0.5 rounded border border-cyan-100">
+                                    <span key={j} className="bg-slate-50 text-slate-600 text-[11px] font-medium px-2 py-0.5 rounded border border-slate-200">
                                       {inv}
                                     </span>
                                   ))}

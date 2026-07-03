@@ -74,11 +74,11 @@ const MODE_ICONS: Record<SessionMode, React.ReactNode> = {
 const MODE_DESCS: Record<SessionMode, string> = {
   health:     'Doctor-patient consultation → SOAP note',
   government: 'Special workflow',
-  legal:      'Special workflow',
+  legal:      'Legal dictation → structured draft document',
   general:    'Any audio → Transcript + summary',
 };
 
-const AVAILABLE_MODES: SessionMode[] = ['health', 'general'];
+const AVAILABLE_MODES: SessionMode[] = ['health', 'legal', 'general'];
 
 export default function Dashboard() {
   const navigate = useNavigate();
@@ -247,7 +247,7 @@ export default function Dashboard() {
             <div className="bg-slate-50 rounded-xl p-4 mb-5 space-y-2 text-sm">
               {['Unlimited sessions', 'All document types (Rx, Referral, TPA)', 'WhatsApp intake', 'AI learning engine'].map(f => (
                 <div key={f} className="flex items-center gap-2 text-slate-700">
-                  <svg className="w-4 h-4 text-emerald-500 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                  <svg className="w-4 h-4 text-primary flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
                     <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
                   </svg>
                   {f}
@@ -278,15 +278,14 @@ export default function Dashboard() {
       <header className="border-b border-slate-200/80 sticky top-0 bg-white/85 backdrop-blur-md z-20">
         <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
           <div className="flex items-center gap-5">
-            <button onClick={() => navigate('/')} className="flex items-center gap-2.5 group cursor-pointer">
-              <span className="grid place-items-center w-8 h-8 rounded-xl bg-primary/10 text-primary font-bold text-base group-hover:bg-primary/15 transition-colors">श</span>
+            <button onClick={() => navigate('/dashboard')} className="flex items-center gap-2.5 group cursor-pointer">
+              <span className="grid place-items-center w-8 h-8 rounded-xl bg-primary text-white font-bold text-sm shadow-sm group-hover:scale-105 transition-transform">श</span>
               <span className="text-[15px] font-bold tracking-tight text-text-dark">Lipi</span>
             </button>
             <div className="h-5 w-px bg-slate-200 hidden md:block" />
             <nav className="hidden md:flex items-center gap-0.5">
               <button onClick={() => navigate('/analytics')} className={navLinkCls}>Overview</button>
               <button onClick={() => navigate('/appointments')} className={navLinkCls}>Appointments</button>
-              <button onClick={() => navigate('/about')} className={navLinkCls}>Methodology</button>
               <button onClick={() => navigate('/internal/review-queue')} className={navLinkCls}>Review Queue</button>
               <button onClick={() => navigate('/internal/ops')} className={navLinkCls}>Ops</button>
               <button onClick={() => navigate('/internal/invoices')} className={navLinkCls}>Invoices</button>
@@ -361,7 +360,7 @@ export default function Dashboard() {
                         } catch { alert('Could not generate OPD Register PDF.'); }
                       }}
                       title="Download today's OPD register as an MCI-format PDF"
-                      className="w-full text-left px-3 py-2 text-[13px] font-medium text-slate-600 hover:bg-slate-50 hover:text-violet-700 transition-colors cursor-pointer"
+                      className="w-full text-left px-3 py-2 text-[13px] font-medium text-slate-600 hover:bg-slate-50 hover:text-primary transition-colors cursor-pointer"
                     >
                       Export as PDF
                     </button>
@@ -471,64 +470,64 @@ export default function Dashboard() {
               onClick={e => { e.stopPropagation(); navigate('/billing'); }}
               className="flex-shrink-0 bg-primary hover:bg-primary-dark text-white text-[12px] font-bold px-4 py-2 rounded-lg transition-all whitespace-nowrap"
             >
-              Upgrade ₹999/mo
+              Upgrade ₹{billing.price_rupees}/mo
             </button>
           </div>
         )}
 
         {/* ── Revenue strip ─────────────────────────────────────── */}
         {revenue && (
-          <div className="mb-8 grid grid-cols-3 rounded-2xl border border-emerald-200/80 bg-emerald-50/60 overflow-hidden divide-x divide-emerald-200/60">
+          <div className="mb-8 grid grid-cols-3 rounded-2xl border border-primary/20 bg-primary/[0.03] overflow-hidden divide-x divide-primary/10">
             <div className="px-5 py-3.5">
-              <p className="text-[10.5px] font-bold uppercase tracking-wider text-emerald-700/70">DHIS income this month</p>
-              <p className="mt-1 text-[1.6rem] font-bold tracking-tight text-emerald-700 leading-none">
+              <p className="text-[10.5px] font-bold uppercase tracking-wider text-primary/60">DHIS income this month</p>
+              <p className="mt-1 text-[1.6rem] font-bold tracking-tight text-primary leading-none">
                 ₹{(revenue.dhis_clinic_amount + revenue.dhis_dsc_amount).toLocaleString('en-IN')}
               </p>
-              <p className="text-[11px] text-emerald-600/70 mt-0.5">{revenue.dhis_transactions} records filed</p>
+              <p className="text-[11px] text-slate-500 mt-0.5">{revenue.dhis_transactions} records filed</p>
             </div>
             <div className="px-5 py-3.5">
-              <p className="text-[10.5px] font-bold uppercase tracking-wider text-emerald-700/70">Lab orders sent</p>
-              <p className="mt-1 text-[1.6rem] font-bold tracking-tight text-emerald-700 leading-none">{revenue.lab_dispatches_sent}</p>
-              <p className="text-[11px] text-emerald-600/70 mt-0.5">to patients this month</p>
+              <p className="text-[10.5px] font-bold uppercase tracking-wider text-primary/60">Lab orders sent</p>
+              <p className="mt-1 text-[1.6rem] font-bold tracking-tight text-primary leading-none">{revenue.lab_dispatches_sent}</p>
+              <p className="text-[11px] text-slate-500 mt-0.5">to patients this month</p>
             </div>
             <div className="px-5 py-3.5">
-              <p className="text-[10.5px] font-bold uppercase tracking-wider text-emerald-700/70">Follow-ups confirmed</p>
-              <p className="mt-1 text-[1.6rem] font-bold tracking-tight text-emerald-700 leading-none">{revenue.follow_ups_confirmed}</p>
-              <p className="text-[11px] text-emerald-600/70 mt-0.5">{revenue.follow_ups_sent} reminders sent</p>
+              <p className="text-[10.5px] font-bold uppercase tracking-wider text-primary/60">Follow-ups confirmed</p>
+              <p className="mt-1 text-[1.6rem] font-bold tracking-tight text-primary leading-none">{revenue.follow_ups_confirmed}</p>
+              <p className="text-[11px] text-slate-500 mt-0.5">{revenue.follow_ups_sent} reminders sent</p>
             </div>
           </div>
         )}
 
         {/* ── Per-doctor learning counter ───────────────────────── */}
         {learningStats && learningStats.total_learned > 0 && (
-          <div className="mb-8 grid grid-cols-3 rounded-2xl border border-violet-200/80 bg-violet-50/50 overflow-hidden divide-x divide-violet-200/60">
+          <div className="mb-8 grid grid-cols-3 rounded-2xl border border-slate-200/70 bg-white shadow-sm overflow-hidden divide-x divide-slate-100">
             <div className="px-5 py-3.5">
-              <p className="text-[10.5px] font-bold uppercase tracking-wider text-violet-700/70">Patterns learned</p>
-              <p className="mt-1 text-[1.6rem] font-bold tracking-tight text-violet-700 leading-none">{learningStats.total_learned}</p>
-              <p className="text-[11px] text-violet-600/70 mt-0.5">from your corrections</p>
+              <p className="text-[10.5px] font-bold uppercase tracking-wider text-slate-400">Patterns learned</p>
+              <p className="mt-1 text-[1.6rem] font-bold tracking-tight text-text-dark leading-none">{learningStats.total_learned}</p>
+              <p className="text-[11px] text-slate-500 mt-0.5">from your corrections</p>
             </div>
             <div className="px-5 py-3.5">
-              <p className="text-[10.5px] font-bold uppercase tracking-wider text-violet-700/70">Accuracy</p>
-              <p className="mt-1 text-[1.6rem] font-bold tracking-tight text-violet-700 leading-none">{learningStats.accuracy_pct}%</p>
-              <p className="text-[11px] text-violet-600/70 mt-0.5">confirm vs reject rate</p>
+              <p className="text-[10.5px] font-bold uppercase tracking-wider text-slate-400">Accuracy</p>
+              <p className="mt-1 text-[1.6rem] font-bold tracking-tight text-text-dark leading-none">{learningStats.accuracy_pct}%</p>
+              <p className="text-[11px] text-slate-500 mt-0.5">confirm vs reject rate</p>
             </div>
             <div className="px-5 py-3.5">
-              <p className="text-[10.5px] font-bold uppercase tracking-wider text-violet-700/70">Promoted globally</p>
-              <p className="mt-1 text-[1.6rem] font-bold tracking-tight text-violet-700 leading-none">{learningStats.promoted_to_global}</p>
-              <p className="text-[11px] text-violet-600/70 mt-0.5">shared across all doctors</p>
+              <p className="text-[10.5px] font-bold uppercase tracking-wider text-slate-400">Promoted globally</p>
+              <p className="mt-1 text-[1.6rem] font-bold tracking-tight text-text-dark leading-none">{learningStats.promoted_to_global}</p>
+              <p className="text-[11px] text-slate-500 mt-0.5">shared across all doctors</p>
             </div>
           </div>
         )}
 
         {error && (
-          <div className="mb-6 rounded-xl bg-red-50 text-alert-critical px-4 py-3 text-sm border border-red-100">
+          <div className="mb-6 rounded-2xl bg-red-50 text-alert-critical px-4 py-3 text-sm border border-red-100">
             {error}
           </div>
         )}
 
         {/* ── Invite assistant strip (always visible) ──────────── */}
         {inviteCode && (
-          <div className="mb-6 rounded-xl border border-slate-200/80 bg-white shadow-sm overflow-hidden">
+          <div className="mb-6 rounded-2xl border border-slate-200/80 bg-white shadow-sm overflow-hidden">
             <div className="px-5 py-4">
               <div className="flex items-center gap-2.5 mb-3">
                 <div className="w-7 h-7 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
@@ -588,7 +587,7 @@ export default function Dashboard() {
               </div>
               <div className="grid gap-3 sm:grid-cols-2">
                 {waiting.map(s => (
-                  <div key={s.id} className="bg-amber-50 border border-amber-200/70 rounded-xl p-4 flex items-start gap-3">
+                  <div key={s.id} className="bg-amber-50 border border-amber-200/70 rounded-2xl p-4 flex items-start gap-3">
                     <div className="w-9 h-9 rounded-xl bg-amber-100 border border-amber-200 flex items-center justify-center shrink-0">
                       <svg className="w-4.5 h-4.5 text-amber-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                         <path strokeLinecap="round" strokeLinejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
@@ -600,7 +599,7 @@ export default function Dashboard() {
                         {s.patient_age && <span className="text-[11px] text-slate-500">{s.patient_age}y</span>}
                         {s.patient_sex && <span className="text-[11px] text-slate-500">{s.patient_sex}</span>}
                         {s.patient_phone && (
-                          <span className="text-[11px] text-emerald-600 font-medium flex items-center gap-0.5">
+                          <span className="text-[11px] text-primary font-medium flex items-center gap-0.5">
                             <svg className="w-3 h-3" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413z"/></svg>
                             {s.patient_phone}
                           </span>
@@ -910,7 +909,7 @@ export default function Dashboard() {
 
             {/* Mode tabs — compact horizontal */}
             <div className="px-6 pb-4">
-              <div className="grid grid-cols-2 gap-1.5 bg-slate-100 p-1 rounded-xl">
+              <div className="grid grid-cols-3 gap-1.5 bg-slate-100 p-1 rounded-xl">
                 {AVAILABLE_MODES.map((mode) => (
                   <button
                     key={mode}
@@ -925,7 +924,7 @@ export default function Dashboard() {
                       {MODE_ICONS[mode]}
                     </span>
                     <span className={`text-[10px] font-bold leading-tight ${selectedMode === mode ? 'text-primary' : 'text-slate-500'}`}>
-                      {mode === 'health' ? 'Health' : 'General'}
+                      {mode === 'health' ? 'Health' : mode === 'legal' ? 'Legal' : 'General'}
                     </span>
                   </button>
                 ))}

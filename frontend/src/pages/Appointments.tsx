@@ -235,7 +235,7 @@ export default function Appointments() {
                       {a.chief_complaint && <p className="text-[11.5px] text-slate-400 mt-0.5">{a.chief_complaint}</p>}
                     </div>
                     <span className={`text-[10.5px] font-bold uppercase tracking-wider px-2 py-1 rounded-full shrink-0 ${
-                      a.status === 'confirmed' ? 'bg-emerald-50 text-emerald-700 border border-emerald-100' : 'bg-slate-100 text-slate-500 border border-slate-200'
+                      a.status === 'confirmed' ? 'bg-primary/[0.06] text-primary border border-primary/15' : 'bg-slate-100 text-slate-500 border border-slate-200'
                     }`}>
                       {a.status}
                     </span>

@@ -4,12 +4,12 @@ import { getAuditLogs, type AuditLogEntry } from '../lib/api';
 
 const EVENT_LABELS: Record<string, { label: string; color: string }> = {
   data_accessed: { label: 'Data Accessed', color: 'bg-blue-50 text-blue-700 border-blue-200' },
-  session_created: { label: 'Session Created', color: 'bg-emerald-50 text-emerald-700 border-emerald-200' },
+  session_created: { label: 'Session Created', color: 'bg-primary/[0.06] text-primary border-primary/20' },
   session_deleted: { label: 'Session Deleted', color: 'bg-red-50 text-red-700 border-red-200' },
   consent_granted: { label: 'Consent Given', color: 'bg-amber-50 text-amber-700 border-amber-200' },
-  phi_erased: { label: 'PHI Erased', color: 'bg-purple-50 text-purple-700 border-purple-200' },
-  prescription_viewed: { label: 'Rx Viewed', color: 'bg-cyan-50 text-cyan-700 border-cyan-200' },
-  fhir_exported: { label: 'FHIR Export', color: 'bg-indigo-50 text-indigo-700 border-indigo-200' },
+  phi_erased: { label: 'PHI Erased', color: 'bg-slate-100 text-slate-700 border-slate-300' },
+  prescription_viewed: { label: 'Rx Viewed', color: 'bg-blue-50 text-blue-700 border-blue-200' },
+  fhir_exported: { label: 'FHIR Export', color: 'bg-blue-50 text-blue-700 border-blue-200' },
 };
 
 function formatTs(ts: string): string {
@@ -44,7 +44,7 @@ export default function AuditLogs() {
       <header className="border-b border-slate-200/80 sticky top-0 bg-white/90 backdrop-blur-md z-10 shadow-sm">
         <div className="max-w-5xl mx-auto px-3 sm:px-6 h-14 flex items-center justify-between">
           <div className="flex items-center gap-2 sm:gap-4">
-            <button onClick={() => navigate('/dashboard')} className="text-slate-500 hover:text-indigo-600 transition-colors flex items-center text-xs font-semibold cursor-pointer">
+            <button onClick={() => navigate('/dashboard')} className="text-slate-500 hover:text-primary transition-colors flex items-center text-xs font-semibold cursor-pointer">
               <svg className="w-4 h-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
               </svg>
@@ -52,10 +52,10 @@ export default function AuditLogs() {
             </button>
             <div className="h-4 w-px bg-slate-200" />
             <div className="flex items-center gap-2">
-              <div className="w-6 h-6 bg-gradient-to-br from-indigo-600 to-cyan-500 rounded-md flex items-center justify-center shadow-sm">
+              <div className="w-6 h-6 bg-primary rounded-md flex items-center justify-center shadow-sm">
                 <span className="font-bold text-white text-[10px]">श</span>
               </div>
-              <span className="text-sm font-bold bg-clip-text text-transparent bg-gradient-to-r from-indigo-700 to-cyan-700">Lipi</span>
+              <span className="text-sm font-bold text-text-dark tracking-tight">Lipi</span>
             </div>
             <div className="h-4 w-px bg-slate-200" />
             <h1 className="text-sm font-bold text-slate-800">Audit Trail</h1>
@@ -73,7 +73,7 @@ export default function AuditLogs() {
 
         {loading ? (
           <div className="flex items-center justify-center py-20">
-            <svg className="animate-spin h-6 w-6 text-indigo-400" fill="none" viewBox="0 0 24 24">
+            <svg className="animate-spin h-6 w-6 text-primary/50" fill="none" viewBox="0 0 24 24">
               <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
               <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
             </svg>
@@ -122,7 +122,7 @@ export default function AuditLogs() {
                 <button
                   onClick={() => setPage(p => Math.max(0, p - 1))}
                   disabled={page === 0}
-                  className="text-xs font-semibold text-indigo-600 hover:text-indigo-800 disabled:text-slate-300 disabled:cursor-not-allowed"
+                  className="text-xs font-semibold text-primary hover:text-primary-dark disabled:text-slate-300 disabled:cursor-not-allowed"
                 >
                   Previous
                 </button>
@@ -130,7 +130,7 @@ export default function AuditLogs() {
                 <button
                   onClick={() => setPage(p => Math.min(totalPages - 1, p + 1))}
                   disabled={page >= totalPages - 1}
-                  className="text-xs font-semibold text-indigo-600 hover:text-indigo-800 disabled:text-slate-300 disabled:cursor-not-allowed"
+                  className="text-xs font-semibold text-primary hover:text-primary-dark disabled:text-slate-300 disabled:cursor-not-allowed"
                 >
                   Next
                 </button>

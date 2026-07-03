@@ -115,7 +115,7 @@ export default function DoctorProfilePage() {
           <div className="flex items-center gap-4">
             <button
               onClick={() => navigate('/dashboard')}
-              className="text-slate-500 hover:text-indigo-600 transition-colors flex items-center text-xs font-semibold cursor-pointer"
+              className="text-slate-500 hover:text-primary transition-colors flex items-center text-xs font-semibold cursor-pointer"
             >
               <svg className="w-4 h-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
@@ -124,10 +124,10 @@ export default function DoctorProfilePage() {
             </button>
             <div className="h-4 w-px bg-slate-200" />
             <div className="flex items-center gap-2">
-              <div className="w-6 h-6 bg-gradient-to-br from-indigo-600 to-cyan-500 rounded-md flex items-center justify-center shadow-sm">
+              <div className="w-6 h-6 bg-primary rounded-md flex items-center justify-center shadow-sm">
                 <span className="font-bold text-white text-[10px]">श</span>
               </div>
-              <span className="text-sm font-bold bg-clip-text text-transparent bg-gradient-to-r from-indigo-700 to-cyan-700">Lipi</span>
+              <span className="text-sm font-bold text-text-dark tracking-tight">Lipi</span>
             </div>
             <div className="h-4 w-px bg-slate-200" />
             <h1 className="text-sm font-bold text-slate-800">Doctor Profile</h1>
@@ -136,7 +136,7 @@ export default function DoctorProfilePage() {
       </header>
 
       <main className="max-w-3xl mx-auto px-6 py-10">
-        <div className="border border-indigo-100 rounded-2xl bg-white shadow-sm p-8">
+        <div className="border border-slate-200/80 rounded-2xl bg-white shadow-sm p-8">
           <div className="mb-6">
             <h2 className="text-lg font-bold text-slate-800">Your clinical profile</h2>
             <p className="text-xs text-slate-500 mt-1">This information appears on printed prescriptions. Stored locally on this device only.</p>
@@ -243,7 +243,7 @@ export default function DoctorProfilePage() {
                 <button
                   type="button"
                   onClick={saveAvailability}
-                  className="px-4 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold transition-all"
+                  className="px-4 py-2 rounded-lg bg-primary hover:bg-primary-dark text-white text-xs font-bold transition-all"
                 >
                   {availSaved ? '✓ Saved' : 'Save Schedule'}
                 </button>
@@ -290,12 +290,12 @@ export default function DoctorProfilePage() {
               <button
                 type="submit"
                 disabled={saving}
-                className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-indigo-600 to-cyan-600 hover:from-indigo-700 hover:to-cyan-700 disabled:opacity-50 text-white text-sm font-bold transition-all shadow-md cursor-pointer"
+                className="px-6 py-2.5 rounded-xl bg-primary hover:bg-primary-dark disabled:opacity-50 text-white text-sm font-bold transition-all shadow-sm cursor-pointer"
               >
                 {saving ? 'Saving…' : 'Save Profile'}
               </button>
               {saved && (
-                <span className="text-xs text-emerald-600 font-bold flex items-center gap-1.5">
+                <span className="text-xs text-primary font-bold flex items-center gap-1.5">
                   <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
                   </svg>

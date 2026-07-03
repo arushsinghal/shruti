@@ -56,7 +56,7 @@ export default function ReferralLetter({ results, patientName, doctorName, abhaN
     <>
       <button
         onClick={() => setOpen(true)}
-        className="flex items-center gap-1.5 text-xs font-medium text-indigo-700 hover:text-indigo-900 border border-indigo-200 hover:border-indigo-400 bg-indigo-50 hover:bg-indigo-100 rounded px-3 py-1.5 transition-all"
+        className="flex items-center gap-1.5 text-xs font-medium text-slate-600 hover:text-primary border border-slate-200 hover:border-primary/30 bg-white hover:bg-primary/[0.04] rounded px-3 py-1.5 transition-all"
         title="Generate Referral Letter"
       >
         <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -98,7 +98,7 @@ export default function ReferralLetter({ results, patientName, doctorName, abhaN
               </button>
               <button
                 onClick={handlePrintClick}
-                className="px-5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold rounded-lg transition-all shadow-sm"
+                className="px-5 py-2 bg-primary hover:bg-primary-dark text-white text-sm font-semibold rounded-lg transition-all shadow-sm"
               >
                 Print Letter →
               </button>

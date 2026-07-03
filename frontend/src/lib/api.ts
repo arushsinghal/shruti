@@ -44,6 +44,38 @@ client.interceptors.request.use((config) => {
   return config;
 });
 
+client.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    const status = error?.response?.status;
+    const detail = error?.response?.data?.detail;
+    const isAuthFailure =
+      status === 401 && (detail === 'Could not validate credentials' || detail === 'Not authenticated');
+
+    if (isAuthFailure) {
+      localStorage.removeItem('token');
+      localStorage.removeItem('user');
+      const publicPath =
+        window.location.pathname === '/' ||
+        window.location.pathname.startsWith('/login') ||
+        window.location.pathname.startsWith('/register') ||
+        window.location.pathname.startsWith('/signup') ||
+        window.location.pathname.startsWith('/pricing') ||
+        window.location.pathname.startsWith('/about') ||
+        window.location.pathname.startsWith('/research') ||
+        window.location.pathname.startsWith('/privacy') ||
+        window.location.pathname.startsWith('/p/') ||
+        window.location.pathname.startsWith('/sign/') ||
+        window.location.pathname.startsWith('/pre-visit/');
+      if (!publicPath) {
+        window.location.assign('/login');
+      }
+    }
+
+    return Promise.reject(error);
+  },
+);
+
 export default client;
 
 export async function createSession(data: CreateSessionRequest = {}): Promise<ConsultationSession> {

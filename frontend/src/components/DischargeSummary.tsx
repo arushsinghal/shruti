@@ -44,7 +44,7 @@ export default function DischargeSummary({ results, patientName, doctorName }: P
     <>
       <button
         onClick={() => setShowModal(true)}
-        className="flex items-center gap-1.5 text-xs font-medium text-rose-700 hover:text-rose-900 border border-rose-200 hover:border-rose-400 bg-rose-50 hover:bg-rose-100 rounded px-3 py-1.5 transition-all"
+        className="flex items-center gap-1.5 text-xs font-medium text-slate-600 hover:text-primary border border-slate-200 hover:border-primary/30 bg-white hover:bg-primary/[0.04] rounded px-3 py-1.5 transition-all"
         title="Generate Discharge Summary"
       >
         <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">

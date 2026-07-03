@@ -32,10 +32,10 @@ function timeAgo(iso: string): string {
 }
 
 const STATUS_COLORS: Record<string, string> = {
-  complete: 'bg-emerald-50 text-emerald-700 border-emerald-200',
+  complete: 'bg-primary/10 text-primary border-primary/20',
   transcribed: 'bg-amber-50 text-amber-700 border-amber-200',
   extracted: 'bg-amber-50 text-amber-700 border-amber-200',
-  soap_ready: 'bg-violet-50 text-violet-700 border-violet-200',
+  soap_ready: 'bg-amber-100 text-amber-800 border-amber-300/60',
   created: 'bg-slate-50 text-slate-500 border-slate-200',
 };
 
@@ -109,7 +109,7 @@ export default function ClinicInbox() {
           </div>
         </div>
         <div className="flex items-center gap-2">
-          <span className="bg-violet-100 text-violet-700 text-[11px] font-bold px-2 py-0.5 rounded-full border border-violet-200">
+          <span className="bg-primary/10 text-primary text-[11px] font-bold px-2 py-0.5 rounded-full border border-primary/20">
             {sessions.length} sessions
           </span>
           <button
@@ -162,8 +162,8 @@ export default function ClinicInbox() {
                       <div className="flex-1 min-w-0">
                         {/* Patient info */}
                         <div className="flex items-center gap-2 mb-1">
-                          <div className="w-7 h-7 rounded-lg bg-violet-100 flex items-center justify-center shrink-0">
-                            <svg className="w-3.5 h-3.5 text-violet-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                          <div className="w-7 h-7 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
+                            <svg className="w-3.5 h-3.5 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                               <path strokeLinecap="round" strokeLinejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                             </svg>
                           </div>
@@ -192,7 +192,7 @@ export default function ClinicInbox() {
                           </span>
                           <span className="text-[11px] text-slate-400">{timeAgo(s.created_at)}</span>
                           {isAssigned && (
-                            <span className="text-[11px] text-emerald-600 font-medium">
+                            <span className="text-[11px] text-primary font-medium">
                               → {s.assigned_doctor_name}
                             </span>
                           )}
@@ -211,7 +211,7 @@ export default function ClinicInbox() {
                           <select
                             value={selectedDoctor[s.id] || ''}
                             onChange={e => setSelectedDoctor(p => ({ ...p, [s.id]: e.target.value }))}
-                            className="text-[11px] border border-slate-200 rounded-lg px-2 py-1.5 bg-white text-slate-700 focus:outline-none focus:border-violet-400 min-w-[130px]"
+                            className="text-[11px] border border-slate-200 rounded-lg px-2 py-1.5 bg-white text-slate-700 focus:outline-none focus:border-primary min-w-[130px]"
                           >
                             <option value="">Assign to…</option>
                             {doctors.map(d => (
@@ -223,7 +223,7 @@ export default function ClinicInbox() {
                           <button
                             onClick={() => assign(s.id)}
                             disabled={!selectedDoctor[s.id] || assigning === s.id}
-                            className="text-[11px] font-semibold bg-violet-600 hover:bg-violet-700 disabled:opacity-40 disabled:cursor-not-allowed text-white px-3 py-1.5 rounded-lg transition-all"
+                            className="text-[11px] font-semibold bg-primary hover:bg-primary-dark disabled:opacity-40 disabled:cursor-not-allowed text-white px-3 py-1.5 rounded-lg transition-all"
                           >
                             {assigning === s.id ? '…' : 'Assign'}
                           </button>

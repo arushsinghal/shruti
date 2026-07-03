@@ -60,13 +60,13 @@ function PeriodBlock({ label, data }: { label: string; data: PeriodStats }) {
           <p className="text-xs text-slate-500">sent to dr</p>
         </div>
         <div>
-          <p className={`text-lg font-bold ${signedPct > 80 ? 'text-emerald-700' : 'text-slate-800'}`}>{signedPct}%</p>
+          <p className={`text-lg font-bold ${signedPct > 80 ? 'text-primary' : 'text-slate-800'}`}>{signedPct}%</p>
           <p className="text-xs text-slate-500">signed</p>
         </div>
       </div>
       {data.total > 0 && (
         <div className="mt-3 bg-slate-100 rounded-full h-1.5 overflow-hidden">
-          <div className="h-full bg-emerald-500 rounded-full" style={{ width: `${signedPct}%` }} />
+          <div className="h-full bg-primary rounded-full" style={{ width: `${signedPct}%` }} />
         </div>
       )}
     </div>
@@ -121,14 +121,14 @@ export default function OpsDashboard() {
             <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3">SLA (last 24h)</p>
             <div className="grid grid-cols-3 gap-4 text-center">
               <div>
-                <p className={`text-2xl font-bold ${stats.sla.avg_seconds_24h !== null && stats.sla.avg_seconds_24h > stats.sla.target_seconds ? 'text-red-600' : 'text-emerald-700'}`}>
+                <p className={`text-2xl font-bold ${stats.sla.avg_seconds_24h !== null && stats.sla.avg_seconds_24h > stats.sla.target_seconds ? 'text-red-600' : 'text-primary'}`}>
                   {fmtSecs(stats.sla.avg_seconds_24h)}
                 </p>
                 <p className="text-xs text-slate-500 mt-0.5">avg delivery</p>
                 <p className="text-[10px] text-slate-400">target {fmtSecs(stats.sla.target_seconds)}</p>
               </div>
               <div>
-                <p className={`text-2xl font-bold ${stats.sla.breach_count_24h > 0 ? 'text-amber-600' : 'text-emerald-700'}`}>
+                <p className={`text-2xl font-bold ${stats.sla.breach_count_24h > 0 ? 'text-amber-600' : 'text-primary'}`}>
                   {stats.sla.breach_count_24h}
                 </p>
                 <p className="text-xs text-slate-500 mt-0.5">SLA breaches</p>
@@ -160,7 +160,7 @@ export default function OpsDashboard() {
               <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3">Quality (this week)</p>
               <div className="flex gap-4">
                 <div className="text-center">
-                  <p className="text-xl font-bold text-emerald-700">{stats.quality.approved_this_week}</p>
+                  <p className="text-xl font-bold text-primary">{stats.quality.approved_this_week}</p>
                   <p className="text-xs text-slate-500">approved</p>
                 </div>
                 <div className="text-center">

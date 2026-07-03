@@ -107,7 +107,7 @@ export default function Analytics() {
                   { label: 'Active Consultations', value: data.overview.total_sessions, color: 'text-text-dark border-l-4 border-l-primary' },
                   { label: 'Weekly Ingestions', value: data.overview.sessions_this_week, color: 'text-primary border-l-4 border-l-primary' },
                   { label: 'Completed Records', value: data.overview.completed_sessions, color: 'text-primary border-l-4 border-l-accent' },
-                  { label: 'Optional Cloud Formatting', value: data.overview.cloud_ai_sessions, color: 'text-accent-dark border-l-4 border-l-purple-500' },
+                  { label: 'Optional Cloud Formatting', value: data.overview.cloud_ai_sessions, color: 'text-accent-dark border-l-4 border-l-accent' },
                 ].map(({ label, value, color }) => (
                   <div key={label} className={`border border-slate-200 rounded p-4 bg-white shadow-sm ${color}`}>
                     <p className="text-[10px] uppercase font-bold text-slate-500 mb-1">{label}</p>
@@ -242,11 +242,14 @@ export default function Analytics() {
               )}
             </div>
 
-            {/* Personal practice reflection — descriptive only, never evaluative */}
-            {insights && insights.stats.consultations_current_period > 0 && (
-              <section>
-                <h2 className="text-xs font-bold text-slate-500 uppercase tracking-widest mb-4">Your Practice, Last 30 Days</h2>
+            {/* Personal practice reflection — Gemini narrates deterministic stats only */}
+            <section>
+              <h2 className="text-xs font-bold text-slate-500 uppercase tracking-widest mb-4">AI Practice Insights</h2>
+              {insights && insights.stats.consultations_current_period > 0 ? (
                 <div className="border border-slate-200 rounded-lg p-6 bg-white shadow-sm">
+                  <div className="mb-4 inline-flex rounded-full border border-primary/15 bg-primary/[0.055] px-3 py-1 text-[10.5px] font-bold uppercase tracking-[0.14em] text-primary">
+                    Gemini narrative over local stats
+                  </div>
                   <p className="text-[13.5px] text-text-dark leading-relaxed mb-4">{insights.narrative}</p>
                   <div className="grid sm:grid-cols-2 gap-6">
                     {insights.stats.top_diagnoses.length > 0 && (
@@ -277,11 +280,18 @@ export default function Analytics() {
                     )}
                   </div>
                   <p className="text-[10.5px] text-slate-400 mt-4 pt-3 border-t border-slate-100">
-                    A private reflection of your own consultations. This describes patterns only, it does not evaluate or grade clinical decisions.
+                    Gemini receives aggregate counts only. It describes your own practice patterns, never grades clinical decisions, and never extracts patient facts.
                   </p>
                 </div>
-              </section>
-            )}
+              ) : (
+                <div className="border border-dashed border-slate-200 rounded-lg p-6 bg-white shadow-sm">
+                  <p className="text-[13.5px] font-semibold text-text-dark">Not enough completed consultations yet.</p>
+                  <p className="text-[12.5px] text-slate-500 mt-1 leading-relaxed">
+                    Once consultations exist, Lipi can ask Gemini to turn deterministic aggregate stats into a short private practice summary. Clinical extraction stays local.
+                  </p>
+                </div>
+              )}
+            </section>
 
             {/* Patient cohort */}
             {data.patient_cohort && data.patient_cohort.total_unique_patients > 0 && (

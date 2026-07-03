@@ -73,15 +73,15 @@ export default function Onboarding() {
         {/* Progress */}
         <div className="flex items-center justify-center gap-2 mb-8">
           {[0, 1, 2].map(i => (
-            <div key={i} className={`h-1.5 rounded-full transition-all ${i <= step ? 'w-16 bg-indigo-600' : 'w-8 bg-slate-200'}`} />
+            <div key={i} className={`h-1.5 rounded-full transition-all ${i <= step ? 'w-16 bg-primary' : 'w-8 bg-slate-200'}`} />
           ))}
         </div>
 
-        <div className="bg-white rounded-2xl border border-indigo-100 shadow-sm overflow-hidden">
+        <div className="bg-white rounded-2xl border border-slate-200/80 shadow-sm overflow-hidden">
           {/* Header */}
-          <div className="px-8 py-6 bg-gradient-to-r from-indigo-50 to-cyan-50 border-b border-indigo-100">
+          <div className="px-8 py-6 bg-primary/[0.04] border-b border-primary/10">
             <div className="flex items-center gap-3 mb-2">
-              <div className="w-10 h-10 bg-gradient-to-br from-indigo-600 to-cyan-500 rounded-xl flex items-center justify-center shadow-md">
+              <div className="w-10 h-10 bg-primary rounded-xl flex items-center justify-center shadow-sm">
                 <span className="font-bold text-white text-sm">श</span>
               </div>
               <div>
@@ -107,12 +107,12 @@ export default function Onboarding() {
                     value={nmcNumber}
                     onChange={e => setNmcNumber(e.target.value)}
                     placeholder="MH-12345"
-                    className="w-full border border-slate-200 rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:border-transparent"
+                    className="w-full border border-slate-200 rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-transparent"
                   />
                   <p className="text-[11px] text-slate-400 mt-1.5">
                     Your National Medical Commission or State Medical Council registration number.
                     {nmcNumber && (nmcValid
-                      ? <span className="text-emerald-600 font-semibold ml-1">Valid format</span>
+                      ? <span className="text-primary font-semibold ml-1">Valid format</span>
                       : <span className="text-red-500 font-semibold ml-1">Invalid — expected format: XX-NNNNN</span>
                     )}
                   </p>
@@ -125,7 +125,7 @@ export default function Onboarding() {
                   <select
                     value={specialization}
                     onChange={e => setSpecialization(e.target.value)}
-                    className="w-full border border-slate-200 rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:border-transparent bg-white cursor-pointer"
+                    className="w-full border border-slate-200 rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-transparent bg-white cursor-pointer"
                   >
                     <option value="">Select your specialization</option>
                     {SPECIALIZATIONS.map(s => <option key={s} value={s}>{s}</option>)}
@@ -135,7 +135,7 @@ export default function Onboarding() {
                 <button
                   onClick={() => { if (nmcValid && specialization) setStep(1); else setError('Fill all required fields'); }}
                   disabled={!nmcValid || !specialization}
-                  className="w-full py-3 rounded-xl bg-gradient-to-r from-indigo-600 to-cyan-600 hover:from-indigo-700 hover:to-cyan-700 disabled:opacity-40 text-white text-sm font-bold transition-all shadow-md"
+                  className="w-full py-3 rounded-xl bg-primary hover:bg-primary-dark disabled:opacity-40 text-white text-sm font-bold transition-all shadow-md"
                 >
                   Next — Clinic Details
                 </button>
@@ -153,7 +153,7 @@ export default function Onboarding() {
                     value={clinicName}
                     onChange={e => setClinicName(e.target.value)}
                     placeholder="City Care Clinic"
-                    className="w-full border border-slate-200 rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:border-transparent"
+                    className="w-full border border-slate-200 rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-transparent"
                   />
                 </div>
 
@@ -164,7 +164,7 @@ export default function Onboarding() {
                     onChange={e => setClinicAddress(e.target.value)}
                     placeholder="123, MG Road, Pune 411001"
                     rows={2}
-                    className="w-full border border-slate-200 rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:border-transparent resize-none"
+                    className="w-full border border-slate-200 rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-transparent resize-none"
                   />
                 </div>
 
@@ -175,7 +175,7 @@ export default function Onboarding() {
                     value={clinicPhone}
                     onChange={e => setClinicPhone(e.target.value)}
                     placeholder="+91 98765 43210"
-                    className="w-full border border-slate-200 rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:border-transparent"
+                    className="w-full border border-slate-200 rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-transparent"
                   />
                 </div>
 
@@ -188,7 +188,7 @@ export default function Onboarding() {
                     value={whatsappPhone}
                     onChange={e => setWhatsappPhone(e.target.value)}
                     placeholder="+91 98765 43210"
-                    className="w-full border border-slate-200 rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:border-transparent"
+                    className="w-full border border-slate-200 rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-transparent"
                   />
                   <p className="text-[11px] text-slate-400 mt-1">Send voice notes to Lipi from this number after each consultation.</p>
                 </div>
@@ -203,7 +203,7 @@ export default function Onboarding() {
                   <button
                     onClick={handleComplete}
                     disabled={saving}
-                    className="flex-1 py-3 rounded-xl bg-gradient-to-r from-indigo-600 to-cyan-600 hover:from-indigo-700 hover:to-cyan-700 disabled:opacity-50 text-white text-sm font-bold transition-all shadow-md"
+                    className="flex-1 py-3 rounded-xl bg-primary hover:bg-primary-dark disabled:opacity-50 text-white text-sm font-bold transition-all shadow-md"
                   >
                     {saving ? 'Setting up your clinic…' : 'Complete Setup'}
                   </button>
@@ -214,8 +214,8 @@ export default function Onboarding() {
             {/* Step 2 — You're live */}
             {step === 2 && (
               <div className="space-y-6 text-center">
-                <div className="w-16 h-16 bg-emerald-100 rounded-full grid place-items-center mx-auto">
-                  <svg className="w-8 h-8 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <div className="w-16 h-16 bg-primary/10 rounded-full grid place-items-center mx-auto">
+                  <svg className="w-8 h-8 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
                   </svg>
                 </div>
@@ -241,7 +241,7 @@ export default function Onboarding() {
 
                 <button
                   onClick={() => navigate('/dashboard')}
-                  className="w-full py-3 rounded-xl bg-gradient-to-r from-indigo-600 to-cyan-600 text-white text-sm font-bold shadow-md"
+                  className="w-full py-3 rounded-xl bg-primary text-white text-sm font-bold shadow-md"
                 >
                   Go to Dashboard →
                 </button>

@@ -102,7 +102,7 @@ export default function InvoiceView() {
               <p className="text-xs text-slate-500 mt-1">Consultations</p>
             </div>
             <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-4 text-center">
-              <p className="text-3xl font-bold text-emerald-700">
+              <p className="text-3xl font-bold text-primary">
                 ₹{data.total_inr.toLocaleString('en-IN')}
               </p>
               <p className="text-xs text-slate-500 mt-1">Total billed</p>
@@ -161,7 +161,7 @@ export default function InvoiceView() {
                     <td className="px-4 py-3 text-slate-500 text-xs">{row.notes}</td>
                     <td className="px-4 py-3">
                       {row.signed ? (
-                        <span className="text-xs text-emerald-700 bg-emerald-50 border border-emerald-200 rounded-full px-2 py-0.5">Signed</span>
+                        <span className="text-xs text-primary bg-primary/[0.06] border border-primary/20 rounded-full px-2 py-0.5">Signed</span>
                       ) : (
                         <span className="text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded-full px-2 py-0.5">Pending</span>
                       )}
@@ -177,7 +177,7 @@ export default function InvoiceView() {
                   <td colSpan={5} className="px-4 py-3 text-sm font-semibold text-slate-700">
                     Total — {data.consultation_count} consultations
                   </td>
-                  <td className="px-4 py-3 text-right text-base font-bold text-emerald-700">
+                  <td className="px-4 py-3 text-right text-base font-bold text-primary">
                     ₹{data.total_inr.toLocaleString('en-IN')}
                   </td>
                 </tr>
