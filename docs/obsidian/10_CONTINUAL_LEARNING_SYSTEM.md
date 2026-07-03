@@ -5,6 +5,20 @@
 > **Status update 2026-07-03:** the basic write path this doc calls for is now live — `learning_service.record_correction()`/`record_false_positive()` are called from every doctor fact-review action and SOAP hallucination flag (see `07_DECISIONS.md` and `09_STRATEGIC_ROADMAP.md`). This is a simpler mechanism than the full `LearningEvent`/`MemoryCandidate`/`PlaybookRule` architecture described below — those richer objects, the Lesson Review Queue, doctor/clinic preference stores, and Stage 2+ model strategy remain future work, not built. Read this doc as "where the design is headed," not "what exists today."
 > Related: [[00_HOME]], [[03_PRODUCT_STRATEGY]], [[05_VALIDATION_PLAN]], [[07_DECISIONS]], [[09_STRATEGIC_ROADMAP]], [[13_AGENTIC_SERVICE_RESEARCH_DIRECTION]], [[12_IMPLEMENTATION_GAP_REGISTER]]
 
+---
+
+## Is continual learning live right now? — the one-line answer, asked often enough to deserve its own section
+
+**Partially. Two different mechanisms exist under this name; only one of them is actually learning.**
+
+| Mechanism | Live? | Is it real continual learning? |
+|---|---|---|
+| Correction flywheel (`learning_service.py`, Bayesian confidence scoring, auto-promotion of extraction rules) | **Yes, live** since 2026-07-02/03 | **Yes.** System behavior (which extraction rules apply) changes permanently based on accumulated doctor corrections, without a human retraining anything. This is genuine, if narrow, continual learning. |
+| Clinical memory assistant / "Jarvis" (`27_CLINICAL_MEMORY_ASSISTANT_SPEC.md`, Sarvam-30B, context-stuffing) | **Yes, live** since 2026-07-03 | **No.** Model weights never change. It only *feels* like learning because more of a patient's confirmed history becomes recallable as visits accumulate. This is retrieval, not learning — see Direction 7 in `21_FRONTIER_RESEARCH_DIRECTIONS.md`. |
+| Fine-tuned Indian clinical model (Direction 6, `21_FRONTIER_RESEARCH_DIRECTIONS.md`) | **Not built** | Would be, if built — this is the actual weight-updating mechanism, gated behind real data volume (`24_HOW_TO_MOVE_AHEAD.md` Phase 2). |
+
+**If asked externally "does Lipi do continual learning":** yes, name the correction flywheel specifically — it's real and live. Do not point to the memory assistant as the answer; it's a different, also-real, also-live feature, but it is not learning and saying so would be an overclaim this vault has repeatedly flagged as a risk to avoid.
+
 ## One-Line Thesis
 
 Lipi should become an AI-native healthcare administration worker that improves on the job from doctor-approved, evidence-backed traces.
