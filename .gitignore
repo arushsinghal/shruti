@@ -43,6 +43,7 @@ frontend/.vite/
 .claude/
 .gstack/
 .cursor/
+.serena/
 
 # Generated / downloaded artifacts (regenerable, not source)
 graphify-out/

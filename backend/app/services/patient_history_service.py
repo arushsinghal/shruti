@@ -57,6 +57,25 @@ async def get_patient_sessions(user_id: str, patient_name: str) -> list[Consulta
     ]
 
 
+async def build_all_patients_summary(user_id: str) -> dict[str, Any]:
+    """Prompt-ready summary of all confirmed sessions for a doctor, grouped by patient.
+    Used by the memory assistant when no patient is scoped (dashboard context)."""
+    all_sessions = await repo.get_sessions_for_user(user_id)
+    by_patient: dict[str, list[ConsultationSession]] = {}
+    for s in all_sessions:
+        name = (s.patient_name or "Unknown").strip()
+        by_patient.setdefault(name, []).append(s)
+    visits = []
+    for name, sessions in by_patient.items():
+        for s in sessions:
+            v = _visit_summary(s)
+            v["patient_name"] = name
+            visits.append(v)
+    visits.sort(key=lambda v: v["date"], reverse=True)
+    return {"patient_name": None, "total_visits": len(visits), "visits": visits,
+            "active_medications": [], "chronic_conditions": [], "allergies": []}
+
+
 async def build_patient_timeline(user_id: str, patient_name: str) -> dict[str, Any]:
     """Aggregated view for the timeline UI: all visits plus rolled-up active
     medications, chronic conditions, and allergies across visits."""
@@ -113,8 +132,9 @@ def format_history_for_prompt(timeline: dict[str, Any], max_visits: int = 25) ->
         dx = ", ".join(
             d if isinstance(d, str) else d.get("text", "") for d in visit["diagnoses"]
         ) or "none recorded"
+        patient_prefix = f"[{visit['patient_name']}] " if visit.get("patient_name") else ""
         lines.append(
-            f"- Visit {visit['session_id'][:8]} on {visit['date'][:10]}: "
+            f"- {patient_prefix}Visit {visit['session_id'][:8]} on {visit['date'][:10]}: "
             f"symptoms: {', '.join(visit['symptoms']) or 'none'}; "
             f"diagnoses: {dx}; medications: {meds}; "
             f"follow-up: {', '.join(visit['follow_up']) or 'none'}."

@@ -13,6 +13,7 @@ import PatientTimeline from './pages/PatientTimeline';
 import Pricing from './pages/Pricing';
 import About from './pages/About';
 import Research from './pages/Research';
+import ResearchPost from './pages/ResearchPost';
 import AssistantDashboard from './pages/AssistantDashboard';
 import AssistantIntake from './pages/AssistantIntake';
 import Privacy from './pages/Privacy';
@@ -38,6 +39,7 @@ export default function App() {
           <Route path="/pricing" element={<Pricing />} />
           <Route path="/about" element={<About />} />
           <Route path="/research" element={<Research />} />
+          <Route path="/research/:slug" element={<ResearchPost />} />
           <Route path="/privacy" element={<Privacy />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />

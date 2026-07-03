@@ -630,8 +630,7 @@ export default function Landing() {
               <motion.div
                 key={t.name}
                 variants={fadeUp}
-                whileHover={{ y: -6, transition: { duration: 0.22 } }}
-                className="rounded-3xl border border-slate-200/80 bg-bg-warm p-7 space-y-5 cursor-default"
+                className="rounded-3xl border border-slate-200/80 bg-bg-warm p-7 space-y-5"
               >
                 <p className="text-[14.5px] text-slate-700 leading-relaxed">"{t.quote}"</p>
                 <div className="pt-3 border-t border-slate-100">
@@ -647,7 +646,8 @@ export default function Landing() {
 
       {/* ── Final CTA ───────────────────────────────────────────────── */}
       <section className="py-24 px-6 bg-primary">
-        <div className="max-w-3xl mx-auto text-center space-y-7">
+        <div className="max-w-5xl mx-auto">
+          <div className="max-w-2xl space-y-7">
           <motion.h2
             initial={reduce ? false : { opacity: 0, y: 24 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -662,7 +662,7 @@ export default function Landing() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.6, delay: 0.1, ease: [0.16, 1, 0.3, 1] as const }}
-            className="text-[15px] text-white/70 leading-relaxed"
+            className="text-[15px] text-white/65 leading-relaxed max-w-[42ch]"
           >
             Currently onboarding pilot doctors directly. Email us and we'll get you set up.
           </motion.p>
@@ -671,23 +671,24 @@ export default function Landing() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.55, delay: 0.18 }}
-            className="flex flex-col sm:flex-row gap-3 justify-center"
+            className="flex flex-col sm:flex-row gap-3"
           >
             <motion.a
               href="mailto:arushsinghal98@gmail.com?subject=Lipi%20early%20access"
-              whileHover={{ scale: 1.04 }} whileTap={{ scale: 0.97 }}
-              className="px-8 py-4 bg-white hover:bg-white/92 text-primary rounded-full font-bold text-[15px] flex items-center justify-center gap-2 transition-colors cursor-pointer"
+              whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}
+              className="px-8 py-4 bg-white hover:bg-white/92 text-primary rounded-full font-bold text-[15px] flex items-center gap-2 transition-colors cursor-pointer"
             >
               Request early access <ArrowRight className="w-4 h-4" />
             </motion.a>
             <motion.button
               onClick={() => setShowSupportModal(true)}
-              whileHover={{ scale: 1.04 }} whileTap={{ scale: 0.97 }}
+              whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}
               className="px-8 py-4 border border-white/30 hover:border-white/60 text-white/80 hover:text-white rounded-full font-semibold text-[15px] transition-all cursor-pointer"
             >
               Talk to us
             </motion.button>
           </motion.div>
+          </div>
         </div>
       </section>
 

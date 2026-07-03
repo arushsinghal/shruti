@@ -23,6 +23,7 @@ from typing import Any
 import httpx
 
 from app.services.patient_history_service import (
+    build_all_patients_summary,
     build_patient_timeline,
     format_history_for_prompt,
 )
@@ -40,7 +41,8 @@ _SYSTEM_PROMPT = (
     "history doesn't answer the question, say so plainly. Reference visit dates in "
     "your answer, but never mention the visit ID string — the UI shows that "
     "separately. This is decision support only — the doctor makes all clinical "
-    "decisions. Answer in 1-2 sentences, directly, no preamble."
+    "decisions. Answer in 1-2 sentences, directly, no preamble. "
+    "Always respond in English regardless of the language of the patient history."
 )
 
 
@@ -72,12 +74,15 @@ async def query(
     if not settings.memory_assistant_enabled:
         raise ClinicalMemoryError("Memory assistant is disabled (memory_assistant_enabled=False)")
 
-    timeline = await build_patient_timeline(user_id, patient_name)
+    if patient_name.strip():
+        timeline = await build_patient_timeline(user_id, patient_name)
+        no_data_msg = "No confirmed visits on file for this patient yet."
+    else:
+        timeline = await build_all_patients_summary(user_id)
+        no_data_msg = "No confirmed visits on file yet."
+
     if timeline["total_visits"] == 0:
-        return {
-            "answer": "No confirmed visits on file for this patient yet.",
-            "citations": [],
-        }
+        return {"answer": no_data_msg, "citations": []}
 
     history_text = format_history_for_prompt(timeline)
 

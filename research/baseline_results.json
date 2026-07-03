@@ -1,0 +1,456 @@
+{
+  "dataset": "synthetic_test_set.json",
+  "n_sentences": 200,
+  "note": "Evaluated on synthetic Hinglish sentences only — no real OPD transcript data was available for this benchmark. Numbers below are illustrative of baseline behavior patterns, not validated real-world performance.",
+  "baseline_1_rule_based": {
+    "description": "NegEx/ConText-style window classifier: scans a +/-5 token window around the entity mention, priority order negation > query > uncertainty > affirmed (epistemic) and historical > planned > current (temporal, default=current per ConText's default-recent convention).",
+    "results": {
+      "per_tag_combination": {
+        "affirmed_current": {
+          "precision": 0.7895,
+          "recall": 0.8824,
+          "f1": 0.8333,
+          "support": 17
+        },
+        "affirmed_historical": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "support": 16
+        },
+        "affirmed_planned": {
+          "precision": 1.0,
+          "recall": 0.8125,
+          "f1": 0.8966,
+          "support": 16
+        },
+        "negated_current": {
+          "precision": 0.6667,
+          "recall": 0.9412,
+          "f1": 0.7805,
+          "support": 17
+        },
+        "negated_historical": {
+          "precision": 0.68,
+          "recall": 1.0,
+          "f1": 0.8095,
+          "support": 17
+        },
+        "negated_planned": {
+          "precision": 1.0,
+          "recall": 0.5625,
+          "f1": 0.72,
+          "support": 16
+        },
+        "queried_current": {
+          "precision": 0.8095,
+          "recall": 1.0,
+          "f1": 0.8947,
+          "support": 17
+        },
+        "queried_historical": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "support": 17
+        },
+        "queried_planned": {
+          "precision": 1.0,
+          "recall": 0.7647,
+          "f1": 0.8667,
+          "support": 17
+        },
+        "uncertain_current": {
+          "precision": 0.9286,
+          "recall": 0.7647,
+          "f1": 0.8387,
+          "support": 17
+        },
+        "uncertain_historical": {
+          "precision": 0.6923,
+          "recall": 0.5625,
+          "f1": 0.6207,
+          "support": 16
+        },
+        "uncertain_planned": {
+          "precision": 1.0,
+          "recall": 0.9412,
+          "f1": 0.9697,
+          "support": 17
+        }
+      },
+      "macro_avg": {
+        "precision": 0.8805,
+        "recall": 0.8526,
+        "f1": 0.8525
+      },
+      "micro_avg": {
+        "precision": 0.855,
+        "recall": 0.855,
+        "f1": 0.855
+      },
+      "overall_accuracy": {
+        "full_combo": 0.855,
+        "epistemic_axis": 0.95,
+        "temporal_axis": 0.9
+      },
+      "epistemic_axis_metrics": {
+        "affirmed": {
+          "precision": 0.9792,
+          "recall": 0.9592,
+          "f1": 0.9691,
+          "support": 49
+        },
+        "negated": {
+          "precision": 0.8448,
+          "recall": 0.98,
+          "f1": 0.9074,
+          "support": 50
+        },
+        "queried": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "support": 51
+        },
+        "uncertain": {
+          "precision": 1.0,
+          "recall": 0.86,
+          "f1": 0.9247,
+          "support": 50
+        }
+      },
+      "temporal_axis_metrics": {
+        "current": {
+          "precision": 0.8077,
+          "recall": 0.9265,
+          "f1": 0.863,
+          "support": 68
+        },
+        "historical": {
+          "precision": 0.9296,
+          "recall": 1.0,
+          "f1": 0.9635,
+          "support": 66
+        },
+        "planned": {
+          "precision": 1.0,
+          "recall": 0.7727,
+          "f1": 0.8718,
+          "support": 66
+        }
+      },
+      "confusion_matrix_epistemic": {
+        "labels": [
+          "affirmed",
+          "negated",
+          "queried",
+          "uncertain"
+        ],
+        "matrix": [
+          [
+            47,
+            2,
+            0,
+            0
+          ],
+          [
+            1,
+            49,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            51,
+            0
+          ],
+          [
+            0,
+            7,
+            0,
+            43
+          ]
+        ]
+      },
+      "confusion_matrix_temporal": {
+        "labels": [
+          "current",
+          "historical",
+          "planned"
+        ],
+        "matrix": [
+          [
+            63,
+            5,
+            0
+          ],
+          [
+            0,
+            66,
+            0
+          ],
+          [
+            15,
+            0,
+            51
+          ]
+        ]
+      }
+    }
+  },
+  "baseline_2_keyword_majority": {
+    "description": "Always predicts affirmed+current (the 'do nothing' baseline representing the most frequent real-consultation state per ConText/i2b2 prevalence literature).",
+    "results": {
+      "per_tag_combination": {
+        "affirmed_current": {
+          "precision": 0.085,
+          "recall": 1.0,
+          "f1": 0.1567,
+          "support": 17
+        },
+        "affirmed_historical": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 16
+        },
+        "affirmed_planned": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 16
+        },
+        "negated_current": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 17
+        },
+        "negated_historical": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 17
+        },
+        "negated_planned": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 16
+        },
+        "queried_current": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 17
+        },
+        "queried_historical": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 17
+        },
+        "queried_planned": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 17
+        },
+        "uncertain_current": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 17
+        },
+        "uncertain_historical": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 16
+        },
+        "uncertain_planned": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 17
+        }
+      },
+      "macro_avg": {
+        "precision": 0.0071,
+        "recall": 0.0833,
+        "f1": 0.0131
+      },
+      "micro_avg": {
+        "precision": 0.085,
+        "recall": 0.085,
+        "f1": 0.085
+      },
+      "overall_accuracy": {
+        "full_combo": 0.085,
+        "epistemic_axis": 0.245,
+        "temporal_axis": 0.34
+      },
+      "epistemic_axis_metrics": {
+        "affirmed": {
+          "precision": 0.245,
+          "recall": 1.0,
+          "f1": 0.3936,
+          "support": 49
+        },
+        "negated": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 50
+        },
+        "queried": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 51
+        },
+        "uncertain": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 50
+        }
+      },
+      "temporal_axis_metrics": {
+        "current": {
+          "precision": 0.34,
+          "recall": 1.0,
+          "f1": 0.5075,
+          "support": 68
+        },
+        "historical": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 66
+        },
+        "planned": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 66
+        }
+      },
+      "confusion_matrix_epistemic": {
+        "labels": [
+          "affirmed",
+          "negated",
+          "queried",
+          "uncertain"
+        ],
+        "matrix": [
+          [
+            49,
+            0,
+            0,
+            0
+          ],
+          [
+            50,
+            0,
+            0,
+            0
+          ],
+          [
+            51,
+            0,
+            0,
+            0
+          ],
+          [
+            50,
+            0,
+            0,
+            0
+          ]
+        ]
+      },
+      "confusion_matrix_temporal": {
+        "labels": [
+          "current",
+          "historical",
+          "planned"
+        ],
+        "matrix": [
+          [
+            68,
+            0,
+            0
+          ],
+          [
+            66,
+            0,
+            0
+          ],
+          [
+            66,
+            0,
+            0
+          ]
+        ]
+      }
+    }
+  },
+  "error_analysis_rule_based": {
+    "total_errors": 29,
+    "total_sentences": 200,
+    "error_rate": 0.145,
+    "failure_mode_counts": {
+      "multiclause_window_bleed (fixed ±5-token window crosses clause boundary)": 5,
+      "missing_planned_signal (kab tak / hogi not in temporal_planned list)": 4,
+      "missing_planned_signal (implicit future modal not recognized)": 4,
+      "other/window_scope_miss": 1,
+      "substring_false_positive ('no' inside 'normal')": 1,
+      "hedge_negation_conflation (pata nahi / confirm nahi misread as fact-negation)": 7,
+      "negated_planned_collapses_to_current (zaroorat nahi pattern)": 7
+    },
+    "example_errors_by_mode": {
+      "multiclause_window_bleed (fixed ±5-token window crosses clause boundary)": [
+        "SYN_003: Lagta hai follow-up abhi hai, par pehle bilkul confirm nahi tha.",
+        "SYN_006: Lagta hai bukhar abhi hai, par pehle bilkul confirm nahi tha.",
+        "SYN_010: Shayad abhi khansi thoda zyada hai, par pehle bilkul confirm nahi tha.",
+        "SYN_015: Lagta hai allergy abhi hai, par pehle bilkul confirm nahi tha.",
+        "SYN_129: Abhi weight hai, pehle bilkul nahi tha."
+      ],
+      "missing_planned_signal (kab tak / hogi not in temporal_planned list)": [
+        "SYN_026: follow-up kab tak leni hogi?",
+        "SYN_031: khansi kab tak leni hogi?",
+        "SYN_033: follow-up kab tak leni hogi?",
+        "SYN_034: ulti/nausea kab tak leni hogi?"
+      ],
+      "missing_planned_signal (implicit future modal not recognized)": [
+        "SYN_076: Lagta hai follow-up thodi der mein karna pad sakta hai, abhi pakka nahi hai.",
+        "SYN_174: Next week sugar ke liye appointment fix ho gaya hai, karna hi hai, abhi karne ki zaroorat nahi.",
+        "SYN_178: Next week khansi ke liye appointment fix ho gaya hai, karna hi hai.",
+        "SYN_179: Next week sar dard ke liye appointment fix ho gaya hai, karna hi hai, abhi karne ki zaroorat nahi."
+      ],
+      "other/window_scope_miss": [
+        "SYN_095: khansi ab control mein hai, koi symptom nahi dikh raha abhi."
+      ],
+      "substring_false_positive ('no' inside 'normal')": [
+        "SYN_135: Is waqt dard normal se zyada hai, patient ne khud confirm kiya."
+      ],
+      "hedge_negation_conflation (pata nahi / confirm nahi misread as fact-negation)": [
+        "SYN_153: Maybe pehle kabhi sugar hua tha, confirm nahi kar sakte abhi.",
+        "SYN_159: Pata nahi pehle dard thi ya nahi.",
+        "SYN_160: Pata nahi pehle allergy thi ya nahi.",
+        "SYN_162: Pata nahi pehle sar dard thi ya nahi.",
+        "SYN_163: Maybe pehle kabhi dawai hua tha, confirm nahi kar sakte abhi."
+      ],
+      "negated_planned_collapses_to_current (zaroorat nahi pattern)": [
+        "SYN_187: Abhi dard ki zaroorat nahi hai.",
+        "SYN_189: Abhi test/report ki zaroorat nahi hai.",
+        "SYN_192: Doctor ne bola abhi test/report karwane ki zaroorat nahi, next visit pe dekhenge.",
+        "SYN_193: Doctor ne bola abhi khansi karwane ki zaroorat nahi, next visit pe dekhenge.",
+        "SYN_197: Doctor ne bola abhi BP karwane ki zaroorat nahi, next visit pe dekhenge."
+      ]
+    }
+  }
+}

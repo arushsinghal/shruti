@@ -13,12 +13,12 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "26_CLAUDE_SCIENCE_PASTE_READY.md",
+                "file": "27_CLINICAL_MEMORY_ASSISTANT_SPEC.md",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "26_CLAUDE_SCIENCE_PASTE_READY"
+              "title": "27_CLINICAL_MEMORY_ASSISTANT_SPEC"
             }
           }
         ]
@@ -185,12 +185,20 @@
   },
   "active": "65df2f57406928f4",
   "lastOpenFiles": [
-    "24_HOW_TO_MOVE_AHEAD.md",
     "26_CLAUDE_SCIENCE_PASTE_READY.md",
     "25_CLAUDE_SCIENCE_WORKFLOWS.md",
+    "24_HOW_TO_MOVE_AHEAD.md",
     "23_EXECUTION_ROUTING.md",
     "22_OPUS_FRONTIER_RESEARCH.md",
     "21_FRONTIER_RESEARCH_DIRECTIONS.md",
+    "13_AGENTIC_SERVICE_RESEARCH_DIRECTION.md",
+    "12_IMPLEMENTATION_GAP_REGISTER.md",
+    "11_OPD_ADMIN_WORKFLOW_IMPLEMENTATION_PLAN.md",
+    "10_CONTINUAL_LEARNING_SYSTEM.md",
+    "09_STRATEGIC_ROADMAP.md",
+    "08_OPEN_QUESTIONS.md",
+    "01_CURRENT_STATE.md",
+    "27_CLINICAL_MEMORY_ASSISTANT_SPEC.md",
     "20_PRODUCT_VISION.md",
     "19_SERVICE_PIVOT.md",
     "18_YC_PITCH_STRATEGY.md",
@@ -198,19 +206,11 @@
     "16_FULL_APP_REVIEW.md",
     "15_AUGNITO_TEARDOWN.md",
     "14_BUILD_PLAN.md",
-    "13_AGENTIC_SERVICE_RESEARCH_DIRECTION.md",
-    "12_IMPLEMENTATION_GAP_REGISTER.md",
-    "11_OPD_ADMIN_WORKFLOW_IMPLEMENTATION_PLAN.md",
-    "10_CONTINUAL_LEARNING_SYSTEM.md",
-    "09_STRATEGIC_ROADMAP.md",
-    "08_OPEN_QUESTIONS.md",
     "07_DECISIONS.md",
     "06_API_COSTS.md",
     "05_VALIDATION_PLAN.md",
     "04_COMPETITORS.md",
     "03_PRODUCT_STRATEGY.md",
-    "02_ARCHITECTURE_MAP.md",
-    "01_CURRENT_STATE.md",
     "Untitled.canvas",
     "Untitled 1.canvas"
   ]

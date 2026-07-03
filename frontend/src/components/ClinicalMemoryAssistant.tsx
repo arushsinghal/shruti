@@ -19,6 +19,11 @@ function patientNameFromPath(pathname: string): string {
   return match ? decodeURIComponent(match[1]) : '';
 }
 
+function sessionIdFromPath(pathname: string): string {
+  const match = pathname.match(/^\/consultation\/([^/]+)/);
+  return match ? match[1] : '';
+}
+
 export default function ClinicalMemoryAssistant() {
   const location = useLocation();
   const [open, setOpen] = useState(false);
@@ -29,10 +34,17 @@ export default function ClinicalMemoryAssistant() {
   const [error, setError] = useState<string | null>(null);
   const threadRef = useRef<HTMLDivElement>(null);
 
-  // Pick up patient context from the URL when navigating between patient pages.
+  // Auto-detect patient from URL. Consultation pages give a session ID → fetch patient name.
   useEffect(() => {
     const fromPath = patientNameFromPath(location.pathname);
-    if (fromPath) setPatientName(fromPath);
+    if (fromPath) { setPatientName(fromPath); return; }
+
+    const sessionId = sessionIdFromPath(location.pathname);
+    if (!sessionId) { setPatientName(''); return; }
+
+    client.get(`/sessions/${sessionId}`)
+      .then(res => { if (res.data?.patient_name) setPatientName(res.data.patient_name); })
+      .catch(() => {});
   }, [location.pathname]);
 
   useEffect(() => {
@@ -40,7 +52,7 @@ export default function ClinicalMemoryAssistant() {
   }, [messages, loading]);
 
   async function handleAsk() {
-    if (!question.trim() || !patientName.trim() || loading) return;
+    if (!question.trim() || loading) return;
     const q = question.trim();
     setMessages(m => [...m, { role: 'user', text: q }]);
     setQuestion('');
@@ -98,14 +110,16 @@ export default function ClinicalMemoryAssistant() {
               </button>
             </div>
 
-            {/* Patient context strip */}
-            <div className="px-5 py-2.5 border-b border-slate-100 bg-[#FCFDFC]">
-              <input
-                value={patientName}
-                onChange={e => setPatientName(e.target.value)}
-                placeholder="Patient name"
-                className="w-full text-[13px] font-medium text-text-dark bg-transparent outline-none placeholder:text-slate-400 placeholder:font-normal"
-              />
+            {/* Patient context badge — auto-detected from URL, not manually entered */}
+            <div className="px-5 py-2 border-b border-slate-100 bg-[#FCFDFC] flex items-center gap-2 min-h-[36px]">
+              {patientName ? (
+                <span className="inline-flex items-center gap-1.5 text-[11px] font-semibold text-primary bg-primary/8 px-2.5 py-1 rounded-full">
+                  <span className="w-1.5 h-1.5 rounded-full bg-primary inline-block" />
+                  {patientName}
+                </span>
+              ) : (
+                <span className="text-[11px] text-slate-400">All patients</span>
+              )}
             </div>
 
             {/* Thread */}
@@ -164,7 +178,8 @@ export default function ClinicalMemoryAssistant() {
               />
               <button
                 onClick={handleAsk}
-                disabled={!question.trim() || !patientName.trim() || loading}
+                disabled={!question.trim() || loading}
+                title={!question.trim() ? 'Type a question first' : ''}
                 className="grid place-items-center w-9 h-9 rounded-full bg-primary text-white disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer transition-opacity flex-shrink-0"
                 aria-label="Ask"
               >

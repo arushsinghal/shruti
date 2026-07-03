@@ -1,0 +1,1802 @@
+[
+  {
+    "id": "SYN_001",
+    "text": "Shayad sar dard thoda high hai.",
+    "entity": "headache",
+    "gold_epistemic": "uncertain",
+    "gold_temporal": "current",
+    "note": "Canonical uncertain-current pattern for entity 'headache'.",
+    "difficulty": "easy"
+  },
+  {
+    "id": "SYN_002",
+    "text": "Shayad dawai thoda high hai.",
+    "entity": "medication",
+    "gold_epistemic": "uncertain",
+    "gold_temporal": "current",
+    "note": "Canonical uncertain-current pattern for entity 'medication'.",
+    "difficulty": "easy"
+  },
+  {
+    "id": "SYN_003",
+    "text": "Lagta hai follow-up abhi hai, par pehle bilkul confirm nahi tha.",
+    "entity": "follow-up",
+    "gold_epistemic": "uncertain",
+    "gold_temporal": "current",
+    "note": "Multi-clause sentence — entity 'follow-up' appears with a contrasting second clause. Gold label reflects the FIRST/primary clause's uncertain-current state; the appended clause introduces a different state and is a known source of confusion for single-label extraction.",
+    "difficulty": "hard"
+  },
+  {
+    "id": "SYN_004",
+    "text": "Lagta hai BP abhi hai.",
+    "entity": "BP",
+    "gold_epistemic": "uncertain",
+    "gold_temporal": "current",
+    "note": "Canonical uncertain-current pattern for entity 'BP'.",
+    "difficulty": "easy"
+  },
+  {
+    "id": "SYN_005",
+    "text": "Shayad abhi test/report thoda zyada hai.",
+    "entity": "test result",
+    "gold_epistemic": "uncertain",
+    "gold_temporal": "current",
+    "note": "Canonical uncertain-current pattern for entity 'test result'.",
+    "difficulty": "medium"
+  },
+  {
+    "id": "SYN_006",
+    "text": "Lagta hai bukhar abhi hai, par pehle bilkul confirm nahi tha.",
+    "entity": "fever",
+    "gold_epistemic": "uncertain",
+    "gold_temporal": "current",
+    "note": "Multi-clause sentence — entity 'fever' appears with a contrasting second clause. Gold label reflects the FIRST/primary clause's uncertain-current state; the appended clause introduces a different state and is a known source of confusion for single-label extraction.",
+    "difficulty": "hard"
+  },
+  {
+    "id": "SYN_007",
+    "text": "Shayad abhi dard thoda zyada hai.",
+    "entity": "pain",
+    "gold_epistemic": "uncertain",
+    "gold_temporal": "current",
+    "note": "Canonical uncertain-current pattern for entity 'pain'.",
+    "difficulty": "medium"
+  },
+  {
+    "id": "SYN_008",
+    "text": "Thoda sa khansi feel ho raha hai abhi, par confirm nahi hai, par pehle bilkul confirm nahi tha.",
+    "entity": "cough",
+    "gold_epistemic": "uncertain",
+    "gold_temporal": "current",
+    "note": "Multi-clause sentence — entity 'cough' appears with a contrasting second clause. Gold label reflects the FIRST/primary clause's uncertain-current state; the appended clause introduces a different state and is a known source of confusion for single-label extraction.",
+    "difficulty": "hard"
+  },
+  {
+    "id": "SYN_009",
+    "text": "Shayad saans phoolna thoda high hai.",
+    "entity": "breathlessness",
+    "gold_epistemic": "uncertain",
+    "gold_temporal": "current",
+    "note": "Canonical uncertain-current pattern for entity 'breathlessness'.",
+    "difficulty": "easy"
+  },
+  {
+    "id": "SYN_010",
+    "text": "Shayad abhi khansi thoda zyada hai, par pehle bilkul confirm nahi tha.",
+    "entity": "cough",
+    "gold_epistemic": "uncertain",
+    "gold_temporal": "current",
+    "note": "Multi-clause sentence — entity 'cough' appears with a contrasting second clause. Gold label reflects the FIRST/primary clause's uncertain-current state; the appended clause introduces a different state and is a known source of confusion for single-label extraction.",
+    "difficulty": "hard"
+  },
+  {
+    "id": "SYN_011",
+    "text": "Shayad abhi bimari thoda zyada hai.",
+    "entity": "diagnosis",
+    "gold_epistemic": "uncertain",
+    "gold_temporal": "current",
+    "note": "Canonical uncertain-current pattern for entity 'diagnosis'.",
+    "difficulty": "medium"
+  },
+  {
+    "id": "SYN_012",
+    "text": "Thoda sa ulti/nausea feel ho raha hai abhi, par confirm nahi hai.",
+    "entity": "nausea",
+    "gold_epistemic": "uncertain",
+    "gold_temporal": "current",
+    "note": "Canonical uncertain-current pattern for entity 'nausea'.",
+    "difficulty": "medium"
+  },
+  {
+    "id": "SYN_013",
+    "text": "Patient ko lagta hai weight abhi bhi hai, thodi si dikkat mehsoos ho rahi hai.",
+    "entity": "weight",
+    "gold_epistemic": "uncertain",
+    "gold_temporal": "current",
+    "note": "Canonical uncertain-current pattern for entity 'weight'.",
+    "difficulty": "medium"
+  },
+  {
+    "id": "SYN_014",
+    "text": "Lagta hai sujan abhi hai.",
+    "entity": "swelling",
+    "gold_epistemic": "uncertain",
+    "gold_temporal": "current",
+    "note": "Canonical uncertain-current pattern for entity 'swelling'.",
+    "difficulty": "easy"
+  },
+  {
+    "id": "SYN_015",
+    "text": "Lagta hai allergy abhi hai, par pehle bilkul confirm nahi tha.",
+    "entity": "allergy",
+    "gold_epistemic": "uncertain",
+    "gold_temporal": "current",
+    "note": "Multi-clause sentence — entity 'allergy' appears with a contrasting second clause. Gold label reflects the FIRST/primary clause's uncertain-current state; the appended clause introduces a different state and is a known source of confusion for single-label extraction.",
+    "difficulty": "hard"
+  },
+  {
+    "id": "SYN_016",
+    "text": "Thoda sa allergy feel ho raha hai abhi, par confirm nahi hai.",
+    "entity": "allergy",
+    "gold_epistemic": "uncertain",
+    "gold_temporal": "current",
+    "note": "Canonical uncertain-current pattern for entity 'allergy'.",
+    "difficulty": "medium"
+  },
+  {
+    "id": "SYN_017",
+    "text": "Thoda sa sugar feel ho raha hai abhi, par confirm nahi hai.",
+    "entity": "sugar",
+    "gold_epistemic": "uncertain",
+    "gold_temporal": "current",
+    "note": "Canonical uncertain-current pattern for entity 'sugar'.",
+    "difficulty": "medium"
+  },
+  {
+    "id": "SYN_018",
+    "text": "Kya sar dard agle hafte karna hoga?",
+    "entity": "headache",
+    "gold_epistemic": "queried",
+    "gold_temporal": "planned",
+    "note": "Canonical queried-planned pattern for entity 'headache'.",
+    "difficulty": "medium"
+  },
+  {
+    "id": "SYN_019",
+    "text": "Doctor, bimari next time zaroori hai kya, ya skip kar sakte hain?",
+    "entity": "diagnosis",
+    "gold_epistemic": "queried",
+    "gold_temporal": "planned",
+    "note": "Canonical queried-planned pattern for entity 'diagnosis'.",
+    "difficulty": "medium"
+  },
+  {
+    "id": "SYN_020",
+    "text": "Kya mujhe agli visit mein test/report dobara karwana padega, ya abhi hi karlein?",
+    "entity": "test result",
+    "gold_epistemic": "queried",
+    "gold_temporal": "planned",
+    "note": "Canonical queried-planned pattern for entity 'test result'.",
+    "difficulty": "medium"
+  },
+  {
+    "id": "SYN_021",
+    "text": "Doctor, sujan next time zaroori hai kya, ya skip kar sakte hain?",
+    "entity": "swelling",
+    "gold_epistemic": "queried",
+    "gold_temporal": "planned",
+    "note": "Canonical queried-planned pattern for entity 'swelling'.",
+    "difficulty": "medium"
+  },
+  {
+    "id": "SYN_022",
+    "text": "Kya mujhe agli visit mein bimari dobara karwana padega, ya abhi hi karlein?",
+    "entity": "diagnosis",
+    "gold_epistemic": "queried",
+    "gold_temporal": "planned",
+    "note": "Canonical queried-planned pattern for entity 'diagnosis'.",
+    "difficulty": "medium"
+  },
+  {
+    "id": "SYN_023",
+    "text": "Kya agli baar bukhar karna padega?",
+    "entity": "fever",
+    "gold_epistemic": "queried",
+    "gold_temporal": "planned",
+    "note": "Canonical queried-planned pattern for entity 'fever'.",
+    "difficulty": "easy"
+  },
+  {
+    "id": "SYN_024",
+    "text": "Doctor, dawai next time zaroori hai kya, ya skip kar sakte hain?",
+    "entity": "medication",
+    "gold_epistemic": "queried",
+    "gold_temporal": "planned",
+    "note": "Canonical queried-planned pattern for entity 'medication'.",
+    "difficulty": "medium"
+  },
+  {
+    "id": "SYN_025",
+    "text": "Kya mujhe agli visit mein sugar dobara karwana padega, ya abhi hi karlein?",
+    "entity": "sugar",
+    "gold_epistemic": "queried",
+    "gold_temporal": "planned",
+    "note": "Canonical queried-planned pattern for entity 'sugar'.",
+    "difficulty": "medium"
+  },
+  {
+    "id": "SYN_026",
+    "text": "follow-up kab tak leni hogi?",
+    "entity": "follow-up",
+    "gold_epistemic": "queried",
+    "gold_temporal": "planned",
+    "note": "Canonical queried-planned pattern for entity 'follow-up'.",
+    "difficulty": "easy"
+  },
+  {
+    "id": "SYN_027",
+    "text": "Kya dard agle hafte karna hoga?",
+    "entity": "pain",
+    "gold_epistemic": "queried",
+    "gold_temporal": "planned",
+    "note": "Canonical queried-planned pattern for entity 'pain'.",
+    "difficulty": "medium"
+  },
+  {
+    "id": "SYN_028",
+    "text": "Kya agli baar BP karna padega?",
+    "entity": "BP",
+    "gold_epistemic": "queried",
+    "gold_temporal": "planned",
+    "note": "Canonical queried-planned pattern for entity 'BP'.",
+    "difficulty": "easy"
+  },
+  {
+    "id": "SYN_029",
+    "text": "Doctor, weight next time zaroori hai kya, ya skip kar sakte hain?",
+    "entity": "weight",
+    "gold_epistemic": "queried",
+    "gold_temporal": "planned",
+    "note": "Canonical queried-planned pattern for entity 'weight'.",
+    "difficulty": "medium"
+  },
+  {
+    "id": "SYN_030",
+    "text": "Kya agli baar saans phoolna karna padega?",
+    "entity": "breathlessness",
+    "gold_epistemic": "queried",
+    "gold_temporal": "planned",
+    "note": "Canonical queried-planned pattern for entity 'breathlessness'.",
+    "difficulty": "easy"
+  },
+  {
+    "id": "SYN_031",
+    "text": "khansi kab tak leni hogi?",
+    "entity": "cough",
+    "gold_epistemic": "queried",
+    "gold_temporal": "planned",
+    "note": "Canonical queried-planned pattern for entity 'cough'.",
+    "difficulty": "easy"
+  },
+  {
+    "id": "SYN_032",
+    "text": "Kya mujhe agli visit mein allergy dobara karwana padega, ya abhi hi karlein?",
+    "entity": "allergy",
+    "gold_epistemic": "queried",
+    "gold_temporal": "planned",
+    "note": "Canonical queried-planned pattern for entity 'allergy'.",
+    "difficulty": "medium"
+  },
+  {
+    "id": "SYN_033",
+    "text": "follow-up kab tak leni hogi?",
+    "entity": "follow-up",
+    "gold_epistemic": "queried",
+    "gold_temporal": "planned",
+    "note": "Canonical queried-planned pattern for entity 'follow-up'.",
+    "difficulty": "easy"
+  },
+  {
+    "id": "SYN_034",
+    "text": "ulti/nausea kab tak leni hogi?",
+    "entity": "nausea",
+    "gold_epistemic": "queried",
+    "gold_temporal": "planned",
+    "note": "Canonical queried-planned pattern for entity 'nausea'.",
+    "difficulty": "easy"
+  },
+  {
+    "id": "SYN_035",
+    "text": "Purana test/report ka koi issue nahi tha.",
+    "entity": "test result",
+    "gold_epistemic": "negated",
+    "gold_temporal": "historical",
+    "note": "Canonical negated-historical pattern for entity 'test result'.",
+    "difficulty": "easy"
+  },
+  {
+    "id": "SYN_036",
+    "text": "Pehle kabhi dard ki koi history nahi thi, patient ne clearly mana kiya.",
+    "entity": "pain",
+    "gold_epistemic": "negated",
+    "gold_temporal": "historical",
+    "note": "Canonical negated-historical pattern for entity 'pain'.",
+    "difficulty": "medium"
+  },
+  {
+    "id": "SYN_037",
+    "text": "Pehle kabhi khansi ki koi history nahi thi, patient ne clearly mana kiya.",
+    "entity": "cough",
+    "gold_epistemic": "negated",
+    "gold_temporal": "historical",
+    "note": "Canonical negated-historical pattern for entity 'cough'.",
+    "difficulty": "medium"
+  },
+  {
+    "id": "SYN_038",
+    "text": "Kabhi bhi pehle sugar nahi hua.",
+    "entity": "sugar",
+    "gold_epistemic": "negated",
+    "gold_temporal": "historical",
+    "note": "Canonical negated-historical pattern for entity 'sugar'.",
+    "difficulty": "medium"
+  },
+  {
+    "id": "SYN_039",
+    "text": "Pehle bukhar nahi thi.",
+    "entity": "fever",
+    "gold_epistemic": "negated",
+    "gold_temporal": "historical",
+    "note": "Canonical negated-historical pattern for entity 'fever'.",
+    "difficulty": "easy"
+  },
+  {
+    "id": "SYN_040",
+    "text": "Kabhi bhi pehle sar dard nahi hua.",
+    "entity": "headache",
+    "gold_epistemic": "negated",
+    "gold_temporal": "historical",
+    "note": "Canonical negated-historical pattern for entity 'headache'.",
+    "difficulty": "medium"
+  },
+  {
+    "id": "SYN_041",
+    "text": "Purane records mein bhi bimari ka zikar nahi hai, kabhi hua hi nahi.",
+    "entity": "diagnosis",
+    "gold_epistemic": "negated",
+    "gold_temporal": "historical",
+    "note": "Canonical negated-historical pattern for entity 'diagnosis'.",
+    "difficulty": "medium"
+  },
+  {
+    "id": "SYN_042",
+    "text": "Purane records mein bhi bukhar ka zikar nahi hai, kabhi hua hi nahi.",
+    "entity": "fever",
+    "gold_epistemic": "negated",
+    "gold_temporal": "historical",
+    "note": "Canonical negated-historical pattern for entity 'fever'.",
+    "difficulty": "medium"
+  },
+  {
+    "id": "SYN_043",
+    "text": "Pehle allergy nahi thi, par ab thoda ho raha hai.",
+    "entity": "allergy",
+    "gold_epistemic": "negated",
+    "gold_temporal": "historical",
+    "note": "Multi-clause sentence — entity 'allergy' appears with a contrasting second clause. Gold label reflects the FIRST/primary clause's negated-historical state; the appended clause introduces a different state and is a known source of confusion for single-label extraction.",
+    "difficulty": "hard"
+  },
+  {
+    "id": "SYN_044",
+    "text": "Purana saans phoolna ka koi issue nahi tha.",
+    "entity": "breathlessness",
+    "gold_epistemic": "negated",
+    "gold_temporal": "historical",
+    "note": "Canonical negated-historical pattern for entity 'breathlessness'.",
+    "difficulty": "easy"
+  },
+  {
+    "id": "SYN_045",
+    "text": "Pehle ulti/nausea nahi thi.",
+    "entity": "nausea",
+    "gold_epistemic": "negated",
+    "gold_temporal": "historical",
+    "note": "Canonical negated-historical pattern for entity 'nausea'.",
+    "difficulty": "easy"
+  },
+  {
+    "id": "SYN_046",
+    "text": "Pehle follow-up nahi thi, par ab thoda ho raha hai.",
+    "entity": "follow-up",
+    "gold_epistemic": "negated",
+    "gold_temporal": "historical",
+    "note": "Multi-clause sentence — entity 'follow-up' appears with a contrasting second clause. Gold label reflects the FIRST/primary clause's negated-historical state; the appended clause introduces a different state and is a known source of confusion for single-label extraction.",
+    "difficulty": "hard"
+  },
+  {
+    "id": "SYN_047",
+    "text": "Kabhi bhi pehle ulti/nausea nahi hua, par ab thoda ho raha hai.",
+    "entity": "nausea",
+    "gold_epistemic": "negated",
+    "gold_temporal": "historical",
+    "note": "Multi-clause sentence — entity 'nausea' appears with a contrasting second clause. Gold label reflects the FIRST/primary clause's negated-historical state; the appended clause introduces a different state and is a known source of confusion for single-label extraction.",
+    "difficulty": "hard"
+  },
+  {
+    "id": "SYN_048",
+    "text": "Pehle weight nahi thi.",
+    "entity": "weight",
+    "gold_epistemic": "negated",
+    "gold_temporal": "historical",
+    "note": "Canonical negated-historical pattern for entity 'weight'.",
+    "difficulty": "easy"
+  },
+  {
+    "id": "SYN_049",
+    "text": "Kabhi bhi pehle dawai nahi hua, par ab thoda ho raha hai.",
+    "entity": "medication",
+    "gold_epistemic": "negated",
+    "gold_temporal": "historical",
+    "note": "Multi-clause sentence — entity 'medication' appears with a contrasting second clause. Gold label reflects the FIRST/primary clause's negated-historical state; the appended clause introduces a different state and is a known source of confusion for single-label extraction.",
+    "difficulty": "hard"
+  },
+  {
+    "id": "SYN_050",
+    "text": "Purana sujan ka koi issue nahi tha.",
+    "entity": "swelling",
+    "gold_epistemic": "negated",
+    "gold_temporal": "historical",
+    "note": "Canonical negated-historical pattern for entity 'swelling'.",
+    "difficulty": "easy"
+  },
+  {
+    "id": "SYN_051",
+    "text": "Purana BP ka koi issue nahi tha.",
+    "entity": "BP",
+    "gold_epistemic": "negated",
+    "gold_temporal": "historical",
+    "note": "Canonical negated-historical pattern for entity 'BP'.",
+    "difficulty": "easy"
+  },
+  {
+    "id": "SYN_052",
+    "text": "Abhi dard hai kya?",
+    "entity": "pain",
+    "gold_epistemic": "queried",
+    "gold_temporal": "current",
+    "note": "Canonical queried-current pattern for entity 'pain'.",
+    "difficulty": "easy"
+  },
+  {
+    "id": "SYN_053",
+    "text": "Doctor ne pucha abhi khansi kaisa feel ho raha hai, hai ya nahi?",
+    "entity": "cough",
+    "gold_epistemic": "queried",
+    "gold_temporal": "current",
+    "note": "Canonical queried-current pattern for entity 'cough'.",
+    "difficulty": "medium"
+  },
+  {
+    "id": "SYN_054",
+    "text": "Abhi bhi follow-up ho raha hai kya?",
+    "entity": "follow-up",
+    "gold_epistemic": "queried",
+    "gold_temporal": "current",
+    "note": "Canonical queried-current pattern for entity 'follow-up'.",
+    "difficulty": "medium"
+  },
+  {
+    "id": "SYN_055",
+    "text": "Doctor ne pucha abhi dawai kaisa feel ho raha hai, hai ya nahi?",
+    "entity": "medication",
+    "gold_epistemic": "queried",
+    "gold_temporal": "current",
+    "note": "Canonical queried-current pattern for entity 'medication'.",
+    "difficulty": "medium"
+  },
+  {
+    "id": "SYN_056",
+    "text": "Kya abhi bhi sugar hai?",
+    "entity": "sugar",
+    "gold_epistemic": "queried",
+    "gold_temporal": "current",
+    "note": "Canonical queried-current pattern for entity 'sugar'.",
+    "difficulty": "easy"
+  },
+  {
+    "id": "SYN_057",
+    "text": "Doctor ne pucha abhi weight kaisa feel ho raha hai, hai ya nahi?",
+    "entity": "weight",
+    "gold_epistemic": "queried",
+    "gold_temporal": "current",
+    "note": "Canonical queried-current pattern for entity 'weight'.",
+    "difficulty": "medium"
+  },
+  {
+    "id": "SYN_058",
+    "text": "Kya abhi bhi dard hai?",
+    "entity": "pain",
+    "gold_epistemic": "queried",
+    "gold_temporal": "current",
+    "note": "Canonical queried-current pattern for entity 'pain'.",
+    "difficulty": "easy"
+  },
+  {
+    "id": "SYN_059",
+    "text": "Abhi bhi saans phoolna ho raha hai kya?",
+    "entity": "breathlessness",
+    "gold_epistemic": "queried",
+    "gold_temporal": "current",
+    "note": "Canonical queried-current pattern for entity 'breathlessness'.",
+    "difficulty": "medium"
+  },
+  {
+    "id": "SYN_060",
+    "text": "Abhi bhi bukhar ho raha hai kya?",
+    "entity": "fever",
+    "gold_epistemic": "queried",
+    "gold_temporal": "current",
+    "note": "Canonical queried-current pattern for entity 'fever'.",
+    "difficulty": "medium"
+  },
+  {
+    "id": "SYN_061",
+    "text": "Abhi bhi bimari ho raha hai kya?",
+    "entity": "diagnosis",
+    "gold_epistemic": "queried",
+    "gold_temporal": "current",
+    "note": "Canonical queried-current pattern for entity 'diagnosis'.",
+    "difficulty": "medium"
+  },
+  {
+    "id": "SYN_062",
+    "text": "Doctor ne pucha abhi bimari kaisa feel ho raha hai, hai ya nahi?",
+    "entity": "diagnosis",
+    "gold_epistemic": "queried",
+    "gold_temporal": "current",
+    "note": "Canonical queried-current pattern for entity 'diagnosis'.",
+    "difficulty": "medium"
+  },
+  {
+    "id": "SYN_063",
+    "text": "Kya abhi bhi allergy hai?",
+    "entity": "allergy",
+    "gold_epistemic": "queried",
+    "gold_temporal": "current",
+    "note": "Canonical queried-current pattern for entity 'allergy'.",
+    "difficulty": "easy"
+  },
+  {
+    "id": "SYN_064",
+    "text": "Abhi bhi sujan ho raha hai kya?",
+    "entity": "swelling",
+    "gold_epistemic": "queried",
+    "gold_temporal": "current",
+    "note": "Canonical queried-current pattern for entity 'swelling'.",
+    "difficulty": "medium"
+  },
+  {
+    "id": "SYN_065",
+    "text": "Kya abhi bhi sar dard hai?",
+    "entity": "headache",
+    "gold_epistemic": "queried",
+    "gold_temporal": "current",
+    "note": "Canonical queried-current pattern for entity 'headache'.",
+    "difficulty": "easy"
+  },
+  {
+    "id": "SYN_066",
+    "text": "Kya abhi bhi ulti/nausea hai?",
+    "entity": "nausea",
+    "gold_epistemic": "queried",
+    "gold_temporal": "current",
+    "note": "Canonical queried-current pattern for entity 'nausea'.",
+    "difficulty": "easy"
+  },
+  {
+    "id": "SYN_067",
+    "text": "Kya aajkal test/report ki dikkat ho rahi hai, batao zara?",
+    "entity": "test result",
+    "gold_epistemic": "queried",
+    "gold_temporal": "current",
+    "note": "Canonical queried-current pattern for entity 'test result'.",
+    "difficulty": "medium"
+  },
+  {
+    "id": "SYN_068",
+    "text": "Kya abhi bhi BP hai?",
+    "entity": "BP",
+    "gold_epistemic": "queried",
+    "gold_temporal": "current",
+    "note": "Canonical queried-current pattern for entity 'BP'.",
+    "difficulty": "easy"
+  },
+  {
+    "id": "SYN_069",
+    "text": "Shayad agle hafte dawai karwana padega.",
+    "entity": "medication",
+    "gold_epistemic": "uncertain",
+    "gold_temporal": "planned",
+    "note": "Canonical uncertain-planned pattern for entity 'medication'.",
+    "difficulty": "easy"
+  },
+  {
+    "id": "SYN_070",
+    "text": "Shayad agle hafte ulti/nausea karwana padega.",
+    "entity": "nausea",
+    "gold_epistemic": "uncertain",
+    "gold_temporal": "planned",
+    "note": "Canonical uncertain-planned pattern for entity 'nausea'.",
+    "difficulty": "easy"
+  },
+  {
+    "id": "SYN_071",
+    "text": "Shayad agli visit mein sar dard dobara karwana pade, doctor ne soch ke bataya.",
+    "entity": "headache",
+    "gold_epistemic": "uncertain",
+    "gold_temporal": "planned",
+    "note": "Canonical uncertain-planned pattern for entity 'headache'.",
+    "difficulty": "medium"
+  },
+  {
+    "id": "SYN_072",
+    "text": "Ho sakta hai dard next time badalna pade.",
+    "entity": "pain",
+    "gold_epistemic": "uncertain",
+    "gold_temporal": "planned",
+    "note": "Canonical uncertain-planned pattern for entity 'pain'.",
+    "difficulty": "easy"
+  },
+  {
+    "id": "SYN_073",
+    "text": "Shayad agli visit mein sar dard dobara karwana pade, doctor ne soch ke bataya.",
+    "entity": "headache",
+    "gold_epistemic": "uncertain",
+    "gold_temporal": "planned",
+    "note": "Canonical uncertain-planned pattern for entity 'headache'.",
+    "difficulty": "medium"
+  },
+  {
+    "id": "SYN_074",
+    "text": "Ho sakta hai sugar next time badalna pade.",
+    "entity": "sugar",
+    "gold_epistemic": "uncertain",
+    "gold_temporal": "planned",
+    "note": "Canonical uncertain-planned pattern for entity 'sugar'.",
+    "difficulty": "easy"
+  },
+  {
+    "id": "SYN_075",
+    "text": "Shayad agli visit mein bimari dobara karwana pade, doctor ne soch ke bataya.",
+    "entity": "diagnosis",
+    "gold_epistemic": "uncertain",
+    "gold_temporal": "planned",
+    "note": "Canonical uncertain-planned pattern for entity 'diagnosis'.",
+    "difficulty": "medium"
+  },
+  {
+    "id": "SYN_076",
+    "text": "Lagta hai follow-up thodi der mein karna pad sakta hai, abhi pakka nahi hai.",
+    "entity": "follow-up",
+    "gold_epistemic": "uncertain",
+    "gold_temporal": "planned",
+    "note": "Canonical uncertain-planned pattern for entity 'follow-up'.",
+    "difficulty": "medium"
+  },
+  {
+    "id": "SYN_077",
+    "text": "Shayad agle hafte bukhar karwana padega.",
+    "entity": "fever",
+    "gold_epistemic": "uncertain",
+    "gold_temporal": "planned",
+    "note": "Canonical uncertain-planned pattern for entity 'fever'.",
+    "difficulty": "easy"
+  },
+  {
+    "id": "SYN_078",
+    "text": "Shayad agli visit mein BP dobara karwana pade, doctor ne soch ke bataya.",
+    "entity": "BP",
+    "gold_epistemic": "uncertain",
+    "gold_temporal": "planned",
+    "note": "Canonical uncertain-planned pattern for entity 'BP'.",
+    "difficulty": "medium"
+  },
+  {
+    "id": "SYN_079",
+    "text": "Shayad agli visit mein sujan dobara karwana pade, doctor ne soch ke bataya.",
+    "entity": "swelling",
+    "gold_epistemic": "uncertain",
+    "gold_temporal": "planned",
+    "note": "Canonical uncertain-planned pattern for entity 'swelling'.",
+    "difficulty": "medium"
+  },
+  {
+    "id": "SYN_080",
+    "text": "Shayad agli visit mein allergy dobara karwana pade, doctor ne soch ke bataya.",
+    "entity": "allergy",
+    "gold_epistemic": "uncertain",
+    "gold_temporal": "planned",
+    "note": "Canonical uncertain-planned pattern for entity 'allergy'.",
+    "difficulty": "medium"
+  },
+  {
+    "id": "SYN_081",
+    "text": "Shayad agle hafte khansi karwana padega.",
+    "entity": "cough",
+    "gold_epistemic": "uncertain",
+    "gold_temporal": "planned",
+    "note": "Canonical uncertain-planned pattern for entity 'cough'.",
+    "difficulty": "easy"
+  },
+  {
+    "id": "SYN_082",
+    "text": "Ho sakta hai follow-up next time badalna pade.",
+    "entity": "follow-up",
+    "gold_epistemic": "uncertain",
+    "gold_temporal": "planned",
+    "note": "Canonical uncertain-planned pattern for entity 'follow-up'.",
+    "difficulty": "easy"
+  },
+  {
+    "id": "SYN_083",
+    "text": "Ho sakta hai saans phoolna next time badalna pade.",
+    "entity": "breathlessness",
+    "gold_epistemic": "uncertain",
+    "gold_temporal": "planned",
+    "note": "Canonical uncertain-planned pattern for entity 'breathlessness'.",
+    "difficulty": "easy"
+  },
+  {
+    "id": "SYN_084",
+    "text": "Ho sakta hai test/report next time badalna pade.",
+    "entity": "test result",
+    "gold_epistemic": "uncertain",
+    "gold_temporal": "planned",
+    "note": "Canonical uncertain-planned pattern for entity 'test result'.",
+    "difficulty": "easy"
+  },
+  {
+    "id": "SYN_085",
+    "text": "Shayad agle hafte weight karwana padega.",
+    "entity": "weight",
+    "gold_epistemic": "uncertain",
+    "gold_temporal": "planned",
+    "note": "Canonical uncertain-planned pattern for entity 'weight'.",
+    "difficulty": "easy"
+  },
+  {
+    "id": "SYN_086",
+    "text": "Abhi follow-up bilkul nahi hai, lekin kal raat thi.",
+    "entity": "follow-up",
+    "gold_epistemic": "negated",
+    "gold_temporal": "current",
+    "note": "Multi-clause sentence — entity 'follow-up' appears with a contrasting second clause. Gold label reflects the FIRST/primary clause's negated-current state; the appended clause introduces a different state and is a known source of confusion for single-label extraction.",
+    "difficulty": "hard"
+  },
+  {
+    "id": "SYN_087",
+    "text": "Filhaal allergy ki koi complaint nahi hai, sab normal chal raha hai.",
+    "entity": "allergy",
+    "gold_epistemic": "negated",
+    "gold_temporal": "current",
+    "note": "Canonical negated-current pattern for entity 'allergy'.",
+    "difficulty": "medium"
+  },
+  {
+    "id": "SYN_088",
+    "text": "dard ab bilkul nahi ho raha.",
+    "entity": "pain",
+    "gold_epistemic": "negated",
+    "gold_temporal": "current",
+    "note": "Canonical negated-current pattern for entity 'pain'.",
+    "difficulty": "medium"
+  },
+  {
+    "id": "SYN_089",
+    "text": "bukhar ab bilkul nahi ho raha.",
+    "entity": "fever",
+    "gold_epistemic": "negated",
+    "gold_temporal": "current",
+    "note": "Canonical negated-current pattern for entity 'fever'.",
+    "difficulty": "medium"
+  },
+  {
+    "id": "SYN_090",
+    "text": "sugar ab bilkul nahi ho raha, lekin kal raat thi.",
+    "entity": "sugar",
+    "gold_epistemic": "negated",
+    "gold_temporal": "current",
+    "note": "Multi-clause sentence — entity 'sugar' appears with a contrasting second clause. Gold label reflects the FIRST/primary clause's negated-current state; the appended clause introduces a different state and is a known source of confusion for single-label extraction.",
+    "difficulty": "hard"
+  },
+  {
+    "id": "SYN_091",
+    "text": "Abhi test/report bilkul nahi hai.",
+    "entity": "test result",
+    "gold_epistemic": "negated",
+    "gold_temporal": "current",
+    "note": "Canonical negated-current pattern for entity 'test result'.",
+    "difficulty": "easy"
+  },
+  {
+    "id": "SYN_092",
+    "text": "weight nahi hai ab.",
+    "entity": "weight",
+    "gold_epistemic": "negated",
+    "gold_temporal": "current",
+    "note": "Canonical negated-current pattern for entity 'weight'.",
+    "difficulty": "easy"
+  },
+  {
+    "id": "SYN_093",
+    "text": "Abhi bimari bilkul nahi hai.",
+    "entity": "diagnosis",
+    "gold_epistemic": "negated",
+    "gold_temporal": "current",
+    "note": "Canonical negated-current pattern for entity 'diagnosis'.",
+    "difficulty": "easy"
+  },
+  {
+    "id": "SYN_094",
+    "text": "Abhi dawai bilkul nahi hai, lekin kal raat thi.",
+    "entity": "medication",
+    "gold_epistemic": "negated",
+    "gold_temporal": "current",
+    "note": "Multi-clause sentence — entity 'medication' appears with a contrasting second clause. Gold label reflects the FIRST/primary clause's negated-current state; the appended clause introduces a different state and is a known source of confusion for single-label extraction.",
+    "difficulty": "hard"
+  },
+  {
+    "id": "SYN_095",
+    "text": "khansi ab control mein hai, koi symptom nahi dikh raha abhi.",
+    "entity": "cough",
+    "gold_epistemic": "negated",
+    "gold_temporal": "current",
+    "note": "Canonical negated-current pattern for entity 'cough'.",
+    "difficulty": "medium"
+  },
+  {
+    "id": "SYN_096",
+    "text": "khansi nahi hai ab.",
+    "entity": "cough",
+    "gold_epistemic": "negated",
+    "gold_temporal": "current",
+    "note": "Canonical negated-current pattern for entity 'cough'.",
+    "difficulty": "easy"
+  },
+  {
+    "id": "SYN_097",
+    "text": "Filhaal sujan ki koi complaint nahi hai, sab normal chal raha hai.",
+    "entity": "swelling",
+    "gold_epistemic": "negated",
+    "gold_temporal": "current",
+    "note": "Canonical negated-current pattern for entity 'swelling'.",
+    "difficulty": "medium"
+  },
+  {
+    "id": "SYN_098",
+    "text": "test/report ab bilkul nahi ho raha.",
+    "entity": "test result",
+    "gold_epistemic": "negated",
+    "gold_temporal": "current",
+    "note": "Canonical negated-current pattern for entity 'test result'.",
+    "difficulty": "medium"
+  },
+  {
+    "id": "SYN_099",
+    "text": "sar dard nahi hai ab.",
+    "entity": "headache",
+    "gold_epistemic": "negated",
+    "gold_temporal": "current",
+    "note": "Canonical negated-current pattern for entity 'headache'.",
+    "difficulty": "easy"
+  },
+  {
+    "id": "SYN_100",
+    "text": "BP nahi hai ab, lekin kal raat thi.",
+    "entity": "BP",
+    "gold_epistemic": "negated",
+    "gold_temporal": "current",
+    "note": "Multi-clause sentence — entity 'BP' appears with a contrasting second clause. Gold label reflects the FIRST/primary clause's negated-current state; the appended clause introduces a different state and is a known source of confusion for single-label extraction.",
+    "difficulty": "hard"
+  },
+  {
+    "id": "SYN_101",
+    "text": "Filhaal ulti/nausea ki koi complaint nahi hai, sab normal chal raha hai, lekin kal raat thi.",
+    "entity": "nausea",
+    "gold_epistemic": "negated",
+    "gold_temporal": "current",
+    "note": "Multi-clause sentence — entity 'nausea' appears with a contrasting second clause. Gold label reflects the FIRST/primary clause's negated-current state; the appended clause introduces a different state and is a known source of confusion for single-label extraction.",
+    "difficulty": "hard"
+  },
+  {
+    "id": "SYN_102",
+    "text": "saans phoolna nahi hai ab.",
+    "entity": "breathlessness",
+    "gold_epistemic": "negated",
+    "gold_temporal": "current",
+    "note": "Canonical negated-current pattern for entity 'breathlessness'.",
+    "difficulty": "easy"
+  },
+  {
+    "id": "SYN_103",
+    "text": "Kya purana sugar tha?",
+    "entity": "sugar",
+    "gold_epistemic": "queried",
+    "gold_temporal": "historical",
+    "note": "Canonical queried-historical pattern for entity 'sugar'.",
+    "difficulty": "easy"
+  },
+  {
+    "id": "SYN_104",
+    "text": "Doctor ne pucha kya pehle kabhi dawai ki problem hui thi?",
+    "entity": "medication",
+    "gold_epistemic": "queried",
+    "gold_temporal": "historical",
+    "note": "Canonical queried-historical pattern for entity 'medication'.",
+    "difficulty": "medium"
+  },
+  {
+    "id": "SYN_105",
+    "text": "Pehle BP thi kya?",
+    "entity": "BP",
+    "gold_epistemic": "queried",
+    "gold_temporal": "historical",
+    "note": "Canonical queried-historical pattern for entity 'BP'.",
+    "difficulty": "easy"
+  },
+  {
+    "id": "SYN_106",
+    "text": "Kya purana bukhar tha?",
+    "entity": "fever",
+    "gold_epistemic": "queried",
+    "gold_temporal": "historical",
+    "note": "Canonical queried-historical pattern for entity 'fever'.",
+    "difficulty": "easy"
+  },
+  {
+    "id": "SYN_107",
+    "text": "Doctor ne pucha kya pehle kabhi test/report ki problem hui thi?",
+    "entity": "test result",
+    "gold_epistemic": "queried",
+    "gold_temporal": "historical",
+    "note": "Canonical queried-historical pattern for entity 'test result'.",
+    "difficulty": "medium"
+  },
+  {
+    "id": "SYN_108",
+    "text": "Kya purana sujan tha?",
+    "entity": "swelling",
+    "gold_epistemic": "queried",
+    "gold_temporal": "historical",
+    "note": "Canonical queried-historical pattern for entity 'swelling'.",
+    "difficulty": "easy"
+  },
+  {
+    "id": "SYN_109",
+    "text": "Doctor ne pucha kya pehle kabhi allergy ki problem hui thi?",
+    "entity": "allergy",
+    "gold_epistemic": "queried",
+    "gold_temporal": "historical",
+    "note": "Canonical queried-historical pattern for entity 'allergy'.",
+    "difficulty": "medium"
+  },
+  {
+    "id": "SYN_110",
+    "text": "Kya purana weight tha?",
+    "entity": "weight",
+    "gold_epistemic": "queried",
+    "gold_temporal": "historical",
+    "note": "Canonical queried-historical pattern for entity 'weight'.",
+    "difficulty": "easy"
+  },
+  {
+    "id": "SYN_111",
+    "text": "Kya aapko purane time mein bimari hua tha, koi record hai?",
+    "entity": "diagnosis",
+    "gold_epistemic": "queried",
+    "gold_temporal": "historical",
+    "note": "Canonical queried-historical pattern for entity 'diagnosis'.",
+    "difficulty": "medium"
+  },
+  {
+    "id": "SYN_112",
+    "text": "Kya purana sar dard tha?",
+    "entity": "headache",
+    "gold_epistemic": "queried",
+    "gold_temporal": "historical",
+    "note": "Canonical queried-historical pattern for entity 'headache'.",
+    "difficulty": "easy"
+  },
+  {
+    "id": "SYN_113",
+    "text": "Pehle saans phoolna thi kya?",
+    "entity": "breathlessness",
+    "gold_epistemic": "queried",
+    "gold_temporal": "historical",
+    "note": "Canonical queried-historical pattern for entity 'breathlessness'.",
+    "difficulty": "easy"
+  },
+  {
+    "id": "SYN_114",
+    "text": "Kya aapko purane time mein khansi hua tha, koi record hai?",
+    "entity": "cough",
+    "gold_epistemic": "queried",
+    "gold_temporal": "historical",
+    "note": "Canonical queried-historical pattern for entity 'cough'.",
+    "difficulty": "medium"
+  },
+  {
+    "id": "SYN_115",
+    "text": "Kya aapko purane time mein dard hua tha, koi record hai?",
+    "entity": "pain",
+    "gold_epistemic": "queried",
+    "gold_temporal": "historical",
+    "note": "Canonical queried-historical pattern for entity 'pain'.",
+    "difficulty": "medium"
+  },
+  {
+    "id": "SYN_116",
+    "text": "Kya purana test/report tha?",
+    "entity": "test result",
+    "gold_epistemic": "queried",
+    "gold_temporal": "historical",
+    "note": "Canonical queried-historical pattern for entity 'test result'.",
+    "difficulty": "easy"
+  },
+  {
+    "id": "SYN_117",
+    "text": "Kya purana ulti/nausea tha?",
+    "entity": "nausea",
+    "gold_epistemic": "queried",
+    "gold_temporal": "historical",
+    "note": "Canonical queried-historical pattern for entity 'nausea'.",
+    "difficulty": "easy"
+  },
+  {
+    "id": "SYN_118",
+    "text": "Kya purana follow-up tha?",
+    "entity": "follow-up",
+    "gold_epistemic": "queried",
+    "gold_temporal": "historical",
+    "note": "Canonical queried-historical pattern for entity 'follow-up'.",
+    "difficulty": "easy"
+  },
+  {
+    "id": "SYN_119",
+    "text": "Kya aapko purane time mein bimari hua tha, koi record hai?",
+    "entity": "diagnosis",
+    "gold_epistemic": "queried",
+    "gold_temporal": "historical",
+    "note": "Canonical queried-historical pattern for entity 'diagnosis'.",
+    "difficulty": "medium"
+  },
+  {
+    "id": "SYN_120",
+    "text": "Abhi test/report hai.",
+    "entity": "test result",
+    "gold_epistemic": "affirmed",
+    "gold_temporal": "current",
+    "note": "Canonical affirmed-current pattern for entity 'test result'.",
+    "difficulty": "easy"
+  },
+  {
+    "id": "SYN_121",
+    "text": "dawai filhaal high chal raha hai, pehle bilkul nahi tha.",
+    "entity": "medication",
+    "gold_epistemic": "affirmed",
+    "gold_temporal": "current",
+    "note": "Multi-clause sentence — entity 'medication' appears with a contrasting second clause. Gold label reflects the FIRST/primary clause's affirmed-current state; the appended clause introduces a different state and is a known source of confusion for single-label extraction.",
+    "difficulty": "hard"
+  },
+  {
+    "id": "SYN_122",
+    "text": "saans phoolna filhaal high chal raha hai.",
+    "entity": "breathlessness",
+    "gold_epistemic": "affirmed",
+    "gold_temporal": "current",
+    "note": "Canonical affirmed-current pattern for entity 'breathlessness'.",
+    "difficulty": "easy"
+  },
+  {
+    "id": "SYN_123",
+    "text": "Aaj kal khansi ki problem bani hui hai, roz mehsoos ho raha hai.",
+    "entity": "cough",
+    "gold_epistemic": "affirmed",
+    "gold_temporal": "current",
+    "note": "Canonical affirmed-current pattern for entity 'cough'.",
+    "difficulty": "medium"
+  },
+  {
+    "id": "SYN_124",
+    "text": "Abhi bhi dard bana hua hai.",
+    "entity": "pain",
+    "gold_epistemic": "affirmed",
+    "gold_temporal": "current",
+    "note": "Canonical affirmed-current pattern for entity 'pain'.",
+    "difficulty": "medium"
+  },
+  {
+    "id": "SYN_125",
+    "text": "Abhi bhi BP bana hua hai.",
+    "entity": "BP",
+    "gold_epistemic": "affirmed",
+    "gold_temporal": "current",
+    "note": "Canonical affirmed-current pattern for entity 'BP'.",
+    "difficulty": "medium"
+  },
+  {
+    "id": "SYN_126",
+    "text": "Aaj kal sujan ki problem bani hui hai, roz mehsoos ho raha hai, pehle bilkul nahi tha.",
+    "entity": "swelling",
+    "gold_epistemic": "affirmed",
+    "gold_temporal": "current",
+    "note": "Multi-clause sentence — entity 'swelling' appears with a contrasting second clause. Gold label reflects the FIRST/primary clause's affirmed-current state; the appended clause introduces a different state and is a known source of confusion for single-label extraction.",
+    "difficulty": "hard"
+  },
+  {
+    "id": "SYN_127",
+    "text": "Abhi bimari hai.",
+    "entity": "diagnosis",
+    "gold_epistemic": "affirmed",
+    "gold_temporal": "current",
+    "note": "Canonical affirmed-current pattern for entity 'diagnosis'.",
+    "difficulty": "easy"
+  },
+  {
+    "id": "SYN_128",
+    "text": "sujan filhaal high chal raha hai.",
+    "entity": "swelling",
+    "gold_epistemic": "affirmed",
+    "gold_temporal": "current",
+    "note": "Canonical affirmed-current pattern for entity 'swelling'.",
+    "difficulty": "easy"
+  },
+  {
+    "id": "SYN_129",
+    "text": "Abhi weight hai, pehle bilkul nahi tha.",
+    "entity": "weight",
+    "gold_epistemic": "affirmed",
+    "gold_temporal": "current",
+    "note": "Multi-clause sentence — entity 'weight' appears with a contrasting second clause. Gold label reflects the FIRST/primary clause's affirmed-current state; the appended clause introduces a different state and is a known source of confusion for single-label extraction.",
+    "difficulty": "hard"
+  },
+  {
+    "id": "SYN_130",
+    "text": "Abhi bukhar hai.",
+    "entity": "fever",
+    "gold_epistemic": "affirmed",
+    "gold_temporal": "current",
+    "note": "Canonical affirmed-current pattern for entity 'fever'.",
+    "difficulty": "easy"
+  },
+  {
+    "id": "SYN_131",
+    "text": "Aaj kal allergy ki problem bani hui hai, roz mehsoos ho raha hai, pehle bilkul nahi tha.",
+    "entity": "allergy",
+    "gold_epistemic": "affirmed",
+    "gold_temporal": "current",
+    "note": "Multi-clause sentence — entity 'allergy' appears with a contrasting second clause. Gold label reflects the FIRST/primary clause's affirmed-current state; the appended clause introduces a different state and is a known source of confusion for single-label extraction.",
+    "difficulty": "hard"
+  },
+  {
+    "id": "SYN_132",
+    "text": "sar dard filhaal high chal raha hai, pehle bilkul nahi tha.",
+    "entity": "headache",
+    "gold_epistemic": "affirmed",
+    "gold_temporal": "current",
+    "note": "Multi-clause sentence — entity 'headache' appears with a contrasting second clause. Gold label reflects the FIRST/primary clause's affirmed-current state; the appended clause introduces a different state and is a known source of confusion for single-label extraction.",
+    "difficulty": "hard"
+  },
+  {
+    "id": "SYN_133",
+    "text": "Abhi sugar hai.",
+    "entity": "sugar",
+    "gold_epistemic": "affirmed",
+    "gold_temporal": "current",
+    "note": "Canonical affirmed-current pattern for entity 'sugar'.",
+    "difficulty": "easy"
+  },
+  {
+    "id": "SYN_134",
+    "text": "Aaj kal follow-up ki problem bani hui hai, roz mehsoos ho raha hai.",
+    "entity": "follow-up",
+    "gold_epistemic": "affirmed",
+    "gold_temporal": "current",
+    "note": "Canonical affirmed-current pattern for entity 'follow-up'.",
+    "difficulty": "medium"
+  },
+  {
+    "id": "SYN_135",
+    "text": "Is waqt dard normal se zyada hai, patient ne khud confirm kiya.",
+    "entity": "pain",
+    "gold_epistemic": "affirmed",
+    "gold_temporal": "current",
+    "note": "Canonical affirmed-current pattern for entity 'pain'.",
+    "difficulty": "medium"
+  },
+  {
+    "id": "SYN_136",
+    "text": "Aaj kal ulti/nausea ki problem bani hui hai, roz mehsoos ho raha hai.",
+    "entity": "nausea",
+    "gold_epistemic": "affirmed",
+    "gold_temporal": "current",
+    "note": "Canonical affirmed-current pattern for entity 'nausea'.",
+    "difficulty": "medium"
+  },
+  {
+    "id": "SYN_137",
+    "text": "bukhar pehle high tha.",
+    "entity": "fever",
+    "gold_epistemic": "affirmed",
+    "gold_temporal": "historical",
+    "note": "Canonical affirmed-historical pattern for entity 'fever'.",
+    "difficulty": "easy"
+  },
+  {
+    "id": "SYN_138",
+    "text": "Pehle bimari tha.",
+    "entity": "diagnosis",
+    "gold_epistemic": "affirmed",
+    "gold_temporal": "historical",
+    "note": "Canonical affirmed-historical pattern for entity 'diagnosis'.",
+    "difficulty": "easy"
+  },
+  {
+    "id": "SYN_139",
+    "text": "Do hafte pehle khansi hua tha, doctor ko dikhaya bhi tha.",
+    "entity": "cough",
+    "gold_epistemic": "affirmed",
+    "gold_temporal": "historical",
+    "note": "Canonical affirmed-historical pattern for entity 'cough'.",
+    "difficulty": "medium"
+  },
+  {
+    "id": "SYN_140",
+    "text": "Purane time mein sujan kaafi zyada tha.",
+    "entity": "swelling",
+    "gold_epistemic": "affirmed",
+    "gold_temporal": "historical",
+    "note": "Canonical affirmed-historical pattern for entity 'swelling'.",
+    "difficulty": "medium"
+  },
+  {
+    "id": "SYN_141",
+    "text": "Do hafte pehle weight hua tha, doctor ko dikhaya bhi tha.",
+    "entity": "weight",
+    "gold_epistemic": "affirmed",
+    "gold_temporal": "historical",
+    "note": "Canonical affirmed-historical pattern for entity 'weight'.",
+    "difficulty": "medium"
+  },
+  {
+    "id": "SYN_142",
+    "text": "Patient ko pehle se dawai ki problem thi, kaafi time se chal rahi thi.",
+    "entity": "medication",
+    "gold_epistemic": "affirmed",
+    "gold_temporal": "historical",
+    "note": "Canonical affirmed-historical pattern for entity 'medication'.",
+    "difficulty": "medium"
+  },
+  {
+    "id": "SYN_143",
+    "text": "ulti/nausea pehle high tha.",
+    "entity": "nausea",
+    "gold_epistemic": "affirmed",
+    "gold_temporal": "historical",
+    "note": "Canonical affirmed-historical pattern for entity 'nausea'.",
+    "difficulty": "easy"
+  },
+  {
+    "id": "SYN_144",
+    "text": "test/report pehle high tha.",
+    "entity": "test result",
+    "gold_epistemic": "affirmed",
+    "gold_temporal": "historical",
+    "note": "Canonical affirmed-historical pattern for entity 'test result'.",
+    "difficulty": "easy"
+  },
+  {
+    "id": "SYN_145",
+    "text": "Patient ko pehle se weight ki problem thi, kaafi time se chal rahi thi.",
+    "entity": "weight",
+    "gold_epistemic": "affirmed",
+    "gold_temporal": "historical",
+    "note": "Canonical affirmed-historical pattern for entity 'weight'.",
+    "difficulty": "medium"
+  },
+  {
+    "id": "SYN_146",
+    "text": "saans phoolna pehle high tha, ab control mein hai.",
+    "entity": "breathlessness",
+    "gold_epistemic": "affirmed",
+    "gold_temporal": "historical",
+    "note": "Multi-clause sentence — entity 'breathlessness' appears with a contrasting second clause. Gold label reflects the FIRST/primary clause's affirmed-historical state; the appended clause introduces a different state and is a known source of confusion for single-label extraction.",
+    "difficulty": "hard"
+  },
+  {
+    "id": "SYN_147",
+    "text": "Patient ko pehle se sar dard ki problem thi, kaafi time se chal rahi thi.",
+    "entity": "headache",
+    "gold_epistemic": "affirmed",
+    "gold_temporal": "historical",
+    "note": "Canonical affirmed-historical pattern for entity 'headache'.",
+    "difficulty": "medium"
+  },
+  {
+    "id": "SYN_148",
+    "text": "Pehle allergy tha, ab control mein hai.",
+    "entity": "allergy",
+    "gold_epistemic": "affirmed",
+    "gold_temporal": "historical",
+    "note": "Multi-clause sentence — entity 'allergy' appears with a contrasting second clause. Gold label reflects the FIRST/primary clause's affirmed-historical state; the appended clause introduces a different state and is a known source of confusion for single-label extraction.",
+    "difficulty": "hard"
+  },
+  {
+    "id": "SYN_149",
+    "text": "Do hafte pehle BP hua tha, doctor ko dikhaya bhi tha.",
+    "entity": "BP",
+    "gold_epistemic": "affirmed",
+    "gold_temporal": "historical",
+    "note": "Canonical affirmed-historical pattern for entity 'BP'.",
+    "difficulty": "medium"
+  },
+  {
+    "id": "SYN_150",
+    "text": "Patient ko pehle se dard ki problem thi, kaafi time se chal rahi thi.",
+    "entity": "pain",
+    "gold_epistemic": "affirmed",
+    "gold_temporal": "historical",
+    "note": "Canonical affirmed-historical pattern for entity 'pain'.",
+    "difficulty": "medium"
+  },
+  {
+    "id": "SYN_151",
+    "text": "Patient ko pehle se follow-up ki problem thi, kaafi time se chal rahi thi, ab control mein hai.",
+    "entity": "follow-up",
+    "gold_epistemic": "affirmed",
+    "gold_temporal": "historical",
+    "note": "Multi-clause sentence — entity 'follow-up' appears with a contrasting second clause. Gold label reflects the FIRST/primary clause's affirmed-historical state; the appended clause introduces a different state and is a known source of confusion for single-label extraction.",
+    "difficulty": "hard"
+  },
+  {
+    "id": "SYN_152",
+    "text": "sugar pehle high tha, ab control mein hai.",
+    "entity": "sugar",
+    "gold_epistemic": "affirmed",
+    "gold_temporal": "historical",
+    "note": "Multi-clause sentence — entity 'sugar' appears with a contrasting second clause. Gold label reflects the FIRST/primary clause's affirmed-historical state; the appended clause introduces a different state and is a known source of confusion for single-label extraction.",
+    "difficulty": "hard"
+  },
+  {
+    "id": "SYN_153",
+    "text": "Maybe pehle kabhi sugar hua tha, confirm nahi kar sakte abhi.",
+    "entity": "sugar",
+    "gold_epistemic": "uncertain",
+    "gold_temporal": "historical",
+    "note": "Canonical uncertain-historical pattern for entity 'sugar'.",
+    "difficulty": "medium"
+  },
+  {
+    "id": "SYN_154",
+    "text": "Shayad pehle weight tha.",
+    "entity": "weight",
+    "gold_epistemic": "uncertain",
+    "gold_temporal": "historical",
+    "note": "Canonical uncertain-historical pattern for entity 'weight'.",
+    "difficulty": "easy"
+  },
+  {
+    "id": "SYN_155",
+    "text": "Shayad pehle bhi allergy ki problem thi, par patient ko pura yaad nahi hai.",
+    "entity": "allergy",
+    "gold_epistemic": "uncertain",
+    "gold_temporal": "historical",
+    "note": "Canonical uncertain-historical pattern for entity 'allergy'.",
+    "difficulty": "medium"
+  },
+  {
+    "id": "SYN_156",
+    "text": "Shayad pehle bhi bukhar ki problem thi, par patient ko pura yaad nahi hai.",
+    "entity": "fever",
+    "gold_epistemic": "uncertain",
+    "gold_temporal": "historical",
+    "note": "Canonical uncertain-historical pattern for entity 'fever'.",
+    "difficulty": "medium"
+  },
+  {
+    "id": "SYN_157",
+    "text": "Lagta hai purane time mein sujan thi.",
+    "entity": "swelling",
+    "gold_epistemic": "uncertain",
+    "gold_temporal": "historical",
+    "note": "Canonical uncertain-historical pattern for entity 'swelling'.",
+    "difficulty": "easy"
+  },
+  {
+    "id": "SYN_158",
+    "text": "Shayad pehle saans phoolna tha.",
+    "entity": "breathlessness",
+    "gold_epistemic": "uncertain",
+    "gold_temporal": "historical",
+    "note": "Canonical uncertain-historical pattern for entity 'breathlessness'.",
+    "difficulty": "easy"
+  },
+  {
+    "id": "SYN_159",
+    "text": "Pata nahi pehle dard thi ya nahi.",
+    "entity": "pain",
+    "gold_epistemic": "uncertain",
+    "gold_temporal": "historical",
+    "note": "Canonical uncertain-historical pattern for entity 'pain'.",
+    "difficulty": "medium"
+  },
+  {
+    "id": "SYN_160",
+    "text": "Pata nahi pehle allergy thi ya nahi.",
+    "entity": "allergy",
+    "gold_epistemic": "uncertain",
+    "gold_temporal": "historical",
+    "note": "Canonical uncertain-historical pattern for entity 'allergy'.",
+    "difficulty": "medium"
+  },
+  {
+    "id": "SYN_161",
+    "text": "Lagta hai purane time mein ulti/nausea thi.",
+    "entity": "nausea",
+    "gold_epistemic": "uncertain",
+    "gold_temporal": "historical",
+    "note": "Canonical uncertain-historical pattern for entity 'nausea'.",
+    "difficulty": "easy"
+  },
+  {
+    "id": "SYN_162",
+    "text": "Pata nahi pehle sar dard thi ya nahi.",
+    "entity": "headache",
+    "gold_epistemic": "uncertain",
+    "gold_temporal": "historical",
+    "note": "Canonical uncertain-historical pattern for entity 'headache'.",
+    "difficulty": "medium"
+  },
+  {
+    "id": "SYN_163",
+    "text": "Maybe pehle kabhi dawai hua tha, confirm nahi kar sakte abhi.",
+    "entity": "medication",
+    "gold_epistemic": "uncertain",
+    "gold_temporal": "historical",
+    "note": "Canonical uncertain-historical pattern for entity 'medication'.",
+    "difficulty": "medium"
+  },
+  {
+    "id": "SYN_164",
+    "text": "Shayad pehle bhi BP ki problem thi, par patient ko pura yaad nahi hai.",
+    "entity": "BP",
+    "gold_epistemic": "uncertain",
+    "gold_temporal": "historical",
+    "note": "Canonical uncertain-historical pattern for entity 'BP'.",
+    "difficulty": "medium"
+  },
+  {
+    "id": "SYN_165",
+    "text": "Maybe pehle kabhi khansi hua tha, confirm nahi kar sakte abhi.",
+    "entity": "cough",
+    "gold_epistemic": "uncertain",
+    "gold_temporal": "historical",
+    "note": "Canonical uncertain-historical pattern for entity 'cough'.",
+    "difficulty": "medium"
+  },
+  {
+    "id": "SYN_166",
+    "text": "Lagta hai purane time mein follow-up thi.",
+    "entity": "follow-up",
+    "gold_epistemic": "uncertain",
+    "gold_temporal": "historical",
+    "note": "Canonical uncertain-historical pattern for entity 'follow-up'.",
+    "difficulty": "easy"
+  },
+  {
+    "id": "SYN_167",
+    "text": "Shayad pehle bhi bimari ki problem thi, par patient ko pura yaad nahi hai.",
+    "entity": "diagnosis",
+    "gold_epistemic": "uncertain",
+    "gold_temporal": "historical",
+    "note": "Canonical uncertain-historical pattern for entity 'diagnosis'.",
+    "difficulty": "medium"
+  },
+  {
+    "id": "SYN_168",
+    "text": "Pata nahi pehle test/report thi ya nahi.",
+    "entity": "test result",
+    "gold_epistemic": "uncertain",
+    "gold_temporal": "historical",
+    "note": "Canonical uncertain-historical pattern for entity 'test result'.",
+    "difficulty": "medium"
+  },
+  {
+    "id": "SYN_169",
+    "text": "Agle hafte follow-up karwa lo.",
+    "entity": "follow-up",
+    "gold_epistemic": "affirmed",
+    "gold_temporal": "planned",
+    "note": "Canonical affirmed-planned pattern for entity 'follow-up'.",
+    "difficulty": "easy"
+  },
+  {
+    "id": "SYN_170",
+    "text": "Agle hafte bukhar karwa lo.",
+    "entity": "fever",
+    "gold_epistemic": "affirmed",
+    "gold_temporal": "planned",
+    "note": "Canonical affirmed-planned pattern for entity 'fever'.",
+    "difficulty": "easy"
+  },
+  {
+    "id": "SYN_171",
+    "text": "allergy agli baar zaroor karwayenge.",
+    "entity": "allergy",
+    "gold_epistemic": "affirmed",
+    "gold_temporal": "planned",
+    "note": "Canonical affirmed-planned pattern for entity 'allergy'.",
+    "difficulty": "medium"
+  },
+  {
+    "id": "SYN_172",
+    "text": "Agle hafte saans phoolna karwa lo.",
+    "entity": "breathlessness",
+    "gold_epistemic": "affirmed",
+    "gold_temporal": "planned",
+    "note": "Canonical affirmed-planned pattern for entity 'breathlessness'.",
+    "difficulty": "easy"
+  },
+  {
+    "id": "SYN_173",
+    "text": "Agle hafte test/report karwa lo.",
+    "entity": "test result",
+    "gold_epistemic": "affirmed",
+    "gold_temporal": "planned",
+    "note": "Canonical affirmed-planned pattern for entity 'test result'.",
+    "difficulty": "easy"
+  },
+  {
+    "id": "SYN_174",
+    "text": "Next week sugar ke liye appointment fix ho gaya hai, karna hi hai, abhi karne ki zaroorat nahi.",
+    "entity": "sugar",
+    "gold_epistemic": "affirmed",
+    "gold_temporal": "planned",
+    "note": "Multi-clause sentence — entity 'sugar' appears with a contrasting second clause. Gold label reflects the FIRST/primary clause's affirmed-planned state; the appended clause introduces a different state and is a known source of confusion for single-label extraction.",
+    "difficulty": "hard"
+  },
+  {
+    "id": "SYN_175",
+    "text": "Agle hafte weight karwa lo.",
+    "entity": "weight",
+    "gold_epistemic": "affirmed",
+    "gold_temporal": "planned",
+    "note": "Canonical affirmed-planned pattern for entity 'weight'.",
+    "difficulty": "easy"
+  },
+  {
+    "id": "SYN_176",
+    "text": "bimari kal se shuru karna hai.",
+    "entity": "diagnosis",
+    "gold_epistemic": "affirmed",
+    "gold_temporal": "planned",
+    "note": "Canonical affirmed-planned pattern for entity 'diagnosis'.",
+    "difficulty": "easy"
+  },
+  {
+    "id": "SYN_177",
+    "text": "dard kal se shuru karna hai, abhi karne ki zaroorat nahi.",
+    "entity": "pain",
+    "gold_epistemic": "affirmed",
+    "gold_temporal": "planned",
+    "note": "Multi-clause sentence — entity 'pain' appears with a contrasting second clause. Gold label reflects the FIRST/primary clause's affirmed-planned state; the appended clause introduces a different state and is a known source of confusion for single-label extraction.",
+    "difficulty": "hard"
+  },
+  {
+    "id": "SYN_178",
+    "text": "Next week khansi ke liye appointment fix ho gaya hai, karna hi hai.",
+    "entity": "cough",
+    "gold_epistemic": "affirmed",
+    "gold_temporal": "planned",
+    "note": "Canonical affirmed-planned pattern for entity 'cough'.",
+    "difficulty": "medium"
+  },
+  {
+    "id": "SYN_179",
+    "text": "Next week sar dard ke liye appointment fix ho gaya hai, karna hi hai, abhi karne ki zaroorat nahi.",
+    "entity": "headache",
+    "gold_epistemic": "affirmed",
+    "gold_temporal": "planned",
+    "note": "Multi-clause sentence — entity 'headache' appears with a contrasting second clause. Gold label reflects the FIRST/primary clause's affirmed-planned state; the appended clause introduces a different state and is a known source of confusion for single-label extraction.",
+    "difficulty": "hard"
+  },
+  {
+    "id": "SYN_180",
+    "text": "Doctor ne bola hai ki agli visit mein ulti/nausea dobara check karwana hai.",
+    "entity": "nausea",
+    "gold_epistemic": "affirmed",
+    "gold_temporal": "planned",
+    "note": "Canonical affirmed-planned pattern for entity 'nausea'.",
+    "difficulty": "medium"
+  },
+  {
+    "id": "SYN_181",
+    "text": "BP agli baar zaroor karwayenge.",
+    "entity": "BP",
+    "gold_epistemic": "affirmed",
+    "gold_temporal": "planned",
+    "note": "Canonical affirmed-planned pattern for entity 'BP'.",
+    "difficulty": "medium"
+  },
+  {
+    "id": "SYN_182",
+    "text": "dawai kal se shuru karna hai, abhi karne ki zaroorat nahi.",
+    "entity": "medication",
+    "gold_epistemic": "affirmed",
+    "gold_temporal": "planned",
+    "note": "Multi-clause sentence — entity 'medication' appears with a contrasting second clause. Gold label reflects the FIRST/primary clause's affirmed-planned state; the appended clause introduces a different state and is a known source of confusion for single-label extraction.",
+    "difficulty": "hard"
+  },
+  {
+    "id": "SYN_183",
+    "text": "BP kal se shuru karna hai.",
+    "entity": "BP",
+    "gold_epistemic": "affirmed",
+    "gold_temporal": "planned",
+    "note": "Canonical affirmed-planned pattern for entity 'BP'.",
+    "difficulty": "easy"
+  },
+  {
+    "id": "SYN_184",
+    "text": "Doctor ne bola hai ki agli visit mein sujan dobara check karwana hai.",
+    "entity": "swelling",
+    "gold_epistemic": "affirmed",
+    "gold_temporal": "planned",
+    "note": "Canonical affirmed-planned pattern for entity 'swelling'.",
+    "difficulty": "medium"
+  },
+  {
+    "id": "SYN_185",
+    "text": "allergy agli baar nahi karenge.",
+    "entity": "allergy",
+    "gold_epistemic": "negated",
+    "gold_temporal": "planned",
+    "note": "Canonical negated-planned pattern for entity 'allergy'.",
+    "difficulty": "easy"
+  },
+  {
+    "id": "SYN_186",
+    "text": "weight agli baar nahi karenge.",
+    "entity": "weight",
+    "gold_epistemic": "negated",
+    "gold_temporal": "planned",
+    "note": "Canonical negated-planned pattern for entity 'weight'.",
+    "difficulty": "easy"
+  },
+  {
+    "id": "SYN_187",
+    "text": "Abhi dard ki zaroorat nahi hai.",
+    "entity": "pain",
+    "gold_epistemic": "negated",
+    "gold_temporal": "planned",
+    "note": "Canonical negated-planned pattern for entity 'pain'.",
+    "difficulty": "easy"
+  },
+  {
+    "id": "SYN_188",
+    "text": "Agle hafte dawai repeat nahi karna, filhaal theek hai.",
+    "entity": "medication",
+    "gold_epistemic": "negated",
+    "gold_temporal": "planned",
+    "note": "Canonical negated-planned pattern for entity 'medication'.",
+    "difficulty": "medium"
+  },
+  {
+    "id": "SYN_189",
+    "text": "Abhi test/report ki zaroorat nahi hai.",
+    "entity": "test result",
+    "gold_epistemic": "negated",
+    "gold_temporal": "planned",
+    "note": "Canonical negated-planned pattern for entity 'test result'.",
+    "difficulty": "easy"
+  },
+  {
+    "id": "SYN_190",
+    "text": "bimari agli baar nahi karenge.",
+    "entity": "diagnosis",
+    "gold_epistemic": "negated",
+    "gold_temporal": "planned",
+    "note": "Canonical negated-planned pattern for entity 'diagnosis'.",
+    "difficulty": "easy"
+  },
+  {
+    "id": "SYN_191",
+    "text": "Agle hafte ulti/nausea repeat nahi karna, filhaal theek hai.",
+    "entity": "nausea",
+    "gold_epistemic": "negated",
+    "gold_temporal": "planned",
+    "note": "Canonical negated-planned pattern for entity 'nausea'.",
+    "difficulty": "medium"
+  },
+  {
+    "id": "SYN_192",
+    "text": "Doctor ne bola abhi test/report karwane ki zaroorat nahi, next visit pe dekhenge.",
+    "entity": "test result",
+    "gold_epistemic": "negated",
+    "gold_temporal": "planned",
+    "note": "Canonical negated-planned pattern for entity 'test result'.",
+    "difficulty": "medium"
+  },
+  {
+    "id": "SYN_193",
+    "text": "Doctor ne bola abhi khansi karwane ki zaroorat nahi, next visit pe dekhenge.",
+    "entity": "cough",
+    "gold_epistemic": "negated",
+    "gold_temporal": "planned",
+    "note": "Canonical negated-planned pattern for entity 'cough'.",
+    "difficulty": "medium"
+  },
+  {
+    "id": "SYN_194",
+    "text": "bukhar agli baar nahi karenge.",
+    "entity": "fever",
+    "gold_epistemic": "negated",
+    "gold_temporal": "planned",
+    "note": "Canonical negated-planned pattern for entity 'fever'.",
+    "difficulty": "easy"
+  },
+  {
+    "id": "SYN_195",
+    "text": "Agle hafte follow-up repeat nahi karna, filhaal theek hai.",
+    "entity": "follow-up",
+    "gold_epistemic": "negated",
+    "gold_temporal": "planned",
+    "note": "Canonical negated-planned pattern for entity 'follow-up'.",
+    "difficulty": "medium"
+  },
+  {
+    "id": "SYN_196",
+    "text": "Agle hafte sar dard repeat nahi karna, filhaal theek hai.",
+    "entity": "headache",
+    "gold_epistemic": "negated",
+    "gold_temporal": "planned",
+    "note": "Canonical negated-planned pattern for entity 'headache'.",
+    "difficulty": "medium"
+  },
+  {
+    "id": "SYN_197",
+    "text": "Doctor ne bola abhi BP karwane ki zaroorat nahi, next visit pe dekhenge.",
+    "entity": "BP",
+    "gold_epistemic": "negated",
+    "gold_temporal": "planned",
+    "note": "Canonical negated-planned pattern for entity 'BP'.",
+    "difficulty": "medium"
+  },
+  {
+    "id": "SYN_198",
+    "text": "Abhi saans phoolna ki zaroorat nahi hai.",
+    "entity": "breathlessness",
+    "gold_epistemic": "negated",
+    "gold_temporal": "planned",
+    "note": "Canonical negated-planned pattern for entity 'breathlessness'.",
+    "difficulty": "easy"
+  },
+  {
+    "id": "SYN_199",
+    "text": "Doctor ne bola abhi sujan karwane ki zaroorat nahi, next visit pe dekhenge.",
+    "entity": "swelling",
+    "gold_epistemic": "negated",
+    "gold_temporal": "planned",
+    "note": "Canonical negated-planned pattern for entity 'swelling'.",
+    "difficulty": "medium"
+  },
+  {
+    "id": "SYN_200",
+    "text": "sugar agli baar nahi karenge.",
+    "entity": "sugar",
+    "gold_epistemic": "negated",
+    "gold_temporal": "planned",
+    "note": "Canonical negated-planned pattern for entity 'sugar'.",
+    "difficulty": "easy"
+  }
+]

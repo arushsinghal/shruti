@@ -9,7 +9,7 @@ router = APIRouter()
 
 class AssistantQueryRequest(BaseModel):
     question: str
-    patient_name: str
+    patient_name: str = ""
 
 
 @router.post("/assistant/query")
