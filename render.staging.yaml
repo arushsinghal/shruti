@@ -1,0 +1,29 @@
+services:
+  - type: web
+    name: lipi-staging
+    runtime: docker
+    plan: starter
+    region: singapore
+    branch: master
+    healthCheckPath: /api/health
+    envVars:
+      - key: DATABASE_URL
+        sync: false
+      - key: POSTGRES_POOL_MIN_SIZE
+        value: "1"
+      - key: POSTGRES_POOL_MAX_SIZE
+        value: "5"
+      - key: ASR_MODE
+        value: cloud
+      - key: SHRUTI_ADMIN_USER
+        value: demo
+      - key: SHRUTI_ADMIN_PASSWORD
+        sync: false
+      - key: SARVAM_API_KEY
+        sync: false
+      - key: GEMINI_API_KEY
+        sync: false
+      - key: SECRET_KEY
+        sync: false
+      - key: CORS_ORIGINS
+        value: "http://localhost:5173,http://127.0.0.1:5173,https://lipi-staging.onrender.com"
