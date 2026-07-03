@@ -145,7 +145,7 @@ const DIALECT_SAMPLES = {
   hinglish: {
     speech: 'Patient ko bukhar hai, around 102, but no chest pain, no vomiting... actually wait, usne kaha thoda dard hai.',
     entities: { symptoms: ['Fever (bukhar)', 'Pain (dard)'], vitals: ['Temp 102°F'], negated: ['Chest Pain', 'Vomiting'] },
-    resolution: "Resolved conversational self-correction — overrode pain-free state with 'mild pain' and mapped colloquial terms ('bukhar', 'dard') to standard clinical classifications.",
+    resolution: "Resolved conversational self-correction: overrode pain-free state with 'mild pain' and mapped colloquial terms ('bukhar', 'dard') to standard clinical classifications.",
   },
   hindi: {
     speech: 'मरीज को तीन दिन से खांसी है, और सर में भी तेज दर्द है। उल्टी नहीं हुई है।',
@@ -177,13 +177,13 @@ const TESTIMONIALS = [
     location: 'Medanta, Gurugram',
   },
   {
-    quote: "It catches things I say in passing — a medication I mention while examining, a follow-up I didn't write down. Everything ends up in the note.",
+    quote: "It catches things I say in passing: a medication I mention while examining, a follow-up I didn't write down. Everything ends up in the note.",
     name: 'Dr. Rahul Bansal',
     role: 'Neurologist',
     location: 'Fortis Hospital, Delhi',
   },
   {
-    quote: "My assistants now get a WhatsApp task list before the patient leaves. Lab dispatch, payment token, next appointment — Lipi queues all of it.",
+    quote: "My assistants now get a WhatsApp task list before the patient leaves. Lab dispatch, payment token, next appointment. Lipi queues all of it.",
     name: 'Dr. Priya Nair',
     role: 'Gynaecologist',
     location: 'Private Clinic, Kochi',
@@ -279,10 +279,10 @@ export default function Landing() {
                 <span className="block font-light text-slate-400">A doctor speaks once.</span>
               </RevealLine>
               <RevealLine immediate delay={0.17}>
-                <span className="block font-extrabold text-primary">Lipi runs</span>
+                <span className="block font-extrabold text-primary">The assistant</span>
               </RevealLine>
               <RevealLine immediate delay={0.25}>
-                <span className="block font-extrabold text-primary">the OPD.</span>
+                <span className="block font-extrabold text-primary">does the rest.</span>
               </RevealLine>
             </h1>
 
@@ -290,10 +290,10 @@ export default function Landing() {
               initial={reduce ? false : { opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.45 }}
-              className="text-[16px] md:text-[17px] text-slate-500 leading-relaxed mb-8 max-w-[42ch]"
+              className="text-[16px] md:text-[17px] text-slate-500 leading-relaxed mb-8 max-w-[44ch]"
             >
-              Voice in. Reviewed note, prescription, lab orders, and follow-up out.
-              Before the next patient walks in.
+              Lipi writes the note, orders the labs, messages the patient, and
+              chases the follow-up. You review and sign. You never manage it.
             </motion.p>
 
             <motion.div
@@ -372,7 +372,7 @@ export default function Landing() {
         <div className="max-w-6xl mx-auto">
           <Eyebrow>How it works</Eyebrow>
           <RevealHeading wrapClassName="mb-16" className="text-[2.4rem] md:text-[3.2rem] font-extrabold tracking-tight leading-[1.05] text-text-dark">
-            One consultation.<br className="hidden md:block" /> The whole OPD handled.
+            The work a great assistant does.<br className="hidden md:block" /> Every single visit.
           </RevealHeading>
 
           <div className="space-y-5">
@@ -388,7 +388,7 @@ export default function Landing() {
               <div className="bg-slate-50 rounded-2xl p-5 border border-slate-100 font-mono text-[13px] text-slate-600 leading-loose">
                 <span className="text-primary font-semibold">Doctor:</span> Teen din se bukhar hai, 102 ke around. Khaansi bhi.
                 <span className="block mt-2"><span className="text-primary font-semibold">Patient:</span> Aur thoda chest mein dard bhi hai.</span>
-                <span className="block mt-2"><span className="text-primary font-semibold">Doctor:</span> Chest pain nahi? achha. BP — 128/82.</span>
+                <span className="block mt-2"><span className="text-primary font-semibold">Doctor:</span> Chest pain nahi? achha. BP is 128/82.</span>
                 <span className="block mt-3 text-slate-400 text-[11px] uppercase tracking-wider">Lipi: extracting 4 entities...</span>
               </div>
             </motion.div>
@@ -401,7 +401,7 @@ export default function Landing() {
                   <p className="text-[10.5px] font-bold uppercase tracking-[0.18em] text-slate-400">Step 02</p>
                   <div className="w-10 h-10 rounded-2xl bg-primary/10 grid place-items-center"><Cpu className="w-5 h-5 text-primary" strokeWidth={1.8} /></div>
                   <h3 className="text-[1.35rem] font-bold leading-snug">Every fact extracted. Traced to source.</h3>
-                  <p className="text-[13.5px] text-slate-500 leading-relaxed">Each entity linked to the exact sentence spoken.</p>
+                  <p className="text-[13.5px] text-slate-500 leading-relaxed">A good assistant never puts words in your mouth. Nothing you didn't say reaches the record.</p>
                 </div>
                 <motion.div variants={stagger} initial={reduce ? false : 'hidden'} whileInView="visible" viewport={{ once: true, amount: 0.4 }} className="grid grid-cols-2 md:grid-cols-4 gap-3">
                   {[
@@ -471,7 +471,7 @@ export default function Landing() {
                   <span className="text-slate-500 text-[15px] font-medium mb-2.5">per ABDM consult</span>
                 </div>
               </div>
-              <p className="text-[14.5px] text-slate-600 leading-relaxed">The government pays your clinic for every consultation filed through ABDM. At 40 patients a day, that is <strong className="text-text-dark">₹800 every day</strong> — directly from DHIS to your bank account.</p>
+              <p className="text-[14.5px] text-slate-600 leading-relaxed">The government pays your clinic for every consultation filed through ABDM. At 40 patients a day, that is <strong className="text-text-dark">₹800 every day</strong>, directly from DHIS to your bank account.</p>
               <div className="bg-white rounded-2xl border border-primary/15 p-5 space-y-3">
                 {[
                   ['40 patients/day × ₹20', '₹800/day', false],
@@ -494,7 +494,7 @@ export default function Landing() {
                   <span className="text-slate-500 text-[15px] font-medium mb-2.5">min saved/day</span>
                 </div>
               </div>
-              <p className="text-[14.5px] text-slate-600 leading-relaxed">At 40 patients, documentation drops from 2–3 min to under 30 sec each. That is your lunch break back, every day.</p>
+              <p className="text-[14.5px] text-slate-600 leading-relaxed">At 40 patients, documentation drops from 2-3 min to under 30 sec each. That is your lunch break back, every day.</p>
               <div className="space-y-4 pt-2">
                 {[
                   ['Writing notes', '2 min', '< 30 sec'],
@@ -525,7 +525,7 @@ export default function Landing() {
             Built for how India actually speaks.
           </RevealHeading>
           <motion.p variants={fadeUp} initial={reduce ? false : 'hidden'} whileInView="visible" viewport={{ once: true }} className="text-[14.5px] text-slate-500 mb-10 leading-relaxed max-w-[50ch]">
-            Hindi, Hinglish, English — with code-switching, self-corrections, and regional vocabulary handled natively.
+            Hindi, Hinglish, English, with code-switching, self-corrections, and regional vocabulary handled natively.
           </motion.p>
           <motion.div variants={fadeUp} initial={reduce ? false : 'hidden'} whileInView="visible" viewport={{ once: true, amount: 0.2 }} className="rounded-3xl border border-slate-200/80 bg-white overflow-hidden shadow-[0_4px_48px_-12px_rgba(18,63,39,0.12)]">
             <div className="flex border-b border-slate-200/80 bg-slate-50/60">
@@ -603,7 +603,7 @@ export default function Landing() {
             transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] as const }}
             className="text-[2.4rem] md:text-[3rem] font-extrabold text-white tracking-tight leading-[1.05]"
           >
-            Ready to run your OPD on autopilot?
+            An assistant for every consultation.
           </motion.h2>
           <motion.p
             initial={reduce ? false : { opacity: 0, y: 16 }}
@@ -650,7 +650,7 @@ export default function Landing() {
                 <span className="text-[20px] font-bold tracking-tight text-text-dark">Lipi</span>
               </div>
               <p className="text-[14px] text-slate-500 leading-relaxed">
-                AI drafts the note, prescription, and follow-up. The doctor reviews and signs — every fact traced to the source sentence.
+                Your clinical assistant drafts the note, prescription, and follow-up. The doctor reviews and signs. Every fact traces to the source sentence.
               </p>
               <button
                 onClick={() => navigate('/dashboard')}

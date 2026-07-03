@@ -9,7 +9,7 @@ import api from '../lib/api';
 const TRUST = ['Audit Trail Enabled', 'Local NLP', 'On-Shore ASR', 'No LLM Hallucination'];
 const VALUE_PROPS = [
   'One consultation → reviewed notes, Rx, orders & follow-ups',
-  'Every clinical fact traces to the transcript — zero hallucination',
+  'Every clinical fact traces to the transcript. Zero hallucination.',
   'Hindi · English · Hinglish, built for Indian OPDs',
 ];
 
@@ -95,7 +95,7 @@ export default function Login() {
         >
           <h1 className="text-[2.5rem] leading-[1.08] font-bold text-white tracking-tight">
             A doctor speaks once.<br />
-            <span className="text-white/70">Lipi runs the OPD.</span>
+            <span className="text-white/70">The assistant does the rest.</span>
           </h1>
           <ul className="mt-8 space-y-3.5">
             {VALUE_PROPS.map((p) => (

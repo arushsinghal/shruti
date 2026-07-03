@@ -12,7 +12,7 @@ export default function About() {
           </div>
           <div className="flex flex-col">
             <span className="text-base font-bold text-white tracking-tight leading-none mb-1">Lipi Health</span>
-            <span className="text-[10px] text-slate-400 font-medium">Clinical AI infrastructure company</span>
+            <span className="text-[10px] text-slate-400 font-medium">The AI clinical assistant for India</span>
           </div>
         </div>
         <button
@@ -45,39 +45,49 @@ export default function About() {
           <div className="relative rounded-xl overflow-hidden shadow-2xl border border-white/10 bg-white/[0.04]">
             <img
               src="/lipi_app_mockup.png"
-              alt="Lipi clinician console showing SOAP documentation workflow"
+              alt="Lipi clinical assistant console showing a reviewed consultation record"
               className="w-full object-cover object-left-top"
               style={{ maxHeight: '360px' }}
             />
             <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent" />
             <div className="absolute bottom-0 left-0 right-0 p-4">
               <p className="text-white text-[11px] font-bold uppercase tracking-wider drop-shadow-sm">
-                Voice2SOAP is live. The broader clinical AI platform is in build.
+                Live in clinics today. Smarter with every consultation.
               </p>
             </div>
           </div>
 
           <p className="text-slate-300 leading-relaxed">
-            Lipi Health is building clinical AI infrastructure for India. Voice2SOAP is the first live product: multilingual consultations become physician-reviewed SOAP records, CDS alerts, printable reports, and FHIR exports.
+            Lipi is the AI clinical assistant for Indian outpatient care. A doctor speaks once, and Lipi does the work a trained assistant does after every consultation: the note, the prescription, the lab orders, the patient follow-up, and the ABDM record. The doctor reviews and signs. Every clinical fact traces back to the exact sentence spoken.
           </p>
           <p className="text-slate-400 leading-relaxed">
-            The bigger company is not a documentation wrapper. Lipi is building toward private clinical speech models, domain-specific documentation LLMs, local safety engines, and operating intelligence for clinics, hospitals, and provider networks.
+            The mission is bigger than one clinic. India's outpatient system still runs on paper, memory, and overworked staff. Lipi exists to digitize it end to end and move Indian primary care toward self-sufficiency: a healthcare AI stack built in India, for India, that no imported system can replace.
           </p>
           <div className="rounded-lg border border-primary/30 bg-primary/10 p-4 text-xs text-slate-300 leading-relaxed">
             <p className="font-bold uppercase tracking-wider text-emerald-300 mb-1">Current access</p>
             <p>
-              Lipi is available for clinical teams and platform partners evaluating Voice2SOAP today and the broader clinical AI stack as it develops.
+              Lipi is onboarding pilot doctors and clinics directly. The assistant is live today; the research that deepens it runs continuously alongside it.
             </p>
           </div>
         </section>
 
         <section className="space-y-4 border-t border-white/10 pt-8">
-          <h2 className="text-2xl font-bold tracking-tight text-white">Why documentation is the wedge</h2>
+          <h2 className="text-2xl font-bold tracking-tight text-white">Why the OPD comes first</h2>
           <p className="text-slate-400 leading-relaxed">
-            Documentation is the highest-frequency workflow in outpatient care. Every consultation creates clinical notes, medication decisions, follow-up instructions, and interoperability needs. Owning this workflow creates the record layer that makes later products possible.
+            Outpatient care is the highest-frequency workflow in Indian medicine. Every consultation creates a note, a prescription, follow-up instructions, and a record the system needs. An assistant that does that work earns a place in the clinic on day one, and builds the doctor-approved clinical record that everything else compounds on.
           </p>
           <p className="text-slate-400 leading-relaxed">
-            The expansion path is clinical memory, referrals, coding, population analytics, and private model infrastructure for provider networks. Voice2SOAP earns the workflow; the platform compounds around it.
+            From there the assistant grows into the operating layer for the clinic: patient memory across visits, referrals, coding, insurance recovery, and the government-filed records that pay the clinic back. One consultation in, a full day's work handled.
+          </p>
+        </section>
+
+        <section className="space-y-4 border-t border-white/10 pt-8">
+          <h2 className="text-2xl font-bold tracking-tight text-white">The research arm</h2>
+          <p className="text-slate-400 leading-relaxed">
+            Underneath the assistant, Lipi runs its own research. Personalized prescribing safety tuned to Indian populations, early-detection signals read from a patient's own visit history, and India-specific antimicrobial resistance intelligence. It exists for one reason: to make the assistant smarter and Indian patients safer.
+          </p>
+          <p className="text-slate-400 leading-relaxed">
+            This research ships as product capability a doctor can use at the point of care, never as papers. The moat is what the assistant does in the room, not what gets written about it.
           </p>
         </section>
 
