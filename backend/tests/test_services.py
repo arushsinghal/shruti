@@ -594,4 +594,22 @@ class TestPostgreSQLDatabase:
         # Verify query was translated to use $1, $2 and fetch was called
         mock_conn.fetch.assert_called_once_with("SELECT * FROM users WHERE username = $1 AND email = $2", "test", "test@test.com")
 
+    @pytest.mark.anyio
+    async def test_db_connection_releases_pooled_pg_connection(self):
+        from app.storage.db import DBConnection
+        from unittest.mock import AsyncMock, Mock
+
+        mock_tx = AsyncMock()
+        mock_conn = AsyncMock()
+        mock_conn.transaction = Mock(return_value=mock_tx)
+        mock_pool = AsyncMock()
+
+        db_conn = DBConnection(mock_conn, is_pg=True, pool=mock_pool)
+        await db_conn.__aenter__()
+        await db_conn.__aexit__(None, None, None)
+
+        mock_tx.start.assert_awaited_once()
+        mock_tx.commit.assert_awaited_once()
+        mock_pool.release.assert_awaited_once_with(mock_conn)
+        mock_conn.close.assert_not_called()
 

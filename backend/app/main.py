@@ -50,7 +50,7 @@ from app.api.routes_documents import router as documents_router
 from app.api.routes_billing import router as billing_router
 from app.api.routes_reviewer import router as reviewer_router
 from app.api.routes_tpa import router as tpa_router
-from app.storage.db import init_db
+from app.storage.db import close_db_pool, init_db, open_db_pool
 from app.utils.config import settings
 from app.utils.rate_limit import SLOWAPI_AVAILABLE, RateLimitExceeded, _rate_limit_exceeded_handler, limiter
 
@@ -117,17 +117,26 @@ async def _cleanup_stale_audio() -> None:
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+    await open_db_pool()
     await init_db()
     from app.services.clinical_extractor import async_reload_knowledge
     from app.services.follow_up_scheduler import follow_up_reminder_loop
     from app.services.monthly_report import monthly_report_loop
     await async_reload_knowledge()
-    asyncio.create_task(_cleanup_stale_audio())
-    asyncio.create_task(_retention_loop())
-    asyncio.create_task(follow_up_reminder_loop())
-    asyncio.create_task(monthly_report_loop())
+    background_tasks = [
+        asyncio.create_task(_cleanup_stale_audio()),
+        asyncio.create_task(_retention_loop()),
+        asyncio.create_task(follow_up_reminder_loop()),
+        asyncio.create_task(monthly_report_loop()),
+    ]
     logger.info("ASR configuration verified. Key loaded: %s", "yes" if settings.sarvam_api_key else "NO")
-    yield
+    try:
+        yield
+    finally:
+        for task in background_tasks:
+            task.cancel()
+        await asyncio.gather(*background_tasks, return_exceptions=True)
+        await close_db_pool()
 
 
 app = FastAPI(title="Lipi - Multilingual Clinical Documentation Platform", version="0.1.0", lifespan=lifespan)

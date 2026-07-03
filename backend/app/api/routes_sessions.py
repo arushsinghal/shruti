@@ -300,7 +300,7 @@ async def legal_export(
     consent_records: list = []
     async with db_connect() as db:
         async with db.execute(
-            "SELECT consent_mode, consent_text_version, consent_hash, timestamp FROM consent_audit_log WHERE session_id=? ORDER BY timestamp",
+            "SELECT consent_mode, consent_text_version, consent_hash, timestamp FROM consent_logs WHERE session_id=? ORDER BY timestamp",
             (session_id,),
         ) as cur:
             rows = await cur.fetchall()
@@ -552,4 +552,3 @@ async def learning_stats(
         "promoted_to_global": promoted,
         "accuracy_pct": round(confirmations / max(confirmations + rejections, 1) * 100, 1),
     }
-

@@ -25,6 +25,8 @@ class Settings(BaseSettings):
     # Named distinctly to avoid collision with DATABASE_URL in any existing .env
     sqlite_db: str = "./lipi.db"
     database_url: str = ""
+    postgres_pool_min_size: int = 1
+    postgres_pool_max_size: int = 5
     seed_demo_user: bool = False
     demo_username: str = "arush"
     demo_password: str = "1234"
