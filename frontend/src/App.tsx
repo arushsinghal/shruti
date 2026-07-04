@@ -30,6 +30,8 @@ import ReviewQueue from './pages/ReviewQueue';
 import OpsDashboard from './pages/OpsDashboard';
 import TPAClaim from './pages/TPAClaim';
 import PreVisitForm from './pages/PreVisitForm';
+import AuditLogs from './pages/AuditLogs';
+import DoctorProfile from './pages/DoctorProfile';
 
 export default function App() {
   return (
@@ -74,6 +76,8 @@ export default function App() {
             <Route path="/internal/review-queue" element={<ReviewQueue />} />
             <Route path="/internal/ops" element={<OpsDashboard />} />
             <Route path="/internal/tpa/:sessionId" element={<TPAClaim />} />
+            <Route path="/audit-logs" element={<AuditLogs />} />
+            <Route path="/availability" element={<DoctorProfile />} />
           </Route>
         </Routes>
       </BrowserRouter>

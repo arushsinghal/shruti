@@ -55,6 +55,10 @@ class Settings(BaseSettings):
     # see clinical_memory_service.py).
     memory_assistant_enabled: bool = False
     sarvam_llm_api_key: str = ""  # falls back to sarvam_api_key if unset
+    # Google's open-sourced Medical Data Toolkit (Apache 2.0), self-hosted, converts
+    # legacy lab report photos/PDFs into FHIR. Empty disables legacy-record import.
+    # See vendor/medical-data-toolkit/README.md for how to run this service.
+    medical_data_toolkit_url: str = ""
     # When True: WhatsApp pipeline holds notes for reviewer approval before sending sign link.
     # Leave False (default) for demo — pipeline auto-sends as before.
     hold_for_review: bool = False

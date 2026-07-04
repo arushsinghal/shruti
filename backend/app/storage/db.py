@@ -47,6 +47,7 @@ async def open_db_pool() -> None:
         settings.database_url,
         min_size=settings.postgres_pool_min_size,
         max_size=settings.postgres_pool_max_size,
+        statement_cache_size=0,  # required for Supabase PgBouncer pooler
     )
     logger.info(
         "PostgreSQL pool opened: min_size=%s max_size=%s",

@@ -445,8 +445,10 @@ export default function AssistantDashboard() {
       <header className="sticky top-0 z-20 bg-white/90 backdrop-blur border-b border-slate-200/80">
         <div className="max-w-2xl mx-auto px-4 h-14 flex items-center justify-between">
           <div className="flex items-center gap-2.5">
-            <span className="grid place-items-center w-8 h-8 rounded-lg bg-primary text-white font-bold text-sm">श</span>
-            <span className="font-bold text-[15px] tracking-tight">Lipi</span>
+            <button onClick={() => navigate('/assistant')} className="flex items-center gap-2.5 cursor-pointer group">
+              <span className="grid place-items-center w-8 h-8 rounded-lg bg-primary text-white font-bold text-sm group-hover:scale-105 transition-transform">श</span>
+              <span className="font-bold text-[15px] tracking-tight">Lipi</span>
+            </button>
             <span className="text-[11px] font-semibold text-slate-400 bg-slate-100 px-2 py-0.5 rounded-full ml-1">Assistant</span>
             {clinicName && (
               <span className="hidden sm:inline text-[11px] text-slate-400">· {clinicName}</span>

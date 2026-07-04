@@ -68,10 +68,10 @@ export default function Analytics() {
               Dashboard
             </button>
             <div className="h-4 w-px bg-slate-200" />
-            <div className="flex items-center gap-2">
-              <span className="font-bold text-primary text-base">श</span>
+            <button onClick={() => navigate('/dashboard')} className="flex items-center gap-2 cursor-pointer group">
+              <span className="font-bold text-primary text-base group-hover:opacity-80 transition-opacity">श</span>
               <span className="text-sm font-bold text-text-dark tracking-tight">Lipi</span>
-            </div>
+            </button>
             <div className="h-4 w-px bg-slate-200" />
             <h1 className="text-sm font-bold text-text-dark">Clinical Ops Dashboard</h1>
           </div>

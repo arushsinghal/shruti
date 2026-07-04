@@ -4,6 +4,7 @@ import api, { getSession } from '../lib/api';
 import type { ConsultationSession } from '../types/clinical';
 import { MODE_LABELS, MODE_COLORS } from '../types/clinical';
 import { motion } from 'framer-motion';
+import { useAuth } from '../context/AuthContext';
 
 function ReferralModal({ sessionId }: { sessionId: string }) {
   const [open, setOpen] = useState(false);
@@ -454,6 +455,8 @@ const CATEGORY_LABELS: Record<string, string> = {
 export default function ReviewNote() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const { user } = useAuth();
+  const homePath = user?.role === 'assistant' ? '/assistant' : '/dashboard';
   const [session, setSession] = useState<ConsultationSession | null>(null);
   const [error, setError] = useState<string | null>(null);
 
@@ -663,10 +666,10 @@ export default function ReviewNote() {
       <header className="border-b border-slate-200/80 sticky top-0 bg-white/90 backdrop-blur-md z-10 shadow-sm print:hidden">
         <div className={`${mode === 'health' ? 'max-w-7xl' : 'max-w-3xl'} mx-auto px-6 h-14 flex items-center justify-between`}>
           <div className="flex items-center gap-4">
-            <div className="flex items-center gap-2">
-              <span className="font-bold text-primary text-base">श</span>
+            <button onClick={() => navigate(homePath)} className="flex items-center gap-2 cursor-pointer group">
+              <span className="font-bold text-primary text-base group-hover:opacity-80 transition-opacity">श</span>
               <span className="text-sm font-bold text-text-dark font-sans">Lipi</span>
-            </div>
+            </button>
             {mode === 'health' ? (
               <nav className="flex items-center ml-2">
                 <button

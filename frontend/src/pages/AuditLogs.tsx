@@ -51,12 +51,12 @@ export default function AuditLogs() {
               Dashboard
             </button>
             <div className="h-4 w-px bg-slate-200" />
-            <div className="flex items-center gap-2">
-              <div className="w-6 h-6 bg-primary rounded-md flex items-center justify-center shadow-sm">
+            <button onClick={() => navigate('/dashboard')} className="flex items-center gap-2 cursor-pointer group">
+              <div className="w-6 h-6 bg-primary rounded-md flex items-center justify-center shadow-sm group-hover:scale-105 transition-transform">
                 <span className="font-bold text-white text-[10px]">श</span>
               </div>
               <span className="text-sm font-bold text-text-dark tracking-tight">Lipi</span>
-            </div>
+            </button>
             <div className="h-4 w-px bg-slate-200" />
             <h1 className="text-sm font-bold text-slate-800">Audit Trail</h1>
           </div>

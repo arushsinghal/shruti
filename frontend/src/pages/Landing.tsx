@@ -437,6 +437,14 @@ export default function Landing() {
                   <p className="text-[13.5px] text-slate-500 leading-relaxed">The doctor speaks and reviews. Lipi prepares the structured record, prescription, investigations, follow-up, patient message, and ABDM-ready filing path around that one consultation.</p>
                 </div>
               </motion.div>
+              <motion.div variants={fadeUp} initial={reduce ? false : 'hidden'} whileInView="visible" viewport={{ once: true, amount: 0.3 }} transition={{ delay: 0.24 }}
+                className="rounded-3xl border border-slate-200/80 bg-white p-7 flex gap-4">
+                <div className="w-10 h-10 rounded-2xl bg-slate-100 grid place-items-center flex-shrink-0"><Database className="w-5 h-5 text-slate-500" strokeWidth={1.8} /></div>
+                <div>
+                  <h3 className="text-[1.05rem] font-bold leading-snug mb-1.5">A patient's old records join the same file</h3>
+                  <p className="text-[13.5px] text-slate-500 leading-relaxed">Lipi reads a patient's existing lab reports using Google and NHA's own open-sourced ABDM toolkit, so history and live consultations sit in one place instead of two.</p>
+                </div>
+              </motion.div>
             </div>
           </div>
         </div>
@@ -1047,6 +1055,7 @@ export default function Landing() {
               <div className="space-y-3.5">
                 <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-slate-400">Company</p>
                 <ul className="space-y-2.5 text-[14px]">
+                  <li><button onClick={() => navigate('/about')} className="text-slate-600 hover:text-primary transition-colors cursor-pointer">About</button></li>
                   <li><button onClick={() => navigate('/research')} className="text-slate-600 hover:text-primary transition-colors cursor-pointer">Research</button></li>
                   <li><button onClick={() => setShowSupportModal(true)} className="text-slate-600 hover:text-primary transition-colors cursor-pointer">Contact</button></li>
                   <li><a href="/privacy" className="text-slate-600 hover:text-primary transition-colors">Privacy</a></li>

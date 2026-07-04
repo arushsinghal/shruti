@@ -9,7 +9,7 @@ const TRUST = ['Audit Trail Enabled', 'Local NLP', 'On-Shore ASR', 'No LLM Hallu
 
 const VALUE_PROPS = [
   'Voice → reviewed SOAP note in under 2 minutes',
-  'Every clinical fact traces to the transcript — zero hallucination',
+  'Every clinical fact traces to the transcript, zero hallucination',
   'Hindi · English · Hinglish, built for Indian OPDs',
 ];
 

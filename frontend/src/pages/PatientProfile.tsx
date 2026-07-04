@@ -116,7 +116,7 @@ export default function PatientProfile() {
           Dashboard
         </button>
         <div className="h-5 w-px bg-slate-200" />
-        <button onClick={() => navigate('/')} className="flex items-center gap-2 group cursor-pointer">
+        <button onClick={() => navigate('/dashboard')} className="flex items-center gap-2 group cursor-pointer">
           <span className="grid place-items-center w-7 h-7 rounded-lg bg-primary/10 text-primary font-bold text-sm">श</span>
           <span className="text-[15px] font-bold tracking-tight text-text-dark hidden sm:inline">Lipi</span>
         </button>

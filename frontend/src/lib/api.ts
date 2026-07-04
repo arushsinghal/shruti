@@ -105,6 +105,22 @@ export async function listSessions(): Promise<ConsultationSession[]> {
   return res.data;
 }
 
+/** Ingests a photo/PDF of a patient's pre-existing lab report via Google's
+ * open-sourced Medical Data Toolkit; files it into the patient's timeline. */
+export async function importLegacyRecord(
+  patientName: string,
+  file: File,
+): Promise<ConsultationSession> {
+  const form = new FormData();
+  form.append('file', file);
+  const res = await client.post<ConsultationSession>(
+    `/patients/${encodeURIComponent(patientName)}/import-legacy-record`,
+    form,
+    { headers: { 'Content-Type': 'multipart/form-data' } },
+  );
+  return res.data;
+}
+
 export async function uploadAudio(
   sessionId: string,
   file: File,

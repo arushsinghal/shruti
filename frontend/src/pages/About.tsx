@@ -171,6 +171,35 @@ export default function About() {
           </div>
         </section>
 
+        {/* ── Ecosystem position ───────────────────────────────────── */}
+        <motion.section
+          initial={reduce ? false : 'hidden'}
+          whileInView="visible"
+          viewport={{ once: true, amount: 0.25 }}
+          variants={fadeUp}
+          className="py-16 border-t border-slate-200/60"
+        >
+          <div className="grid lg:grid-cols-[0.85fr_1.15fr] gap-10 lg:gap-16 items-start">
+            <h2 className="text-[1.9rem] md:text-[2.2rem] font-bold tracking-tight leading-[1.06] max-w-[18ch]">
+              Built on open infrastructure, not against it
+            </h2>
+            <div className="space-y-5 max-w-2xl">
+              <p className="text-[15px] text-slate-600 leading-relaxed">
+                India's National Health Authority and Google open sourced a toolkit in 2026 that
+                converts existing paper lab reports into ABDM-compliant FHIR records. Lipi
+                integrates it directly: a patient's old lab reports are read straight into their
+                Lipi record, sitting alongside every consultation Lipi has captured live.
+              </p>
+              <p className="text-[15px] text-slate-600 leading-relaxed">
+                That split reflects how we think about the stack. Digitizing a hospital's back
+                catalogue of paper is a different problem from capturing what a doctor says out
+                loud during a live consultation. Lipi solves the second problem. The first is
+                infrastructure we are glad to build on rather than rebuild.
+              </p>
+            </div>
+          </div>
+        </motion.section>
+
         {/* ── Founder ──────────────────────────────────────────────── */}
         <motion.section
           initial={reduce ? false : 'hidden'}

@@ -277,6 +277,8 @@ export default function Dashboard() {
               <button onClick={() => navigate('/internal/review-queue')} className={navLinkCls}>Review Queue</button>
               <button onClick={() => navigate('/internal/ops')} className={navLinkCls}>Ops</button>
               <button onClick={() => navigate('/internal/invoices')} className={navLinkCls}>Invoices</button>
+              <button onClick={() => navigate('/audit-logs')} className={navLinkCls}>Audit Logs</button>
+              <button onClick={() => navigate('/availability')} className={navLinkCls}>Availability</button>
               <button onClick={() => navigate('/clinic-inbox')} className={`${navLinkCls} flex items-center gap-1`}>
                 <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />

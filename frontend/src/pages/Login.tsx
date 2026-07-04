@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { motion, useReducedMotion } from 'framer-motion';
 import { Zap, ArrowRight, ShieldCheck, AlertCircle, Check, Loader2 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
@@ -138,14 +138,17 @@ export default function Login() {
 
           <div className="mb-6 rounded-xl border border-primary/20 bg-primary/5 px-4 py-3.5">
             <p className="text-[13px] text-text-dark leading-relaxed">
-              Lipi is currently invite-only for partner clinics.{' '}
+              Lipi is in early pilot with partner clinics across India.{' '}
+              <Link to="/signup" className="font-semibold text-primary hover:text-primary-dark transition-colors">
+                Start a free trial
+              </Link>{' '}
+              or{' '}
               <a
                 href="mailto:arushsinghal98@gmail.com?subject=Lipi%20early%20access"
                 className="font-semibold text-primary hover:text-primary-dark transition-colors"
               >
-                Request early access
-              </a>{' '}
-              to get set up.
+                request early access
+              </a>.
             </p>
           </div>
 
@@ -235,6 +238,11 @@ export default function Login() {
               <ArrowRight className="w-4 h-4" />
             </button>
           </form>
+
+          <p className="mt-4 text-center text-[12.5px] text-slate-400">
+            Setting up a clinic staff account?{' '}
+            <Link to="/register" className="text-primary font-semibold hover:underline">Register here</Link>
+          </p>
 
           {/* Trust badges */}
           <div className="mt-8 flex items-center justify-center gap-x-2 gap-y-2 flex-wrap">

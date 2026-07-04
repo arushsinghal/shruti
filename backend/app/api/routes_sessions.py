@@ -1,13 +1,14 @@
 import hashlib
 import json
 from datetime import datetime
-from fastapi import APIRouter, HTTPException, Query, Depends, Request
+from fastapi import APIRouter, HTTPException, Query, Depends, Request, File, UploadFile
 from pydantic import BaseModel
 
-from app.schemas.consultation import ConsultationSession, CreateSessionRequest, ModeEnum
+from app.schemas.consultation import ConsultationSession, CreateSessionRequest, ModeEnum, StatusEnum
 from app.storage.repository import SessionRepository
 from app.api.routes_auth import get_current_user
 from app.services.patient_history_service import build_patient_timeline
+from app.services import legacy_record_import
 
 router = APIRouter()
 repo = SessionRepository()
@@ -22,6 +23,59 @@ async def get_patient_timeline(
     sessions only. Confirmed facts only — never candidate/rejected data."""
     user_id = str(current_user["id"])
     return await build_patient_timeline(user_id, patient_name)
+
+
+_ALLOWED_RECORD_CONTENT_TYPES = {"application/pdf", "image/png", "image/jpeg"}
+_MAX_RECORD_UPLOAD_BYTES = 15 * 1024 * 1024  # 15 MB
+
+
+@router.post("/patients/{patient_name}/import-legacy-record", status_code=201)
+async def import_legacy_record(
+    patient_name: str,
+    file: UploadFile = File(...),
+    current_user: dict = Depends(get_current_user),
+) -> ConsultationSession:
+    """Ingests a photo/PDF of a patient's pre-existing lab report using Google's
+    open-sourced Medical Data Toolkit, and files it into this patient's timeline
+    as a completed session alongside their live-captured consultations."""
+    if not legacy_record_import.is_configured():
+        raise HTTPException(
+            status_code=503,
+            detail="Legacy record import is not configured on this server.",
+        )
+
+    content_type = file.content_type or ""
+    if content_type not in _ALLOWED_RECORD_CONTENT_TYPES:
+        raise HTTPException(
+            status_code=400,
+            detail=f"Unsupported file type '{content_type}'. Allowed: PDF, PNG, JPEG.",
+        )
+
+    file_bytes = await file.read()
+    if len(file_bytes) > _MAX_RECORD_UPLOAD_BYTES:
+        raise HTTPException(
+            status_code=413,
+            detail=f"File too large. Maximum is {_MAX_RECORD_UPLOAD_BYTES // (1024 * 1024)} MB.",
+        )
+
+    try:
+        toolkit_response = await legacy_record_import.document_to_fhir(file_bytes, content_type)
+        clinical_facts = legacy_record_import.fhir_bundle_to_clinical_facts(toolkit_response)
+    except legacy_record_import.LegacyRecordImportError as e:
+        raise HTTPException(status_code=422, detail=str(e))
+
+    user_id = str(current_user["id"])
+    session = await repo.create_session(
+        user_id=user_id,
+        patient_name=patient_name,
+        doctor_name=current_user.get("full_name"),
+        mode=ModeEnum.health,
+        initiated_by="legacy_import",
+    )
+    session.status = StatusEnum.complete
+    session.clinical_facts = clinical_facts
+    await repo.update_session(session)
+    return session
 
 
 class GrantConsentRequest(BaseModel):

@@ -1,7 +1,7 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import client from '../lib/api';
+import client, { importLegacyRecord } from '../lib/api';
 
 // ── Types ────────────────────────────────────────────────────────────────────
 
@@ -79,6 +79,31 @@ export default function PatientTimeline() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [expandedVisits, setExpandedVisits] = useState<Set<string>>(new Set());
+  const [importing, setImporting] = useState(false);
+  const [importError, setImportError] = useState<string | null>(null);
+  const [importSuccess, setImportSuccess] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  async function handleImportFile(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    e.target.value = ''; // allow re-selecting the same file later
+    if (!file || !timeline) return;
+    setImporting(true);
+    setImportError(null);
+    setImportSuccess(false);
+    try {
+      await importLegacyRecord(timeline.patient_name, file);
+      setImportSuccess(true);
+      await fetchTimeline(timeline.patient_name);
+    } catch (err: any) {
+      setImportError(
+        err?.response?.data?.detail ||
+        'Could not process this record. Try a clearer photo of a lab report.',
+      );
+    } finally {
+      setImporting(false);
+    }
+  }
 
   async function fetchTimeline(name: string) {
     if (!name.trim()) return;
@@ -140,10 +165,10 @@ export default function PatientTimeline() {
               Dashboard
             </button>
             <div className="h-4 w-px bg-slate-200"></div>
-            <div className="flex items-center gap-2">
-              <span className="font-bold text-primary text-base">श</span>
+            <button onClick={() => navigate('/dashboard')} className="flex items-center gap-2 cursor-pointer group">
+              <span className="font-bold text-primary text-base group-hover:opacity-80 transition-opacity">श</span>
               <span className="text-sm font-bold text-text-dark tracking-tight">Lipi</span>
-            </div>
+            </button>
             <div className="h-4 w-px bg-slate-200"></div>
             <span className="text-xs font-bold text-slate-500 uppercase tracking-widest">Patient History</span>
           </div>
@@ -251,6 +276,39 @@ export default function PatientTimeline() {
                       {timeline.total_visits} visit{timeline.total_visits !== 1 ? 's' : ''} on record
                     </p>
                   </div>
+                </div>
+
+                <div className="flex flex-col items-end gap-1">
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept="application/pdf,image/png,image/jpeg"
+                    className="hidden"
+                    onChange={handleImportFile}
+                  />
+                  <button
+                    onClick={() => fileInputRef.current?.click()}
+                    disabled={importing}
+                    className="flex items-center gap-1.5 text-xs font-semibold text-primary border border-primary/25 bg-primary/5 hover:bg-primary/10 px-3 py-1.5 rounded-lg transition-colors disabled:opacity-60 cursor-pointer"
+                  >
+                    {importing ? (
+                      <svg className="w-3.5 h-3.5 animate-spin" fill="none" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                      </svg>
+                    ) : (
+                      <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M12 12v9m0-9l-3 3m3-3l3 3" />
+                      </svg>
+                    )}
+                    {importing ? 'Processing…' : 'Import old lab report'}
+                  </button>
+                  {importSuccess && (
+                    <p className="text-[10px] text-primary font-semibold">Added to timeline ✓</p>
+                  )}
+                  {importError && (
+                    <p className="text-[10px] text-red-600 font-medium max-w-[220px] text-right">{importError}</p>
+                  )}
                 </div>
               </div>
 
