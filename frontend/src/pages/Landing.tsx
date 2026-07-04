@@ -12,6 +12,8 @@ import {
 import {
   ArrowRight,
   FileText,
+  FileCheck2,
+  FileSymlink,
   Receipt,
   MessageSquare,
   CalendarCheck,
@@ -28,6 +30,8 @@ import {
   Clock,
   Send,
   Smartphone,
+  Stethoscope,
+  Users,
 } from 'lucide-react';
 import { ProductShowcase } from '../components/ProductShowcase';
 import SupportModal from '../components/SupportModal';
@@ -166,12 +170,15 @@ const DIALECT_SAMPLES = {
 type LangKey = keyof typeof DIALECT_SAMPLES;
 
 const TASKS = [
+  { icon: FileCheck2, label: 'Insurance / TPA', detail: 'Claim packets prepared' },
   { icon: FileText, label: 'Clinical notes', detail: 'Written as you speak' },
   { icon: Receipt, label: 'Prescriptions', detail: 'Drafted, ready to sign' },
-  { icon: MessageSquare, label: 'Patient instructions', detail: 'Sent on WhatsApp' },
   { icon: FlaskConical, label: 'Lab orders', detail: 'Generated and dispatched' },
+  { icon: FileSymlink, label: 'Referral letters', detail: 'Generated from the note' },
+  { icon: MessageSquare, label: 'Patient instructions', detail: 'Sent on WhatsApp' },
   { icon: CreditCard, label: 'Payments', detail: 'UPI links and tokens' },
   { icon: Database, label: 'ABDM / FHIR', detail: 'Records auto-filled' },
+  { icon: CalendarCheck, label: 'Scheduling + intake', detail: 'Slots and pre-visit forms' },
 ];
 
 const TESTIMONIALS = [
@@ -364,8 +371,8 @@ export default function Landing() {
               className="mt-9 flex flex-wrap items-center gap-x-5 gap-y-2 text-[12px] text-slate-400 font-medium"
             >
               <span className="flex items-center gap-1.5"><BadgeCheck className="w-3.5 h-3.5 text-primary/60" strokeWidth={2} /> ABDM mandated</span>
-              <span className="flex items-center gap-1.5"><ShieldCheck className="w-3.5 h-3.5 text-primary/60" strokeWidth={2} /> On-shore NLP</span>
-              <span className="flex items-center gap-1.5"><BadgeCheck className="w-3.5 h-3.5 text-primary/60" strokeWidth={2} /> Zero hallucination</span>
+              <span className="flex items-center gap-1.5"><ShieldCheck className="w-3.5 h-3.5 text-primary/60" strokeWidth={2} /> On-shore clinical NLP</span>
+              <span className="flex items-center gap-1.5"><BadgeCheck className="w-3.5 h-3.5 text-primary/60" strokeWidth={2} /> Zero hallucination, source-traced</span>
             </motion.div>
           </motion.div>
 
@@ -512,6 +519,65 @@ export default function Landing() {
                 </motion.div>
               );
             })}
+          </motion.div>
+        </div>
+      </section>
+
+      {/* ── Whole clinic system ──────────────────────────────────────── */}
+      <section className="border-b border-slate-200/60 bg-white px-6 py-24">
+        <div className="mx-auto max-w-6xl">
+          <RevealHeading wrapClassName="mb-4" className="max-w-[26ch] text-[2rem] md:text-[2.6rem] font-extrabold tracking-tight leading-[1.08] text-text-dark">
+            Built for the doctor, assistant, and patient.
+          </RevealHeading>
+          <motion.p
+            variants={fadeUp}
+            initial={reduce ? false : 'hidden'}
+            whileInView="visible"
+            viewport={{ once: true, amount: 0.4 }}
+            className="max-w-[58ch] text-[14.5px] leading-relaxed text-slate-500 mb-10"
+          >
+            Lipi is not a single-user scribe. It coordinates the OPD workflow across the people who actually run the clinic.
+          </motion.p>
+          <motion.div
+            variants={stagger}
+            initial={reduce ? false : 'hidden'}
+            whileInView="visible"
+            viewport={{ once: true, amount: 0.3 }}
+            className="grid gap-4 sm:grid-cols-3"
+          >
+            {[
+              {
+                icon: Stethoscope,
+                role: 'Doctor',
+                headline: 'Reviews and signs',
+                detail: 'Clinical note, prescription, investigations, safety checks, and ABDM-ready record.',
+              },
+              {
+                icon: Users,
+                role: 'Assistant',
+                headline: 'Runs the follow-through',
+                detail: 'Lab dispatch, payment token, follow-up reminder, appointment slot, and claim packet.',
+              },
+              {
+                icon: Smartphone,
+                role: 'Patient',
+                headline: 'Receives the next step',
+                detail: 'Signed Rx link, test instructions, follow-up reminder, booking prompt, and pre-visit intake.',
+              },
+            ].map((card) => (
+              <motion.div
+                key={card.role}
+                variants={fadeUp}
+                className="rounded-3xl border border-slate-200/80 bg-bg-warm p-7"
+              >
+                <div className="w-10 h-10 rounded-2xl bg-primary/10 grid place-items-center mb-5">
+                  <card.icon className="w-5 h-5 text-primary" strokeWidth={1.8} />
+                </div>
+                <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-primary/70 mb-1.5">{card.role}</p>
+                <h3 className="text-[1.1rem] font-bold text-text-dark leading-snug mb-2">{card.headline}</h3>
+                <p className="text-[13.5px] text-slate-500 leading-relaxed">{card.detail}</p>
+              </motion.div>
+            ))}
           </motion.div>
         </div>
       </section>
@@ -681,7 +747,7 @@ export default function Landing() {
                   <p className="text-[13.5px] text-slate-500 mt-1">No second back-office pass. The assistant queue builds itself.</p>
                 </div>
               </div>
-              <motion.div variants={stagger} initial={reduce ? false : 'hidden'} whileInView="visible" viewport={{ once: true, amount: 0.3 }} className="grid grid-cols-2 md:grid-cols-3 gap-3">
+              <motion.div variants={stagger} initial={reduce ? false : 'hidden'} whileInView="visible" viewport={{ once: true, amount: 0.3 }} className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                 {TASKS.map((t, i) => {
                   const featured = i < 2;
                   return (

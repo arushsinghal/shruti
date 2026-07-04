@@ -138,7 +138,7 @@ function AssistantMemoryDemo({ reduce }: { reduce: boolean }) {
           <MessageSquareText className="h-3 w-3" strokeWidth={1.9} />
           Ask Lipi
         </span>
-        <span className="rounded-full bg-primary/[0.055] px-2 py-0.5 text-[9.5px] font-bold text-primary">clinic memory</span>
+        <span className="rounded-full bg-primary/[0.055] px-2 py-0.5 text-[9.5px] font-bold text-primary">clinic memory, cited</span>
       </div>
 
       <div className="grid grid-cols-[1fr_1.02fr] gap-2">
