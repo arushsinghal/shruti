@@ -56,15 +56,15 @@ export default function Login() {
   };
 
   const handleDemoLogin = () => {
-    setUsername('arush');
+    setUsername('demo');
     setPassword('1234');
-    handleLogin('arush', '1234');
+    handleLogin('demo', '1234');
   };
 
   const handleAssistantDemoLogin = () => {
-    setUsername('meena');
+    setUsername('demo');
     setPassword('1234');
-    handleLogin('meena', '1234');
+    handleLogin('demo', '1234');
   };
 
   const inputCls =
