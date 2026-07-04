@@ -2,7 +2,6 @@ import { useState, type MouseEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, useReducedMotion, AnimatePresence } from 'framer-motion';
 import { ArrowRight, Check, Sparkles, Plus, Minus, TrendingUp, Zap, IndianRupee } from 'lucide-react';
-import { CursorSpotlight, AuroraBackdrop } from '../components/Ambient';
 
 interface Tier {
   name: string;
@@ -36,12 +35,12 @@ const TIERS: Tier[] = [
     unit: 'per doctor / month',
     highlight: true,
     cta: 'Start 14-day trial',
-    note: 'DHIS deposits ₹9,000+/mo to your clinic — more than covers this fee.',
+    note: 'DHIS deposits ₹9,000+/mo to your clinic, more than covers this fee.',
     features: [
       'Unlimited consultations',
-      'Auto DHIS claim logging — ₹7.50/OPD monthly from NHA',
+      'Auto DHIS claim logging: ₹7.50/OPD monthly from NHA',
       'WhatsApp follow-up reminders to patients',
-      'Lab dispatch — Thyrocare & 1mg booking links',
+      'Lab dispatch: Thyrocare & 1mg booking links',
       'Consultation fee collection via UPI deep-link',
       'ABDM FHIR R4 + HIE-CM push (Cat1 & Cat2)',
       'Assistant work queue & patient timeline',
@@ -67,28 +66,25 @@ const TIERS: Tier[] = [
 
 const REVENUE_STREAMS = [
   {
-    icon: <IndianRupee className="w-5 h-5" />,
+    icon: <IndianRupee className="w-4.5 h-4.5" />,
     label: 'DHIS government payout',
-    detail: '₹7.50 per OPD · ₹15 per discharge — deposited by NHA monthly',
-    color: 'bg-emerald-50 text-emerald-700 border-emerald-200',
+    detail: '₹7.50 per OPD, ₹15 per discharge, deposited by NHA monthly',
   },
   {
-    icon: <TrendingUp className="w-5 h-5" />,
+    icon: <TrendingUp className="w-4.5 h-4.5" />,
     label: 'Lab affiliate commission',
-    detail: 'Thyrocare & 1mg — per booking completed via Lipi dispatch',
-    color: 'bg-sky-50 text-sky-700 border-sky-200',
+    detail: 'Thyrocare and 1mg, per booking completed via Lipi dispatch',
   },
   {
-    icon: <Zap className="w-5 h-5" />,
+    icon: <Zap className="w-4.5 h-4.5" />,
     label: 'Consultation fee settlement',
     detail: 'UPI deep-link sent to patient when appointment is confirmed',
-    color: 'bg-violet-50 text-violet-700 border-violet-200',
   },
   {
-    icon: <Check className="w-5 h-5" />,
+    icon: <Check className="w-4.5 h-4.5" />,
     label: 'NHCX insurance pre-auth',
-    detail: 'Cashless claim filing — coming soon',
-    color: 'bg-amber-50 text-amber-700 border-amber-200',
+    detail: 'Cashless claim filing',
+    comingSoon: true,
   },
 ];
 
@@ -104,27 +100,27 @@ const INCLUDED = [
 const FAQS: { q: string; a: string }[] = [
   {
     q: 'What is DHIS and why does the government pay us?',
-    a: 'The Digital Health Incentive Scheme (DHIS) is an NHA program that pays clinics ₹7.50 per OPD (₹15 for discharges) for every record digitized via ABDM-compliant software. Lipi is built as a registered Digital Solution Company (DSC), so both you and Lipi earn from the government every month — no extra work required.',
+    a: 'The Digital Health Incentive Scheme (DHIS) is an NHA program that pays clinics ₹7.50 per OPD (₹15 for discharges) for every record digitized via ABDM-compliant software. Lipi is built as a registered Digital Solution Company (DSC), so both you and Lipi earn from the government every month. No extra work required.',
   },
   {
     q: 'How does the "net cost ₹0" work?',
-    a: '40 patients/day × ₹7.50 × 22 working days = ₹6,600/month deposited by NHA into your clinic account. Lipi Pro is ₹1,499/month. You\'re up ₹5,100 just from DHIS — before anything else. At volume, one doctor\'s DHIS income covers multiple seats.',
+    a: '40 patients/day × ₹7.50 × 22 working days = ₹6,600/month deposited by NHA into your clinic account. Lipi Pro is ₹1,499/month. You\'re up ₹5,100 just from DHIS, before anything else. At volume, one doctor\'s DHIS income covers multiple seats.',
   },
   {
     q: 'Does Lipi just take notes?',
-    a: 'No. Lipi is an AI-native OPD service — from one consultation it produces reviewed records, prescriptions, referrals, investigation orders, patient follow-ups, payment collection, and the ABDM records that trigger your government income. All from speech, all doctor-reviewed.',
+    a: 'No. Lipi is an AI-native OPD service. From one consultation it produces reviewed records, prescriptions, referrals, investigation orders, patient follow-ups, payment collection, and the ABDM records that trigger your government income. All from speech, all doctor-reviewed.',
   },
   {
     q: 'How does "zero hallucination" work?',
-    a: 'Extraction from speech to clinical facts is fully deterministic — no LLM. Every fact traces to the exact sentence the doctor spoke. The SOAP note stays empty until the doctor confirms facts in one tap. AI only ever operates on confirmed ground truth.',
+    a: 'Extraction from speech to clinical facts is fully deterministic, no LLM. Every fact traces to the exact sentence the doctor spoke. The SOAP note stays empty until the doctor confirms facts in one tap. AI only ever operates on confirmed ground truth.',
   },
   {
     q: 'What is the lock-in risk if I switch EMRs?',
-    a: 'If you switch to a non-DSC EMR, your clinic loses DHIS income entirely — even at 200 patients/day. NHA only pays when the software filing records is ABDM v3 DSC-registered. This is not our lock-in — it is the government\'s incentive structure.',
+    a: 'If you switch to a non-DSC EMR, your clinic loses DHIS income entirely, even at 200 patients/day. NHA only pays when the software filing records is ABDM v3 DSC-registered. This is not our lock-in, it is the government\'s incentive structure.',
   },
   {
     q: 'Which languages does Lipi support?',
-    a: 'Hindi, English, and Hinglish code-switching — built for how Indian OPDs actually speak, including self-corrections and regional vocabulary.',
+    a: 'Hindi, English, and Hinglish code-switching, built for how Indian OPDs actually speak, including self-corrections and regional vocabulary.',
   },
   {
     q: 'Is patient data secure?',
@@ -145,8 +141,6 @@ export default function Pricing() {
 
   return (
     <div className="min-h-screen bg-bg-warm font-sans text-text-dark antialiased overflow-x-hidden">
-      <CursorSpotlight />
-
       {/* Nav */}
       <nav className="w-full sticky top-0 z-[100] bg-white/80 backdrop-blur-md border-b border-slate-200/70">
         <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between gap-4">
@@ -171,7 +165,6 @@ export default function Pricing() {
 
       {/* Hero */}
       <section className="relative px-6 pt-20 pb-12 text-center overflow-hidden">
-        <AuroraBackdrop />
         <motion.div
           initial={reduce ? false : { opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
@@ -183,7 +176,7 @@ export default function Pricing() {
           </span>
           <h1 className="text-[2.5rem] leading-[1.05] md:text-[3.5rem] md:leading-[1.03] tracking-tight font-bold">
             Lipi pays for itself.
-            <span className="text-gradient-brand"> Government money, deposited monthly.</span>
+            <span className="text-primary"> Government money, deposited monthly.</span>
           </h1>
           <p className="mt-6 text-[16px] md:text-[18px] text-slate-500 max-w-2xl mx-auto leading-relaxed">
             The NHA Digital Health Incentive Scheme pays your clinic ₹7.50 per OPD visit for every digitized record. 40 patients/day = ₹9,240/month new income. Lipi handles the filing. You collect the deposit.
@@ -195,7 +188,7 @@ export default function Pricing() {
       <section className="px-6 pb-10">
         <div className="max-w-4xl mx-auto grid sm:grid-cols-3 gap-4">
           {[
-            { label: 'Clinic earns (40 OPDs/day)', value: '₹9,000', sub: '/month · direct from NHA', green: true },
+            { label: 'Clinic earns (40 OPDs/day)', value: '₹9,000', sub: '/month · direct from NHA', primary: true },
             { label: 'Lipi earns (DSC share)', value: '₹3,000', sub: '/month · 25% of DHIS pool', primary: true },
             { label: 'Net cost to clinic', value: '₹0', sub: 'DHIS income > Lipi subscription', dark: true },
           ].map((stat, i) => (
@@ -208,7 +201,7 @@ export default function Pricing() {
               className="rounded-2xl bg-white border border-slate-200/80 px-5 py-5 flex flex-col gap-1"
             >
               <p className="text-[11.5px] font-semibold text-slate-500 uppercase tracking-wider">{stat.label}</p>
-              <p className={`text-[2rem] font-bold tracking-tight leading-none ${stat.green ? 'text-emerald-600' : stat.primary ? 'text-primary' : 'text-slate-800'}`}>{stat.value}</p>
+              <p className={`text-[2rem] font-bold tracking-tight leading-none ${stat.primary ? 'text-primary' : 'text-slate-800'}`}>{stat.value}</p>
               <p className="text-[12px] text-slate-400">{stat.sub}</p>
             </motion.div>
           ))}
@@ -232,11 +225,6 @@ export default function Pricing() {
                   : 'bg-white border border-slate-200/80 hover:border-primary/30 hover:shadow-[0_24px_50px_-30px_rgba(27,94,59,0.3)]'
               }`}
             >
-              {tier.highlight && (
-                <span className="absolute -top-3 left-1/2 -translate-x-1/2 bg-accent text-text-dark text-[10.5px] font-bold uppercase tracking-wider px-3 py-1 rounded-full shadow-sm">
-                  Most popular
-                </span>
-              )}
               <h3 className={`text-[15px] font-bold ${tier.highlight ? 'text-white' : 'text-text-dark'}`}>{tier.name}</h3>
               <p className={`text-[13px] mt-1 ${tier.highlight ? 'text-white/70' : 'text-slate-500'}`}>{tier.tagline}</p>
 
@@ -280,9 +268,8 @@ export default function Pricing() {
       <section className="px-6 py-20">
         <div className="max-w-5xl mx-auto">
           <div className="text-center max-w-2xl mx-auto mb-10">
-            <span className="text-[12.5px] font-bold uppercase tracking-wider text-primary">Multiple income streams</span>
-            <h2 className="text-3xl md:text-[2.25rem] font-bold tracking-tight mt-3 leading-tight">Lipi opens revenue channels you didn't have before.</h2>
-            <p className="text-slate-500 text-[15px] mt-3 leading-relaxed">Every consultation produces not just a note — it produces a government payout, a lab referral, and an opportunity to collect your fee before the patient leaves.</p>
+            <h2 className="text-3xl md:text-[2.25rem] font-bold tracking-tight leading-tight">Lipi opens revenue channels you didn't have before.</h2>
+            <p className="text-slate-500 text-[15px] mt-3 leading-relaxed">Every consultation produces a note, a government payout, a lab referral, and a chance to collect your fee before the patient leaves.</p>
           </div>
           <div className="grid sm:grid-cols-2 gap-4">
             {REVENUE_STREAMS.map((stream, i) => (
@@ -292,12 +279,17 @@ export default function Pricing() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: i * 0.06 }}
-                className={`flex items-start gap-4 rounded-2xl border px-5 py-4 ${stream.color}`}
+                className="flex items-start gap-4 rounded-2xl bg-white border border-slate-200/80 px-5 py-4"
               >
-                <span className="mt-0.5 shrink-0">{stream.icon}</span>
+                <span className="mt-0.5 shrink-0 grid place-items-center w-9 h-9 rounded-xl bg-primary/10 text-primary">{stream.icon}</span>
                 <div>
-                  <p className="text-[14px] font-semibold leading-tight">{stream.label}</p>
-                  <p className="text-[12.5px] opacity-70 mt-0.5">{stream.detail}</p>
+                  <div className="flex items-center gap-2">
+                    <p className="text-[14px] font-semibold text-text-dark leading-tight">{stream.label}</p>
+                    {stream.comingSoon && (
+                      <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 bg-slate-100 px-1.5 py-0.5 rounded">Coming soon</span>
+                    )}
+                  </div>
+                  <p className="text-[12.5px] text-slate-500 mt-0.5">{stream.detail}</p>
                 </div>
               </motion.div>
             ))}
@@ -309,9 +301,8 @@ export default function Pricing() {
       <section className="px-6 pb-20">
         <div className="max-w-5xl mx-auto">
           <div className="text-center max-w-2xl mx-auto mb-10">
-            <span className="text-[12.5px] font-bold uppercase tracking-wider text-primary">Around every visit</span>
-            <h2 className="text-3xl md:text-[2.25rem] font-bold tracking-tight mt-3 leading-tight">Everything around the visit, handled.</h2>
-            <p className="text-slate-500 text-[15px] mt-3 leading-relaxed">From one spoken consultation, Lipi handles the full administrative tail — so you see more patients without adding to your team.</p>
+            <h2 className="text-3xl md:text-[2.25rem] font-bold tracking-tight leading-tight">Everything around the visit, handled.</h2>
+            <p className="text-slate-500 text-[15px] mt-3 leading-relaxed">From one spoken consultation, Lipi handles the full administrative tail, so you see more patients without adding to your team.</p>
           </div>
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
             {INCLUDED.map((r, i) => (
@@ -332,7 +323,7 @@ export default function Pricing() {
             ))}
           </div>
           <div className="mt-6 rounded-2xl bg-primary/[0.05] border border-primary/15 px-6 py-5 text-center">
-            <p className="text-[15px] text-slate-600 leading-relaxed"><span className="font-semibold text-text-dark">The government pays both of you.</span> But only if your software is ABDM v3 DSC-certified. A clinic that switches to an uncertified EMR loses their DHIS income entirely — the lock-in is structural, not UX.</p>
+            <p className="text-[15px] text-slate-600 leading-relaxed"><span className="font-semibold text-text-dark">The government pays both of you.</span> But only if your software is ABDM v3 DSC-certified. A clinic that switches to an uncertified EMR loses their DHIS income entirely. The lock-in is structural, not UX.</p>
           </div>
         </div>
       </section>
@@ -377,7 +368,7 @@ export default function Pricing() {
           <div className="absolute inset-0 opacity-[0.12] [background:radial-gradient(40%_60%_at_80%_20%,#fff,transparent_60%)]" />
           <div className="relative z-10 max-w-2xl mx-auto space-y-6">
             <h2 className="text-3xl md:text-[2.5rem] font-bold tracking-tight text-white leading-tight">Start earning from your records today.</h2>
-            <p className="text-white/80 text-[15px] leading-relaxed">No card required. Run your first consultation — see a reviewed note, prescription, and DHIS-ready FHIR bundle from one spoken session.</p>
+            <p className="text-white/80 text-[15px] leading-relaxed">No card required. Run your first consultation and see a reviewed note, prescription, and DHIS-ready FHIR bundle from one spoken session.</p>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2">
               <button onClick={() => navigate('/dashboard')} className="w-full sm:w-auto px-7 py-3.5 bg-white text-primary hover:bg-slate-50 rounded-full font-semibold text-[14.5px] transition-all active:scale-[0.98] cursor-pointer shadow-lg flex items-center justify-center gap-2">
                 Open Lipi <ArrowRight className="w-4 h-4" />
