@@ -20,7 +20,7 @@ _SELECT = (
     "SELECT id, patient_name, doctor_name, created_at, status, "
     "audio_file_path, transcript, clinical_facts, memory_state, soap_note, cds_suggestions, "
     "cloud_ai_consent, diarized_transcript, mode, user_id, abha_number, pmjay_beneficiary, specialty, "
-    "patient_phone, initiated_by, patient_age, patient_sex "
+    "patient_phone, initiated_by, patient_age, patient_sex, patient_id "
     "FROM sessions"
 )
 
@@ -77,6 +77,7 @@ def _row_to_session(row: Any) -> ConsultationSession:
         initiated_by=row[19] if (len(row) > 19 and row[19]) else "doctor",
         patient_age=row[20] if len(row) > 20 else None,
         patient_sex=row[21] if len(row) > 21 else None,
+        patient_id=row[22] if len(row) > 22 else None,
     )
 
 
