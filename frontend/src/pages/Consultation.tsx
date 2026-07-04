@@ -68,33 +68,16 @@ function ConsentGate({ onConsented, error }: { onConsented: () => void; error?: 
   );
 }
 
-// ── Document-ready preview card for non-health modes ──────────────────────────
-function DocumentReadyCard({ mode, soap, onReview }: { mode: SessionMode; soap: any; onReview: () => void }) {
-  const isFir = mode === 'government';
-  const isLegal = mode === 'legal';
-
-  const previewLines: { label: string; value: string }[] = isFir ? [
-    { label: 'FIR No.', value: soap?.fir_number || '—' },
-    { label: 'Complainant', value: soap?.complainant_name || '—' },
-    { label: 'Accused', value: soap?.accused_name || '—' },
-    { label: 'Offences', value: (soap?.offences_alleged || []).slice(0, 2).join('; ') || '—' },
-    { label: 'Location', value: soap?.place_of_incident || '—' },
-    { label: 'Action', value: soap?.action_taken || '—' },
-  ] : isLegal ? [
-    { label: 'Doc Type', value: soap?.document_type || '—' },
-    { label: 'Ref', value: soap?.document_ref || '—' },
-    { label: 'Court', value: soap?.court_name || '—' },
-    { label: 'Petitioner', value: soap?.petitioner || '—' },
-    { label: 'Respondent', value: soap?.respondent || '—' },
-    { label: 'Status', value: soap?.status || '—' },
-  ] : [
+// ── Document-ready preview card for general (non-health) mode ────────────────
+function DocumentReadyCard({ soap, onReview }: { soap: any; onReview: () => void }) {
+  const previewLines: { label: string; value: string }[] = [
     { label: 'Status', value: soap?.S || '—' },
     { label: 'Summary', value: soap?.A || '—' },
   ];
 
-  const accent = isFir ? 'border-slate-300 bg-slate-50' : isLegal ? 'border-slate-300 bg-slate-50' : 'border-slate-200 bg-slate-50';
-  const iconColor = isFir ? 'text-slate-600' : isLegal ? 'text-slate-600' : 'text-slate-500';
-  const title = isFir ? 'FIR Draft Ready' : isLegal ? 'Legal Document Draft Ready' : 'Transcript Summary Ready';
+  const accent = 'border-slate-200 bg-slate-50';
+  const iconColor = 'text-slate-500';
+  const title = 'Transcript Summary Ready';
 
   return (
     <div className="space-y-4">
@@ -428,10 +411,7 @@ function AiProgressSequencer() {
               <div className="flex items-center gap-2 min-w-0">
                 <div className="w-2 h-2 rounded-full bg-red-500 animate-pulse shrink-0"></div>
                 <span className="text-[11px] font-bold text-slate-500 uppercase tracking-widest truncate">
-                  {session.mode === 'government' ? 'Officer Recording'
-                   : session.mode === 'legal' ? 'Legal Recording'
-                   : session.mode === 'general' ? 'Audio Input'
-                   : 'Consultation Recording'}
+                  {session.mode === 'general' ? 'Audio Input' : 'Consultation Recording'}
                 </span>
               </div>
               <span className="text-[9px] font-bold text-primary bg-primary/10 border border-primary/15 px-2 py-0.5 rounded-full tracking-widest uppercase shrink-0">
@@ -552,10 +532,7 @@ function AiProgressSequencer() {
                     onClick={handleExtractFacts}
                     className="w-full px-4 py-3 rounded-xl bg-primary hover:bg-primary-dark text-white text-sm font-bold transition-all shadow-sm active:scale-[0.99] flex items-center justify-center gap-2 cursor-pointer"
                   >
-                    {session.mode === 'government' ? 'Generate FIR →'
-                    : session.mode === 'legal' ? 'Generate Legal Document →'
-                    : session.mode === 'general' ? 'Summarise Transcript →'
-                    : 'Process Clinical Intelligence →'}
+                    {session.mode === 'general' ? 'Summarise Transcript →' : 'Process Clinical Intelligence →'}
                   </button>
                 ) : (
                   <div className="w-full px-4 py-3 rounded-xl bg-primary/5 border border-primary/15 text-primary text-sm font-bold flex items-center justify-center gap-2">
@@ -650,7 +627,6 @@ function AiProgressSequencer() {
             ) : (
               <div className="p-6 xl:p-8">
                 <DocumentReadyCard
-                  mode={session.mode!}
                   soap={clinicalResults.soap as any}
                   onReview={() => navigate(`/review/${id}`)}
                 />
@@ -668,10 +644,7 @@ function AiProgressSequencer() {
                     </svg>
                   </div>
                   <p className="text-sm font-semibold text-slate-600">
-                    {session.mode === 'government' ? 'FIR document will appear here after processing.'
-                    : session.mode === 'legal' ? 'Legal document will appear here after processing.'
-                    : session.mode === 'general' ? 'Transcript summary will appear here after processing.'
-                    : 'Clinical documentation will appear here after processing.'}
+                    {session.mode === 'general' ? 'Transcript summary will appear here after processing.' : 'Clinical documentation will appear here after processing.'}
                   </p>
                   <p className="text-xs text-slate-400 mt-2">Record or upload audio on the left to begin.</p>
                 </div>

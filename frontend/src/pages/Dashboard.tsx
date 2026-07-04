@@ -54,16 +54,6 @@ const MODE_ICONS: Record<SessionMode, React.ReactNode> = {
       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
     </svg>
   ),
-  government: (
-    <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-    </svg>
-  ),
-  legal: (
-    <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 6l3 1m0 0l-3 9a5.002 5.002 0 006.001 0M6 7l3 9M6 7l6-2m6 2l3-1m-3 1l-3 9a5.002 5.002 0 006.001 0M18 7l3 9m-3-9l-6-2m0-2v2m0 16V5m0 16H9m3 0h3" />
-    </svg>
-  ),
   general: (
     <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
@@ -72,13 +62,11 @@ const MODE_ICONS: Record<SessionMode, React.ReactNode> = {
 };
 
 const MODE_DESCS: Record<SessionMode, string> = {
-  health:     'Doctor-patient consultation → SOAP note',
-  government: 'Special workflow',
-  legal:      'Legal dictation → structured draft document',
-  general:    'Any audio → Transcript + summary',
+  health:  'Doctor-patient consultation → SOAP note',
+  general: 'Any audio → Transcript + summary',
 };
 
-const AVAILABLE_MODES: SessionMode[] = ['health', 'legal', 'general'];
+const AVAILABLE_MODES: SessionMode[] = ['health', 'general'];
 
 export default function Dashboard() {
   const navigate = useNavigate();
@@ -909,7 +897,7 @@ export default function Dashboard() {
 
             {/* Mode tabs — compact horizontal */}
             <div className="px-6 pb-4">
-              <div className="grid grid-cols-3 gap-1.5 bg-slate-100 p-1 rounded-xl">
+              <div className="grid grid-cols-2 gap-1.5 bg-slate-100 p-1 rounded-xl">
                 {AVAILABLE_MODES.map((mode) => (
                   <button
                     key={mode}
@@ -924,7 +912,7 @@ export default function Dashboard() {
                       {MODE_ICONS[mode]}
                     </span>
                     <span className={`text-[10px] font-bold leading-tight ${selectedMode === mode ? 'text-primary' : 'text-slate-500'}`}>
-                      {mode === 'health' ? 'Health' : mode === 'legal' ? 'Legal' : 'General'}
+                      {mode === 'health' ? 'Health' : 'General'}
                     </span>
                   </button>
                 ))}
@@ -970,32 +958,6 @@ export default function Dashboard() {
                       className="w-full border border-slate-200 rounded-lg px-3 py-2.5 text-sm text-slate-800 outline-none focus:border-primary focus:ring-2 focus:ring-primary/15 transition-all"
                     />
                   </div>
-                </div>
-              )}
-
-              {selectedMode === 'government' && (
-                <div>
-                  <label className="block text-xs font-semibold text-slate-600 mb-1.5">Complainant Name</label>
-                  <input
-                    type="text"
-                    value={sessionPatientName}
-                    onChange={e => setSessionPatientName(e.target.value)}
-                    placeholder="e.g. Ramesh Singh"
-                    className="w-full border border-slate-200 rounded-lg px-3 py-2.5 text-sm text-slate-800 outline-none focus:border-primary focus:ring-2 focus:ring-primary/15 transition-all"
-                  />
-                </div>
-              )}
-
-              {selectedMode === 'legal' && (
-                <div>
-                  <label className="block text-xs font-semibold text-slate-600 mb-1.5">Party / Petitioner Name</label>
-                  <input
-                    type="text"
-                    value={sessionPatientName}
-                    onChange={e => setSessionPatientName(e.target.value)}
-                    placeholder="e.g. Priya Sharma"
-                    className="w-full border border-slate-200 rounded-lg px-3 py-2.5 text-sm text-slate-800 outline-none focus:border-primary focus:ring-2 focus:ring-primary/15 transition-all"
-                  />
                 </div>
               )}
 

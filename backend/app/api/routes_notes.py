@@ -45,8 +45,6 @@ from app.services.memory_context import MemoryContextService
 from app.services.soap_generator import SOAPGeneratorService
 from app.services.cds_engine import CDSEngineService
 from app.services.fhir_mapper import FHIRMapperService
-from app.services.fir_generator import FIRGeneratorService
-from app.services.legal_generator import LegalGeneratorService
 from app.services.investigation_order_renderer import render_investigation_order_html
 from app.services import provenance
 from app.services.learning_service import learning_service
@@ -61,8 +59,6 @@ memory = MemoryContextService()
 soap_gen = SOAPGeneratorService()
 cds_engine = CDSEngineService()
 fhir_svc = FHIRMapperService()
-fir_gen = FIRGeneratorService()
-legal_gen = LegalGeneratorService()
 
 # Task 31: per-session write locks — prevents concurrent process_clinical on the same session
 _session_locks: dict[str, asyncio.Lock] = {}
@@ -114,28 +110,12 @@ def _run_health_pipeline(transcript: str) -> tuple[dict, dict, dict, list]:
     return facts, state, soap_note, cds_suggestions
 
 
-def _run_fir_pipeline(transcript: str, session_id: str) -> tuple[dict, dict, dict, list]:
-    """FIR document generation pipeline."""
-    fir_doc = fir_gen.generate_fir(transcript, session_id)
-    facts: dict = {"transcript_length": len(transcript), "offences": fir_doc.get("offences_alleged", [])}
-    state: dict = {"mode": "government", "location": fir_doc.get("place_of_incident", ""), "complainant": fir_doc.get("complainant_name", "")}
-    return facts, state, fir_doc, []
-
-
-def _run_legal_pipeline(transcript: str, session_id: str) -> tuple[dict, dict, dict, list]:
-    """Legal document generation pipeline."""
-    legal_doc = legal_gen.generate_legal_doc(transcript, session_id)
-    facts: dict = {"transcript_length": len(transcript), "sections_cited": legal_doc.get("legal_sections_cited", [])}
-    state: dict = {"mode": "legal", "document_type": legal_doc.get("document_type", ""), "parties": [legal_doc.get("petitioner", ""), legal_doc.get("respondent", "")]}
-    return facts, state, legal_doc, []
-
-
 @router.post("/sessions/{session_id}/process-clinical", response_model=ProcessClinicalResponse)
 async def process_clinical(
     session_id: str,
     current_user: dict = Depends(get_current_user),
 ):
-    """Runs Lipi NLP pipeline on transcription. Branches by session mode (health/government/legal/general). Research prototype only — output requires expert review."""
+    """Runs Lipi NLP pipeline on transcription. Branches by session mode (health/general). Research prototype only — output requires expert review."""
     lock = _get_session_lock(session_id)
     if lock.locked():
         raise HTTPException(status_code=409, detail="Processing already in progress for this session")
@@ -164,29 +144,22 @@ async def _process_clinical_inner(session_id: str, current_user: dict):
     soap_evidence: dict[str, list[str]] = {}
 
     try:
-        if mode == ModeEnum.government:
-            facts, state, doc, cds_suggestions = _run_fir_pipeline(session.transcript, session_id)
-            source = "fir_engine"
-        elif mode == ModeEnum.legal:
-            facts, state, doc, cds_suggestions = _run_legal_pipeline(session.transcript, session_id)
-            source = "legal_engine"
-        else:
-            # health or general — deterministic clinical pipeline
-            facts, full_state, doc, cds_suggestions = _run_health_pipeline(session.transcript)
-            source = "local"
-            state = full_state
-            if mode == ModeEnum.health:
-                # Opt-out review model: the draft SOAP is populated immediately from
-                # non-rejected candidates (negated/uncertain facts keep a visible
-                # certainty marker, never rendered as if affirmed) so the doctor
-                # reviews the whole note and removes anything wrong before signing.
-                # Structured export (FHIR, investigation orders) still hard-gates on
-                # per-fact "confirmed" status — see routes_fact_review.py.
-                extracted_dicts, _, draft_soap, soap_evidence = _build_health_provenance(
-                    session.transcript, facts
-                )
-                doc = draft_soap
-                state = {**full_state, "_extracted_facts": extracted_dicts}
+        # health or general — deterministic clinical pipeline
+        facts, full_state, doc, cds_suggestions = _run_health_pipeline(session.transcript)
+        source = "local"
+        state = full_state
+        if mode == ModeEnum.health:
+            # Opt-out review model: the draft SOAP is populated immediately from
+            # non-rejected candidates (negated/uncertain facts keep a visible
+            # certainty marker, never rendered as if affirmed) so the doctor
+            # reviews the whole note and removes anything wrong before signing.
+            # Structured export (FHIR, investigation orders) still hard-gates on
+            # per-fact "confirmed" status — see routes_fact_review.py.
+            extracted_dicts, _, draft_soap, soap_evidence = _build_health_provenance(
+                session.transcript, facts
+            )
+            doc = draft_soap
+            state = {**full_state, "_extracted_facts": extracted_dicts}
     except Exception as e:
         logger.error("Processing pipeline failed for mode=%s: %s", mode, e)
         raise HTTPException(status_code=500, detail="Clinical processing failed. Please try again.")

@@ -19,10 +19,8 @@ class StatusEnum(str, Enum):
 
 
 class ModeEnum(str, Enum):
-    health = "health"          # Doctor SOAP notes
-    government = "government"  # Police FIR reports
-    legal = "legal"            # Legal proceedings / affidavits
-    general = "general"        # General transcription
+    health = "health"    # Doctor SOAP notes
+    general = "general"  # General transcription
 
 
 class ConsentLogResponse(BaseModel):

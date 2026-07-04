@@ -7,20 +7,16 @@ export type SessionStatus =
   | 'soap_ready'
   | 'complete';
 
-export type SessionMode = 'health' | 'government' | 'legal' | 'general';
+export type SessionMode = 'health' | 'general';
 
 export const MODE_LABELS: Record<SessionMode, string> = {
   health: 'Health — SOAP Note',
-  government: 'Government — FIR Report',
-  legal: 'Legal — Document',
   general: 'General — Transcript',
 };
 
 export const MODE_COLORS: Record<SessionMode, string> = {
-  health:     'bg-primary/10 text-primary border border-primary/20',
-  government: 'bg-slate-100 text-slate-700 border border-slate-200',
-  legal:      'bg-slate-100 text-slate-700 border border-slate-200',
-  general:    'bg-slate-100 text-slate-600 border border-slate-200',
+  health:  'bg-primary/10 text-primary border border-primary/20',
+  general: 'bg-slate-100 text-slate-600 border border-slate-200',
 };
 
 export interface ClinicalFact {
