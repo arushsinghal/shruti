@@ -164,7 +164,9 @@ export default function PatientRecords() {
                 </div>
                 <div className="px-5 py-4 space-y-3">
                   {v.doctor_name && (
-                    <p className="text-[12.5px] text-slate-500">Dr. {v.doctor_name}</p>
+                    <p className="text-[12.5px] text-slate-500">
+                      {/^dr\.?\s/i.test(v.doctor_name) ? v.doctor_name : `Dr. ${v.doctor_name}`}
+                    </p>
                   )}
                   {v.medications.length > 0 && (
                     <div>

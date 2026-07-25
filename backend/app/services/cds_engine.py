@@ -154,7 +154,13 @@ def _matching_med_names(med_names: list[str], terms: set[str]) -> list[str]:
 
 
 class CDSEngineService:
-    def generate_cds(self, state: dict) -> list:
+    def generate_cds(self, state: dict, prior_history: dict | None = None) -> list:
+        """prior_history, if given, is the consent-gated cross-clinic patient graph
+        from patient_history_service.get_patient_graph() — allergies and active
+        medications recorded at ANY visit on the platform, not just this session.
+        This is what lets a genuinely new prescription get checked against a
+        conflict from a visit weeks ago at a different clinic, not just today's
+        transcript."""
         suggestions = []
 
         medications = state.get("medications", {})
@@ -258,6 +264,63 @@ class CDSEngineService:
                         "urgency": interaction["urgency"],
                         "safety_label": "doctor_review_required",
                         "alert_type": "drug_drug_interaction",
+                    })
+
+        # 2b. Cross-visit checks — today's new medications against the patient's
+        # consent-gated history from OTHER visits (possibly other clinics). This
+        # is the check a single-clinic system structurally cannot do.
+        if prior_history:
+            history_allergies = [
+                (a.get("text") or "").lower() for a in (prior_history.get("allergies") or [])
+            ]
+            history_meds_raw = [
+                m.get("name") for m in (prior_history.get("active_medications") or []) if m.get("name")
+            ]
+            history_med_names = _expand_brands([str(name) for name in history_meds_raw])
+
+            historical_pairs: set[tuple[str, str]] = set()
+            for med_name in med_names:
+                med_lower = med_name.lower()
+                for allergy in history_allergies:
+                    if not allergy or (allergy, med_lower) in historical_pairs:
+                        continue
+                    cross_class = _cross_reactive_alert(allergy, med_lower) if allergy not in med_lower else "direct match"
+                    if allergy in med_lower or cross_class:
+                        historical_pairs.add((allergy, med_lower))
+                        suggestions.append({
+                            "suggestion": f"ALLERGY ALERT (from a prior visit): {med_name} may conflict with a recorded allergy to {allergy}",
+                            "rationale": (
+                                f"Patient's cross-visit history shows an allergy to {allergy}, recorded at a "
+                                f"different visit, not in today's transcript. Verify before prescribing."
+                            ),
+                            "urgency": "critical",
+                            "safety_label": "doctor_review_required",
+                            "alert_type": "historical_allergy_contraindication",
+                        })
+
+            historical_interaction_keys: set[tuple[str, str, str]] = set()
+            for interaction in _DRUG_INTERACTIONS:
+                today_left = _matching_med_names(med_names, interaction["left"])  # type: ignore[arg-type]
+                today_right = _matching_med_names(med_names, interaction["right"])  # type: ignore[arg-type]
+                hist_left = _matching_med_names(history_med_names, interaction["left"])  # type: ignore[arg-type]
+                hist_right = _matching_med_names(history_med_names, interaction["right"])  # type: ignore[arg-type]
+                # Only meaningful when one side is NEW today and the other side is
+                # from history — same-session pairs are already covered above.
+                for new_med, old_med in [(m, o) for m in today_left for o in hist_right] + \
+                                          [(m, o) for m in today_right for o in hist_left]:
+                    key = tuple(sorted((new_med.lower(), old_med.lower())) + [str(interaction["suggestion"])])
+                    if key in historical_interaction_keys:
+                        continue
+                    historical_interaction_keys.add(key)
+                    suggestions.append({
+                        "suggestion": f"{interaction['suggestion']} (prior visit): {new_med} + {old_med}",
+                        "rationale": (
+                            f"{interaction['rationale']} {old_med.capitalize()} was recorded as an active "
+                            f"medication at a different visit, not in today's transcript."
+                        ),
+                        "urgency": interaction["urgency"],
+                        "safety_label": "doctor_review_required",
+                        "alert_type": "historical_drug_interaction",
                     })
 
         # 3. Symptom-based suggestions

@@ -30,6 +30,8 @@ import ReviewQueue from './pages/ReviewQueue';
 import OpsDashboard from './pages/OpsDashboard';
 import TPAClaim from './pages/TPAClaim';
 import PreVisitForm from './pages/PreVisitForm';
+import PatientDownloadPortal from './pages/PatientDownloadPortal';
+import AbdmReadiness from './pages/AbdmReadiness';
 import AuditLogs from './pages/AuditLogs';
 import DoctorProfile from './pages/DoctorProfile';
 
@@ -57,9 +59,14 @@ export default function App() {
           <Route path="/sign/:token" element={<DocSignPage />} />
           {/* No-login patient pre-visit form — appointment id in URL is the access key */}
           <Route path="/pre-visit/:appointmentId" element={<PreVisitForm />} />
+          {/* No-login prescription share/download portal — share token in URL, patient
+              verifies name/initials + year of birth before the signed download_token
+              is issued (see routes_public.py _decode_share_token / _decode_download_token) */}
+          <Route path="/patient-download/:token" element={<PatientDownloadPortal />} />
 
           <Route element={<ProtectedRoute />}>
             <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/abdm-readiness" element={<AbdmReadiness />} />
             <Route path="/assistant" element={<AssistantDashboard />} />
             <Route path="/assistant/intake" element={<AssistantIntake />} />
             <Route path="/patient/:name" element={<PatientProfile />} />

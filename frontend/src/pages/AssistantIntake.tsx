@@ -1,6 +1,6 @@
 import { useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { createIntakeSession, voiceExtractIntake } from '../lib/api';
+import { createIntakeSession, voiceExtractIntake, getPatientGraphByPhone, setPatientCrossClinicConsent, type PatientGraphPreview } from '../lib/api';
 import { motion, AnimatePresence } from 'framer-motion';
 import { UserPlus, Phone, ChevronLeft, CheckCircle2, Mic, MicOff, Loader2, Wand2, AlertCircle } from 'lucide-react';
 
@@ -14,9 +14,30 @@ export default function AssistantIntake() {
     patient_age: '',
     patient_sex: '',
     chief_complaint: '',
+    abha_number: '',
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+
+  // ── Phase 3: patient-carried records ───────────────────────────────────
+  const [graphPreview, setGraphPreview] = useState<PatientGraphPreview | null>(null);
+  const [loadHistoryConsent, setLoadHistoryConsent] = useState(false);
+  const [checkingHistory, setCheckingHistory] = useState(false);
+
+  async function checkPriorHistory() {
+    const phone = form.patient_phone.trim();
+    if (phone.length < 8) return;
+    setCheckingHistory(true);
+    try {
+      const preview = await getPatientGraphByPhone(phone);
+      setGraphPreview(preview);
+      setLoadHistoryConsent(preview.cross_clinic_consent);
+    } catch {
+      setGraphPreview(null);
+    } finally {
+      setCheckingHistory(false);
+    }
+  }
   const [done, setDone] = useState(false);
 
   // ── Voice mode ──────────────────────────────────────────────────────────
@@ -59,6 +80,7 @@ export default function AssistantIntake() {
           setVoiceTranscript(result.transcript);
           // Auto-fill fields — only override empty fields
           setForm(prev => ({
+            ...prev,
             patient_name: prev.patient_name || result.patient_name || '',
             patient_phone: prev.patient_phone,
             patient_age: prev.patient_age || result.patient_age || '',
@@ -109,6 +131,7 @@ export default function AssistantIntake() {
         patient_age: form.patient_age.trim() || undefined,
         patient_sex: form.patient_sex || undefined,
         chief_complaint: form.chief_complaint.trim() || undefined,
+        abha_number: form.abha_number.trim() || undefined,
       });
       setDone(true);
     } catch (err: any) {
@@ -119,7 +142,7 @@ export default function AssistantIntake() {
   }
 
   function registerAnother() {
-    setForm({ patient_name: '', patient_phone: '', patient_age: '', patient_sex: '', chief_complaint: '' });
+    setForm({ patient_name: '', patient_phone: '', patient_age: '', patient_sex: '', chief_complaint: '', abha_number: '' });
     setDone(false);
     setError('');
     setVoiceTranscript('');
@@ -293,9 +316,55 @@ export default function AssistantIntake() {
                 WhatsApp number
               </label>
               <input type="tel" required value={form.patient_phone} onChange={set('patient_phone')}
+                onBlur={checkPriorHistory}
                 placeholder="e.g. 9876543210 or +91…"
                 className="w-full px-4 py-2.5 border border-slate-200 rounded-xl text-[14px] outline-none focus:border-primary focus:ring-2 focus:ring-primary/15 bg-slate-50 focus:bg-white transition-all placeholder:text-slate-300" />
               <p className="text-[11px] text-slate-400 mt-1">Saved once — used for prescription dispatch. Never shared.</p>
+
+              {checkingHistory && (
+                <p className="text-[12px] text-slate-400 mt-2">Checking for prior visits…</p>
+              )}
+
+              {graphPreview && graphPreview.other_clinic_visits > 0 && (
+                <div className="mt-3 rounded-xl border border-primary/20 bg-primary/[0.04] p-3.5">
+                  <p className="text-[13px] font-semibold text-text-dark">
+                    This patient has {graphPreview.other_clinic_visits} visit{graphPreview.other_clinic_visits > 1 ? 's' : ''} recorded at another clinic on Lipi.
+                  </p>
+                  <label className="flex items-start gap-2 mt-2 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={loadHistoryConsent}
+                      onChange={async (e) => {
+                        const consent = e.target.checked;
+                        setLoadHistoryConsent(consent);
+                        if (graphPreview.patient_id) {
+                          try {
+                            await setPatientCrossClinicConsent(graphPreview.patient_id, consent);
+                            const refreshed = await getPatientGraphByPhone(form.patient_phone.trim());
+                            setGraphPreview(refreshed);
+                          } catch {
+                            setLoadHistoryConsent(!consent);
+                          }
+                        }
+                      }}
+                      className="mt-0.5 h-4 w-4 accent-primary"
+                    />
+                    <span className="text-[12.5px] text-slate-600 leading-snug">
+                      Patient consents to loading their history from other clinics — allergies and current medications will be checked automatically during their consultation.
+                    </span>
+                  </label>
+                  {loadHistoryConsent && graphPreview.cross_clinic_consent && (
+                    <div className="mt-2.5 pt-2.5 border-t border-primary/10 space-y-1">
+                      {graphPreview.allergies.length > 0 && (
+                        <p className="text-[12px] text-slate-600"><span className="font-semibold">Allergies:</span> {graphPreview.allergies.map(a => a.text).join(', ')}</p>
+                      )}
+                      {graphPreview.active_medications.length > 0 && (
+                        <p className="text-[12px] text-slate-600"><span className="font-semibold">Active medications:</span> {graphPreview.active_medications.map(m => m.name).join(', ')}</p>
+                      )}
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
           </div>
 
@@ -326,6 +395,13 @@ export default function AssistantIntake() {
                 placeholder="e.g. Fever for 3 days, headache…"
                 className={`w-full px-4 py-2.5 border border-slate-200 rounded-xl text-[13px] outline-none focus:border-primary focus:ring-2 focus:ring-primary/15 bg-slate-50 focus:bg-white transition-all placeholder:text-slate-300 resize-none${voiceTranscript && form.chief_complaint ? ' border-primary/40 bg-primary/[0.02]' : ''}`} />
               <p className="text-[11px] text-slate-400 mt-1">Shown to the doctor before consultation starts.</p>
+            </div>
+            <div>
+              <label className="block text-[12px] font-semibold text-slate-600 mb-1.5">ABHA number (optional)</label>
+              <input value={form.abha_number} onChange={set('abha_number')}
+                placeholder="14-digit Ayushman Bharat Health Account id"
+                className={inputCls} />
+              <p className="text-[11px] text-slate-400 mt-1">If the patient already has one. Links this visit to their ABDM health record.</p>
             </div>
           </div>
 

@@ -62,9 +62,9 @@ export default function Login() {
   };
 
   const handleAssistantDemoLogin = () => {
-    setUsername('demo');
+    setUsername('assistant_demo');
     setPassword('1234');
-    handleLogin('demo', '1234');
+    handleLogin('assistant_demo', '1234');
   };
 
   const inputCls =

@@ -141,6 +141,58 @@ async def get_tpa_claim(
     }
 
 
+@router.get("/internal/tpa-claim/{session_id}/fhir")
+async def get_tpa_claim_fhir(
+    session_id: str,
+    current_user: dict = Depends(get_current_user),
+) -> dict:
+    """Return the claim as an HL7 FHIR R4 Claim resource, shaped for NHCX
+    pre-authorization submission. We are not yet registered as an NHCX
+    Health Information Provider, so this is exported for review/testing —
+    not submitted to NHCX's gateway. See TPAClaim.tsx 'Export FHIR Claim'."""
+    claim = await get_tpa_claim(session_id, current_user)
+
+    diagnoses = claim["clinical"]["diagnoses"] or []
+    diagnosis_entries = [
+        {
+            "sequence": i + 1,
+            "diagnosisCodeableConcept": {
+                "coding": (
+                    [{"system": "http://hl7.org/fhir/sid/icd-10", "code": d["icd10"], "display": d["name"]}]
+                    if d.get("icd10")
+                    else []
+                ),
+                "text": d["name"],
+            },
+        }
+        for i, d in enumerate(diagnoses)
+    ]
+
+    items = [
+        {"sequence": i + 1, "productOrService": {"text": name}, "category": {"text": "investigation"}}
+        for i, name in enumerate(claim["clinical"]["investigations"])
+    ] + [
+        {"sequence": len(claim["clinical"]["investigations"]) + i + 1, "productOrService": {"text": name}, "category": {"text": "medication"}}
+        for i, name in enumerate(claim["clinical"]["medications"])
+    ]
+
+    return {
+        "resourceType": "Claim",
+        "status": "active" if claim["consultation"]["signed"] else "draft",
+        "type": {"text": "institutional"},
+        "use": "preauthorization",
+        "patient": {"display": claim["patient"]["name"]},
+        "created": claim["generated_at"],
+        "provider": {
+            "display": claim["doctor"]["name"],
+            "identifier": {"system": "https://nmc.org.in/nmc-number", "value": claim["doctor"]["nmc_number"]} if claim["doctor"]["nmc_number"] else None,
+        },
+        "diagnosis": diagnosis_entries,
+        "item": items,
+        "_lipi_note": "Structured for NHCX pre-authorization. Awaiting NHA Health Information Provider registration before live submission.",
+    }
+
+
 @router.get("/internal/tpa-claim/{session_id}/print", response_class=HTMLResponse)
 async def get_tpa_claim_print(
     session_id: str,

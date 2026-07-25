@@ -20,7 +20,7 @@ logger = logging.getLogger(__name__)
 T = TypeVar("T", bound=BaseModel)
 
 # The default model for fast, structured tasks
-_MODEL_ID = "gemini-2.0-flash"
+_MODEL_ID = "gemini-2.5-flash"
 
 
 class ExtractedFact(BaseModel):
@@ -54,6 +54,21 @@ class CDSSuggestion(BaseModel):
 
 class CDSSchema(BaseModel):
     suggestions: list[CDSSuggestion]
+
+class ActionItem(BaseModel):
+    action: str = Field(description="One of: 'prescription', 'investigation_order', 'referral', 'tpa_claim', 'patient_info'.")
+    to_doctor: str = Field(default="", description="For 'referral' only: the doctor's name being referred to, if explicitly stated. Empty string if not stated.")
+    to_specialty: str = Field(default="", description="For 'referral' only: the specialty being referred to, if explicitly stated. Empty string if not stated.")
+    reason: str = Field(default="", description="For 'referral' only: the stated reason for referral, if given. Empty string if not stated.")
+    urgency: str = Field(default="routine", description="For 'referral' only: 'urgent' if the message indicates urgency, otherwise 'routine'.")
+    policy_number: str = Field(default="", description="For 'tpa_claim' only: insurance policy number, if explicitly stated. Empty string if not stated.")
+    insurer_name: str = Field(default="", description="For 'tpa_claim' only: insurer name, if explicitly stated. Empty string if not stated.")
+    tpa_name: str = Field(default="", description="For 'tpa_claim' only: TPA name, if explicitly stated. Empty string if not stated.")
+    query_type: str = Field(default="", description="For 'patient_info' only: one of 'allergies', 'medications', 'chronic_conditions', 'bp_trend', 'summary' — whichever the doctor is asking about.")
+
+class ActionIntentSchema(BaseModel):
+    actions: list[ActionItem] = Field(default_factory=list, description="Ordered list of the document/query actions requested, in the order they should run. A single message may request more than one (e.g. a referral and a TPA claim together). Leave empty if the message, read together with the conversation history, does not clearly request any of the five known actions.")
+    clarifying_question: str = Field(default="", description="Fill this ONLY when the message seems to want one of the five actions but it is genuinely ambiguous which one — briefly say what's ambiguous (e.g. 'I'm not sure if you mean the referral or the insurance claim'), not just a bare question, and leave 'actions' empty. Leave blank in every other case, including when the message is unrelated to these five actions.")
 
 
 class LLMClientService:
@@ -157,10 +172,6 @@ class LLMClientService:
     def generate_cds(self, memory_state: dict) -> list[dict]:
         raise RuntimeError("Gemini CDS generation is disabled by safety policy; use local CDS.")
 
-    def diarize_transcript(self, raw_transcript: str) -> str:
-        """Cloud transcript diarization is disabled for clinical privacy."""
-        raise RuntimeError("Gemini diarization is disabled by privacy policy.")
-
     def narrate_practice_insight(self, stats: dict) -> str:
         """Turn deterministically-computed doctor practice statistics into a
         plain-language sentence or two.
@@ -199,6 +210,134 @@ class LLMClientService:
         except Exception as exc:
             logger.warning("Gemini practice-insight narration failed, using local fallback: %s", exc)
             return self._local_practice_insight_fallback(stats)
+
+    # Safety boundary: this is a command router, not a clinical model. It maps
+    # a doctor's instruction (plus recent conversation history, so references
+    # like "do that for him too" resolve) to a list of pre-built, already-
+    # existing document actions and pulls out only values the doctor
+    # explicitly stated. It never drafts clinical content, never infers a
+    # value that wasn't said, and every action it returns still runs through
+    # the same confirmation-gated document endpoints (409 if any fact is
+    # unconfirmed) as the equivalent UI button. This is intent classification
+    # across a short window of turns, not autonomy — there is no planning
+    # loop, no tool-use round-trip, and no memory beyond the turns passed in.
+    def classify_action_intent(self, message: str, history: list[dict] | None = None) -> dict:
+        if not self.client:
+            return {"actions": [], "clarifying_question": ""}
+
+        history_block = ""
+        if history:
+            # Only the most recent turns matter for resolving references —
+            # keep the prompt small rather than replaying the full thread.
+            recent = history[-10:]
+            lines = [
+                f"{'Doctor' if t.get('role') == 'user' else 'Assistant'}: {t.get('text', '')}"
+                for t in recent
+            ]
+            history_block = "Conversation so far:\n" + "\n".join(lines) + "\n\n"
+
+        prompt = f"""
+        You are a command router for a clinical documentation tool. A doctor
+        is chatting with you about this specific consultation. Your ONLY job
+        is to decide which of these five pre-built actions they want —
+        possibly more than one in a single message — and pull out any
+        details they explicitly stated for each. You do not generate
+        clinical content, medical advice, or document text yourself — you
+        only classify and extract values already present in the message or
+        the conversation history below.
+
+        Available actions:
+        - "prescription": the already-signed prescription for this consultation
+        - "investigation_order": the lab/investigation order for this consultation
+        - "referral": a referral letter to another doctor (fields: to_doctor, to_specialty, reason, urgency)
+        - "tpa_claim": an insurance/TPA claim document (fields: policy_number, insurer_name, tpa_name)
+        - "patient_info": answer a question about this patient using their existing recorded history — never invents anything (field: query_type, one of "allergies", "medications", "chronic_conditions", "bp_trend", "summary")
+
+        A single message can request more than one action (e.g. "refer to
+        Dr Sharma and also file the insurance claim") — list each requested
+        action in the order it should run.
+
+        Use the conversation history to resolve references like "do that for
+        him too" or "the same doctor as before" — pull the actual name or
+        detail from an earlier turn if it is there.
+
+        If the message seems to want one of these five actions but it is
+        genuinely ambiguous which one, leave "actions" empty and set
+        clarifying_question to a short sentence that states what's ambiguous
+        (e.g. "I'm not sure if you mean the referral or the insurance
+        claim") rather than a bare question. If the message is unrelated to
+        these five actions entirely, leave both "actions" and
+        "clarifying_question" empty.
+
+        Only fill in a field if it was explicitly stated somewhere in the
+        message or history below — never guess or invent a value.
+
+        {history_block}Doctor's latest message: "{message}"
+        """
+        try:
+            result = self._generate_structured(prompt, ActionIntentSchema)
+            return result.model_dump()
+        except Exception as exc:
+            logger.warning("Action-intent classification failed, defaulting to no action: %s", exc)
+            return {"actions": [], "clarifying_question": ""}
+
+    def narrate_patient_query(self, query_type: str, data: dict) -> str:
+        """Turns already-recorded, doctor-confirmed patient timeline data
+        into a plain-language answer to a doctor's question about this
+        patient.
+
+        Safety boundary, same class as narrate_practice_insight and
+        generate_soap_note: Gemini receives only pre-computed data already
+        confirmed by a doctor across past visits, and describes it — it
+        never infers a new clinical fact, never diagnoses, and never fills a
+        gap the data doesn't answer. If the data is empty or doesn't cover
+        the question, it must say so plainly rather than guessing.
+        """
+        if not self.client:
+            return self._local_patient_query_fallback(query_type, data)
+
+        prompt = f"""
+        You are answering a doctor's question about one of their patients,
+        using only the pre-recorded, doctor-confirmed data below. Do not
+        infer, diagnose, or add any clinical interpretation not directly
+        present in the data. If the data doesn't answer the question, say so
+        plainly rather than guessing. Write 1-3 short, factual sentences.
+
+        Question type: {query_type}
+        Patient data:
+        {json.dumps(data, indent=2, default=str)}
+        """
+        try:
+            response = self.client.models.generate_content(
+                model=_MODEL_ID,
+                contents=prompt,
+                config=types.GenerateContentConfig(temperature=0.1),
+            )
+            text = (response.text or "").strip()
+            return text or self._local_patient_query_fallback(query_type, data)
+        except Exception as exc:
+            logger.warning("Patient-query narration failed, using local fallback: %s", exc)
+            return self._local_patient_query_fallback(query_type, data)
+
+    @staticmethod
+    def _local_patient_query_fallback(query_type: str, data: dict) -> str:
+        """Deterministic, templated answer — no LLM required."""
+        if query_type == "allergies":
+            allergies = data.get("allergies") or []
+            return f"Recorded allergies: {', '.join(str(a) for a in allergies)}." if allergies else "No allergies recorded for this patient."
+        if query_type == "medications":
+            meds = data.get("active_medications") or []
+            names = [m.get("name", str(m)) if isinstance(m, dict) else str(m) for m in meds]
+            return f"Active medications: {', '.join(names)}." if names else "No active medications recorded."
+        if query_type == "chronic_conditions":
+            conditions = data.get("chronic_conditions") or []
+            names = [c.get("display") or c.get("text") or str(c) if isinstance(c, dict) else str(c) for c in conditions]
+            return f"Chronic conditions: {', '.join(names)}." if names else "No chronic conditions recorded."
+        if query_type == "bp_trend":
+            visits = data.get("visits") or []
+            return f"{len(visits)} visit(s) on record with vitals logged." if visits else "No vitals recorded yet."
+        total = data.get("total_visits", 0)
+        return f"{total} visit(s) on record for this patient."
 
     @staticmethod
     def _local_practice_insight_fallback(stats: dict) -> str:

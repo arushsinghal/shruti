@@ -49,6 +49,8 @@ from app.services.investigation_order_renderer import render_investigation_order
 from app.services import provenance
 from app.services.learning_service import learning_service
 from app.services.memory_service import get_patient_memory
+from app.services.patient_history_service import get_patient_graph, build_patient_timeline
+from app.services.llm_client import LLMClientService
 
 logger = logging.getLogger(__name__)
 
@@ -59,6 +61,7 @@ memory = MemoryContextService()
 soap_gen = SOAPGeneratorService()
 cds_engine = CDSEngineService()
 fhir_svc = FHIRMapperService()
+llm_client = LLMClientService()
 
 # Task 31: per-session write locks — prevents concurrent process_clinical on the same session
 _session_locks: dict[str, asyncio.Lock] = {}
@@ -97,16 +100,21 @@ def _build_health_provenance(transcript: str, facts: dict) -> tuple[list[dict], 
     return extracted_dicts, resolved_state, initial_soap, soap_evidence
 
 
-def _run_health_pipeline(transcript: str) -> tuple[dict, dict, dict, list]:
+def _run_health_pipeline(transcript: str, prior_history: dict | None = None) -> tuple[dict, dict, dict, list]:
     """Clinical pipeline: deterministic extraction → memory resolution → SOAP + CDS.
 
     Zero-LLM by policy. No generative model participates in transcript → facts → SOAP.
     Extraction is fully deterministic (keyword + fuzzy + regex via ClinicalExtractorService).
+
+    prior_history, if given, is the consent-gated cross-clinic patient graph (see
+    patient_history_service.get_patient_graph) — it only ever reaches the CDS engine,
+    never SOAP generation, so a cross-visit safety alert can never be mistaken for
+    something the patient said today.
     """
     facts = extractor.extract(transcript)
     state = memory.resolve_memory([facts])
     soap_note = soap_gen.generate_soap(state)
-    cds_suggestions = cds_engine.generate_cds(state)
+    cds_suggestions = cds_engine.generate_cds(state, prior_history=prior_history)
     return facts, state, soap_note, cds_suggestions
 
 
@@ -140,12 +148,23 @@ async def _process_clinical_inner(session_id: str, current_user: dict):
         )
 
     mode = session.mode
+    user_id_str = str(current_user["id"])
     extracted_dicts: list[dict[str, Any]] = []
     soap_evidence: dict[str, list[str]] = {}
 
+    # Cross-visit patient graph for CDS (Phase 2) — consent-gated, resolved by
+    # patient_id so it spans every clinic on the platform, not just this doctor's
+    # own sessions. Non-fatal: a failure here must never block the consultation.
+    prior_history: dict | None = None
+    if session.patient_id and mode == ModeEnum.health:
+        try:
+            prior_history = await get_patient_graph(session.patient_id, user_id_str)
+        except Exception as exc:
+            logger.warning("Cross-visit patient graph fetch failed (non-fatal): %s", exc)
+
     try:
         # health or general — deterministic clinical pipeline
-        facts, full_state, doc, cds_suggestions = _run_health_pipeline(session.transcript)
+        facts, full_state, doc, cds_suggestions = _run_health_pipeline(session.transcript, prior_history)
         source = "local"
         state = full_state
         if mode == ModeEnum.health:
@@ -168,7 +187,6 @@ async def _process_clinical_inner(session_id: str, current_user: dict):
     # state so it never merges into SOAP, CDS, or investigation orders.
     # prior_context is stored for UI display only — never touches SOAP generation paths.
     # Non-critical: failure here must never crash the clinical pipeline.
-    user_id_str = str(current_user["id"])
     if session.patient_name and mode == ModeEnum.health:
         try:
             prior_ctx = await get_patient_memory(
@@ -354,6 +372,95 @@ async def get_investigation_order(
         logger.error("Investigation order generation failed: %s", e)
         raise HTTPException(status_code=500, detail=f"Failed to generate investigation order: {e}")
     return HTMLResponse(content=html)
+
+
+class AssistantMessageTurn(BaseModel):
+    role: str
+    text: str
+
+
+class AssistantMessageRequest(BaseModel):
+    message: str
+    history: List[AssistantMessageTurn] = []
+
+
+class AssistantActionItem(BaseModel):
+    action: str
+    to_doctor: str = ""
+    to_specialty: str = ""
+    reason: str = ""
+    urgency: str = "routine"
+    policy_number: str = ""
+    insurer_name: str = ""
+    tpa_name: str = ""
+    query_type: str = ""
+    answer: str = ""
+
+
+class AssistantActionResponse(BaseModel):
+    actions: List[AssistantActionItem] = []
+    clarifying_question: str = ""
+
+
+def _slice_timeline_for_query(timeline: dict, query_type: str) -> dict:
+    """Pulls only the piece of the patient timeline relevant to the asked
+    question, so the narration prompt sees just what it needs — not the
+    doctor's entire visit history for every question."""
+    if query_type == "allergies":
+        return {"allergies": timeline.get("allergies", [])}
+    if query_type == "medications":
+        return {"active_medications": timeline.get("active_medications", [])}
+    if query_type == "chronic_conditions":
+        return {"chronic_conditions": timeline.get("chronic_conditions", [])}
+    if query_type == "bp_trend":
+        return {
+            "visits": [
+                {"date": v.get("date"), "vitals": v.get("vitals")}
+                for v in (timeline.get("visits") or [])
+            ]
+        }
+    return {
+        "total_visits": timeline.get("total_visits"),
+        "active_medications": timeline.get("active_medications"),
+        "chronic_conditions": timeline.get("chronic_conditions"),
+        "allergies": timeline.get("allergies"),
+    }
+
+
+@router.post("/sessions/{session_id}/assistant", response_model=AssistantActionResponse)
+async def classify_assistant_action(
+    session_id: str,
+    body: AssistantMessageRequest,
+    current_user: dict = Depends(get_current_user),
+):
+    """Maps a doctor's natural-language instruction (e.g. "fill the insurance
+    form for me" or "has this patient's allergy status changed") to zero or
+    more of the existing actions and extracts any parameters explicitly
+    stated in the message or recent history. Never generates clinical
+    content — classification only, plus (for patient_info) narration of
+    already-confirmed history that never introduces a new fact. Document
+    actions (prescription, investigation-order, referral, tpa-claim) still
+    run through the same confirmation-gated endpoints the equivalent UI
+    buttons use, so the doctor confirmation gate is never bypassed here."""
+    user_id = str(current_user["id"])
+    session = await repo.get_session(session_id, user_id)
+    if session is None:
+        raise HTTPException(status_code=404, detail="Session not found")
+    history = [{"role": t.role, "text": t.text} for t in body.history]
+    result = llm_client.classify_action_intent(body.message, history=history)
+
+    actions = result.get("actions") or []
+    for item in actions:
+        if item.get("action") == "patient_info" and session.patient_name:
+            timeline = await build_patient_timeline(user_id, session.patient_name)
+            query_type = item.get("query_type") or "summary"
+            data_slice = _slice_timeline_for_query(timeline, query_type)
+            item["answer"] = llm_client.narrate_patient_query(query_type, data_slice)
+
+    return AssistantActionResponse(
+        actions=[AssistantActionItem(**a) for a in actions],
+        clarifying_question=result.get("clarifying_question", ""),
+    )
 
 
 @router.post("/sessions/{session_id}/feedback", response_model=SOAPFeedbackResponse)

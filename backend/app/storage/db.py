@@ -1088,13 +1088,47 @@ async def init_db() -> None:
                 
                 # Demo user seeding (Gated behind SEED_DEMO_USER=true)
                 if settings.seed_demo_user and settings.demo_username and settings.demo_password:
+                    from app.utils.security import get_password_hash
                     row = await conn.fetchrow("SELECT id FROM users WHERE username = $1", settings.demo_username)
                     if not row:
-                        from app.utils.security import get_password_hash
                         hashed_pw = get_password_hash(settings.demo_password)
                         await conn.execute(
-                            "INSERT INTO users (username, email, hashed_password, full_name) VALUES ($1, $2, $3, $4)",
+                            "INSERT INTO users (username, email, hashed_password, full_name, role) VALUES ($1, $2, $3, $4, 'doctor')",
                             settings.demo_username, f"{settings.demo_username}@example.com", hashed_pw, settings.demo_full_name
+                        )
+                    # Assistant demo user — always paired with the doctor demo
+                    row = await conn.fetchrow("SELECT id FROM users WHERE username = 'assistant_demo'")
+                    if not row:
+                        hashed_pw = get_password_hash(settings.demo_password)
+                        await conn.execute(
+                            "INSERT INTO users (username, email, hashed_password, full_name, role) VALUES ($1, $2, $3, $4, 'assistant')",
+                            'assistant_demo', 'assistant_demo@example.com', hashed_pw, 'Meena (Front Desk)'
+                        )
+
+                    # Demo clinic — links demo doctor + assistant_demo so assistant skips code entry.
+                    # Id avoids 'O'/'0' and 'I'/'1' look-alike chars — its first 6 hex chars become
+                    # the spoken/typed clinic invite code (see /api/clinic/invite-code).
+                    demo_clinic_id = 'a1b2c3-0000-0000-0000-000000000000'
+                    doctor_row = await conn.fetchrow("SELECT id FROM users WHERE username = $1", settings.demo_username)
+                    assistant_row = await conn.fetchrow("SELECT id FROM users WHERE username = 'assistant_demo'")
+                    if doctor_row and assistant_row:
+                        doctor_id = str(doctor_row['id'])
+                        assistant_id = str(assistant_row['id'])
+                        from datetime import datetime, timezone
+                        now = datetime.now(timezone.utc).isoformat()
+                        await conn.execute(
+                            """INSERT INTO clinics (id, name, owner_user_id, plan_name, plan_status, created_at)
+                               VALUES ($1, $2, $3, 'Pilot', 'trial', $4)
+                               ON CONFLICT (id) DO NOTHING""",
+                            demo_clinic_id, 'Demo Clinic', doctor_id, now
+                        )
+                        await conn.execute(
+                            "INSERT INTO clinic_members (clinic_id, user_id, role) VALUES ($1, $2, 'owner') ON CONFLICT DO NOTHING",
+                            demo_clinic_id, doctor_id
+                        )
+                        await conn.execute(
+                            "INSERT INTO clinic_members (clinic_id, user_id, role) VALUES ($1, $2, 'member') ON CONFLICT DO NOTHING",
+                            demo_clinic_id, assistant_id
                         )
         finally:
             await pool.release(conn)

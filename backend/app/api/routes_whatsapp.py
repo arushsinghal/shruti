@@ -115,7 +115,7 @@ async def _lookup_user_by_phone(phone_digits: str) -> Optional[dict]:
             """
             SELECT dp.user_id, u.full_name
             FROM doctor_profiles dp
-            JOIN users u ON u.id = dp.user_id
+            JOIN users u ON CAST(u.id AS TEXT) = dp.user_id
             WHERE dp.whatsapp_phone = ?
             """,
             (phone_digits,),
@@ -266,7 +266,7 @@ async def _run_text_pipeline(
 
         facts = _extractor.extract(transcript)
         state = _memory.resolve_memory([facts])
-        soap = await _soap_gen.generate_soap_async(state)
+        soap = _soap_gen.generate_soap(state)
         cds = _cds_engine.generate_cds(state)
 
         session.clinical_facts = facts
@@ -393,7 +393,7 @@ async def _run_whatsapp_pipeline(
         # Clinical extraction pipeline (deterministic, zero-LLM) + Gemini SOAP prose
         facts = _extractor.extract(transcript)
         state = _memory.resolve_memory([facts])
-        soap = await _soap_gen.generate_soap_async(state)
+        soap = _soap_gen.generate_soap(state)
         cds = _cds_engine.generate_cds(state)
 
         session.clinical_facts = facts
@@ -523,15 +523,15 @@ async def _auto_create_tasks(session_id: str, user_id: str, facts: dict) -> None
 
 async def _handle_patient_message(from_digits: str, from_phone: str, body: str) -> str:
     """Route inbound message from a non-doctor phone."""
-    from app.services.patient_intake import get_active_intake, start_intake, advance_intake
+    from app.services.patient_intake import get_active_intake, get_last_intake, start_intake, advance_intake
     from app.services.appointment_booking import get_available_slots, book_appointment
 
     body_lower = body.lower().strip()
 
     # Appointment booking trigger
     if any(kw in body_lower for kw in ("book", "appointment", "appoint", "slot", "date", "milna", "booking")):
-        # Check if they have an active intake with a clinic linked
-        intake = await get_active_intake(from_digits)
+        # Check if they have a clinic linked (from a past or in-progress intake)
+        intake = await get_last_intake(from_digits)
         if intake and intake.get("clinic_user_id"):
             slots = await get_available_slots(intake["clinic_user_id"])
             if slots:
@@ -545,7 +545,7 @@ async def _handle_patient_message(from_digits: str, from_phone: str, body: str) 
 
     # Slot selection (digit reply after seeing slot list)
     if body_lower in ("1", "2", "3", "4", "5"):
-        intake = await get_active_intake(from_digits)
+        intake = await get_last_intake(from_digits)
         if intake and intake.get("clinic_user_id"):
             slots = await get_available_slots(intake["clinic_user_id"])
             idx = int(body_lower) - 1
@@ -680,9 +680,15 @@ async def whatsapp_webhook(request: Request, background_tasks: BackgroundTasks) 
     form = await request.form()
     form_data = dict(form)
 
-    # Validate Twilio signature (skipped in mock mode)
+    # Validate Twilio signature (skipped in mock mode). Twilio signs the
+    # public https:// URL it posted to, but behind Cloud Run's proxy the
+    # app sees a plain http:// connection unless the forwarded scheme is
+    # honored explicitly here, independent of uvicorn's proxy-header trust.
     sig = request.headers.get("X-Twilio-Signature", "")
+    forwarded_proto = request.headers.get("x-forwarded-proto")
     request_url = str(request.url)
+    if forwarded_proto and request_url.startswith("http://"):
+        request_url = forwarded_proto + request_url[len("http"):]
     if not _valid_twilio_signature(request_url, form_data, sig):
         logger.warning("WhatsApp webhook: invalid Twilio signature from %s", request.client)
         return Response(content=_TWIML_EMPTY, media_type="text/xml", status_code=403)
@@ -697,9 +703,11 @@ async def whatsapp_webhook(request: Request, background_tasks: BackgroundTasks) 
 
     logger.info("WhatsApp inbound: from=%s media=%d type=%s", from_phone, num_media, media_type)
 
-    # Handle help text
+    # Handle help text — only for registered doctors. Unregistered senders (patients)
+    # saying "hi" must fall through to the patient intake/booking flow below.
     if num_media == 0 and body in ("help", "hi", "hello", "start", ""):
-        return Response(content=_TWIML_HELP, media_type="text/xml")
+        if await _lookup_user_by_phone(from_digits):
+            return Response(content=_TWIML_HELP, media_type="text/xml")
 
     # Doctor sending patient phone: "P +91XXXXXXXXXX" or "patient +91XXXXXXXXXX"
     if num_media == 0 and body and (body.lower().startswith("p ") or body.lower().startswith("patient ")):

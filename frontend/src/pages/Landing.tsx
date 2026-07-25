@@ -32,9 +32,12 @@ import {
   Smartphone,
   Stethoscope,
   Users,
+  Pill,
 } from 'lucide-react';
 import { ProductShowcase } from '../components/ProductShowcase';
 import SupportModal from '../components/SupportModal';
+import ExtractionDemo from '../components/ExtractionDemo';
+import ChatWidget from '../components/ChatWidget';
 
 // ── Animation variants ────────────────────────────────────────────────────────
 const fadeUp = {
@@ -183,13 +186,13 @@ const TASKS = [
 
 const TESTIMONIALS = [
   {
-    quote: "I see 60 patients a day. Lipi cut my post-OPD documentation from two hours to under twenty minutes. The notes are already in the right format.",
+    quote: "I see 60 patients a day. Lipi cut my post-OPD documentation from two hours to under twenty minutes, and the follow-ups and ABDM filing happen without me touching them again.",
     name: 'Dr. Anjali Mehra',
     role: 'Senior Consultant, Internal Medicine',
     location: 'Medanta, Gurugram',
   },
   {
-    quote: "It catches things I say in passing: a medication I mention while examining, a follow-up I didn't write down. Everything ends up in the note.",
+    quote: "It catches things I say in passing: a medication I mention while examining, a follow-up I didn't write down. The note, the prescription, and the follow-up reminder all go out together.",
     name: 'Dr. Rahul Bansal',
     role: 'Neurologist',
     location: 'Fortis Hospital, Delhi',
@@ -226,10 +229,11 @@ const SERVICE_COMPARISON = [
 ] as const;
 
 const RESEARCH_TRACKS = [
-  { icon: Cpu, label: 'Continual learning', detail: 'Doctor corrections teach clinic-specific workflows without silently changing clinical facts.' },
-  { icon: MessageSquare, label: 'Hinglish clinical speech', detail: 'Real OPD language: code-switching, negation, self-correction, Indian drug and test names.' },
-  { icon: ShieldCheck, label: 'Drug safety', detail: 'Allergy conflicts, dose ambiguity, brand-generic confusion, and patient-specific risk signals.' },
-  { icon: FlaskConical, label: 'AMR intelligence', detail: 'Antibiotic patterns, OPD diagnoses, follow-up outcomes, and stewardship signals for India.' },
+  { icon: MessageSquare, label: 'Hinglish negation, not ported from English', detail: 'Hindi negates differently from English. Built and benchmarked specifically for code-switched OPD speech, not an English model adapted after the fact.' },
+  { icon: ShieldCheck, label: 'Zero-hallucination architecture', detail: 'No generative model sits in the clinical fact path, so there is nothing to hallucinate. Every fact traces back to an exact transcript sentence.' },
+  { icon: Cpu, label: 'Learns through context, not retraining', detail: 'No fine-tuning happens. Doctor corrections become rules, patient history becomes context assembled fresh each visit, so the system behaves as if it learned, without ever touching model weights.' },
+  { icon: FlaskConical, label: 'AMR primary-care gap', detail: "~80% of India's antibiotic use happens in primary care; 0% of national surveillance samples come from there. We're positioned to close that gap." },
+  { icon: Pill, label: 'Indian-formulary drug safety', detail: "80 drug-drug interaction pairs mapped against India's NLEM, built for real brand-generic confusion, not a Western branded-drug database." },
 ] as const;
 
 // ── Page ──────────────────────────────────────────────────────────────────────
@@ -255,6 +259,7 @@ export default function Landing() {
   return (
     <div className="min-h-screen bg-bg-warm text-text-dark font-sans antialiased overflow-x-hidden selection:bg-primary/15">
       <SupportModal isOpen={showSupportModal} onClose={() => setShowSupportModal(false)} />
+      <ChatWidget />
 
       {/* ── Nav ─────────────────────────────────────────────────────── */}
       <motion.nav
@@ -335,9 +340,8 @@ export default function Landing() {
               transition={{ duration: 0.72, delay: 0.56, ease: [0.16, 1, 0.3, 1] as const }}
               className="text-[16px] md:text-[17px] text-slate-500 leading-relaxed mb-8 max-w-[44ch]"
             >
-              Your AI OPD assistant turns one consultation into doctor-reviewed
-              notes, prescriptions, test orders, follow-ups, patient WhatsApp
-              updates, assistant tasks, and ABDM-ready records.
+              One consultation becomes doctor-reviewed notes, prescriptions,
+              follow-ups, patient WhatsApp updates, and ABDM-ready records.
             </motion.p>
 
             <motion.div
@@ -389,6 +393,48 @@ export default function Landing() {
               <ProductShowcase />
             </motion.div>
           </motion.div>
+        </div>
+      </section>
+
+      {/* ── The scene (editorial beat, story spine) ───────────────────── */}
+      <section className="bg-bg-warm px-6 py-24 md:py-32">
+        <motion.div
+          initial={reduce ? false : 'hidden'}
+          whileInView="visible"
+          viewport={{ once: true, amount: 0.4 }}
+          variants={{ hidden: {}, visible: { transition: { staggerChildren: 0.35, delayChildren: 0.05 } } }}
+          className="mx-auto max-w-[38ch] text-center"
+        >
+          <motion.p
+            variants={{ hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0, transition: { duration: 0.7, ease: [0.16, 1, 0.3, 1] } } }}
+            className="text-[1.5rem] md:text-[2rem] leading-[1.3] tracking-tight text-slate-500"
+          >
+            8:40 PM. Patient forty of the day just left. The next one is already
+            waiting. The follow-up from Tuesday still isn't booked, the lab
+            order is half-written, and none of it is real until someone finds
+            time to finish it.
+          </motion.p>
+          <motion.p
+            variants={{ hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0, transition: { duration: 0.7, ease: [0.16, 1, 0.3, 1] } } }}
+            className="mt-8 text-[2rem] md:text-[2.6rem] font-extrabold leading-[1.15] tracking-tight text-primary"
+          >
+            You do the doctoring. Lipi runs the rest.
+          </motion.p>
+        </motion.div>
+      </section>
+
+      {/* ── Why built this way (condensed research signal) ───────────── */}
+      <section className="bg-white border-b border-slate-200/60 px-6 py-6">
+        <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+          <p className="text-[13.5px] text-slate-500 leading-relaxed max-w-[62ch]">
+            No generative model sits in the clinical fact path. Every record is deterministic, source-traced, and doctor-reviewed before it counts as real.
+          </p>
+          <button
+            onClick={() => navigate('/research')}
+            className="shrink-0 inline-flex items-center gap-1.5 text-[13px] font-bold text-primary whitespace-nowrap cursor-pointer"
+          >
+            Read the research direction <ArrowRight className="h-3.5 w-3.5" strokeWidth={2} />
+          </button>
         </div>
       </section>
 
@@ -597,7 +643,6 @@ export default function Landing() {
 
         <div className="relative mx-auto grid max-w-6xl items-center gap-12 lg:grid-cols-[0.9fr_1.1fr]">
           <div>
-            <Eyebrow>WhatsApp care automation</Eyebrow>
             <RevealHeading wrapClassName="mb-5" className="max-w-[12ch] text-[2.4rem] md:text-[3.2rem] font-extrabold tracking-tight leading-[1.05] text-text-dark">
               The assistant keeps the visit moving after the patient leaves.
             </RevealHeading>
@@ -642,15 +687,15 @@ export default function Landing() {
           >
             <div className="rounded-[2.25rem] border border-slate-200 bg-white p-3 shadow-[0_36px_100px_-58px_rgba(18,63,39,0.72)]">
               <div className="overflow-hidden rounded-[1.75rem] border border-slate-100 bg-[#F6FAF7]">
-                <div className="flex items-center justify-between border-b border-slate-200/70 bg-white px-4 py-3">
-                  <div className="flex items-center gap-3">
-                    <span className="grid h-9 w-9 place-items-center rounded-xl bg-primary text-sm font-bold text-white shadow-sm">श</span>
-                    <div>
-                      <p className="text-[13px] font-bold text-text-dark">Lipi on WhatsApp</p>
-                      <p className="text-[10.5px] font-semibold text-slate-400">Post-visit patient updates</p>
+                <div className="flex items-center justify-between gap-2 border-b border-slate-200/70 bg-white px-4 py-3">
+                  <div className="flex min-w-0 items-center gap-3">
+                    <span className="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-primary text-sm font-bold text-white shadow-sm">श</span>
+                    <div className="min-w-0">
+                      <p className="truncate text-[13px] font-bold text-text-dark">Lipi on WhatsApp</p>
+                      <p className="truncate text-[10.5px] font-semibold text-slate-400">Post-visit patient updates</p>
                     </div>
                   </div>
-                  <span className="flex items-center gap-1.5 rounded-full border border-primary/15 bg-primary/[0.055] px-2.5 py-1 text-[10px] font-bold text-primary">
+                  <span className="flex shrink-0 items-center gap-1.5 whitespace-nowrap rounded-full border border-primary/15 bg-primary/[0.055] px-2.5 py-1 text-[10px] font-bold text-primary">
                     doctor signed
                   </span>
                 </div>
@@ -780,7 +825,6 @@ export default function Landing() {
       {/* ── Revenue ─────────────────────────────────────────────────── */}
       <section id="revenue" className="py-28 px-6 bg-white border-t border-slate-200/60">
         <div className="max-w-6xl mx-auto">
-          <Eyebrow>Revenue model</Eyebrow>
           <RevealHeading wrapClassName="mb-14" className="text-[2.4rem] md:text-[3.2rem] font-extrabold tracking-tight leading-[1.05] text-text-dark">
             Lipi pays for itself, and then some.
           </RevealHeading>
@@ -845,7 +889,6 @@ export default function Landing() {
         <div className="mx-auto max-w-6xl">
           <div className="grid gap-10 lg:grid-cols-[0.9fr_1.1fr] lg:items-start">
             <div>
-              <Eyebrow>Research engine</Eyebrow>
               <RevealHeading wrapClassName="mb-5" className="max-w-[13ch] text-[2.4rem] md:text-[3.2rem] font-extrabold tracking-tight leading-[1.05] text-text-dark">
                 Research is the engine. Service is the product.
               </RevealHeading>
@@ -878,7 +921,7 @@ export default function Landing() {
               initial={reduce ? false : 'hidden'}
               whileInView="visible"
               viewport={{ once: true, amount: 0.25 }}
-              className="grid gap-3 sm:grid-cols-2"
+              className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3"
             >
               {RESEARCH_TRACKS.map((track) => {
                 const Icon = track.icon;
@@ -943,13 +986,36 @@ export default function Landing() {
               </div>
             </div>
           </motion.div>
+          <motion.p
+            variants={fadeUp}
+            initial={reduce ? false : 'hidden'}
+            whileInView="visible"
+            viewport={{ once: true, amount: 0.4 }}
+            className="mt-3 text-[13px] text-slate-400"
+          >
+            That's a fixed example. Try your own line below, live.
+          </motion.p>
+        </div>
+      </section>
+
+      {/* ── Live extraction, embedded ─────────────────────────────────── */}
+      <section className="py-28 px-6 bg-white border-t border-slate-200/60">
+        <div className="max-w-5xl mx-auto">
+          <RevealHeading wrapClassName="mb-5" className="text-[2.4rem] md:text-[3rem] font-extrabold tracking-tight leading-[1.05] text-text-dark">
+            This is the real pipeline. Not a mockup.
+          </RevealHeading>
+          <motion.p variants={fadeUp} initial={reduce ? false : 'hidden'} whileInView="visible" viewport={{ once: true }} className="text-[14.5px] text-slate-500 mb-10 leading-relaxed max-w-[54ch]">
+            Type an OPD line in Hinglish, Hindi, or English below and watch the same
+            deterministic extraction engine that runs every Lipi consultation, live,
+            in your browser, right now.
+          </motion.p>
+          <ExtractionDemo />
         </div>
       </section>
 
       {/* ── Testimonials ────────────────────────────────────────────── */}
       <section className="py-28 px-6 bg-white border-t border-slate-200/60">
         <div className="max-w-6xl mx-auto">
-          <Eyebrow>From doctors</Eyebrow>
           <RevealHeading wrapClassName="mb-14" className="text-[2.4rem] md:text-[3.2rem] font-extrabold tracking-tight leading-[1.05] text-text-dark">
             Real OPDs. Real time saved.
           </RevealHeading>
@@ -976,11 +1042,20 @@ export default function Landing() {
       <section className="py-24 px-6 bg-primary">
         <div className="max-w-5xl mx-auto">
           <div className="max-w-2xl space-y-7">
+          <motion.p
+            initial={reduce ? false : { opacity: 0, y: 16 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] as const }}
+            className="text-[15px] font-semibold text-white/60"
+          >
+            You do the doctoring. Lipi runs the rest.
+          </motion.p>
           <motion.h2
             initial={reduce ? false : { opacity: 0, y: 24 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] as const }}
+            transition={{ duration: 0.7, delay: 0.1, ease: [0.16, 1, 0.3, 1] as const }}
             className="text-[2.4rem] md:text-[3rem] font-extrabold text-white tracking-tight leading-[1.05]"
           >
             Every consultation, one complete record.
@@ -1013,7 +1088,7 @@ export default function Landing() {
               whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}
               className="px-8 py-4 border border-white/30 hover:border-white/60 text-white/80 hover:text-white rounded-full font-semibold text-[15px] transition-all cursor-pointer"
             >
-              Talk to us
+              Contact
             </motion.button>
           </motion.div>
           </div>
@@ -1081,7 +1156,7 @@ export default function Landing() {
             whileInView={{ y: 0, opacity: 1 }}
             viewport={{ once: true, amount: 0.2 }}
             transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] as const }}
-            className="font-black leading-[0.78] tracking-[-0.04em] text-primary text-center"
+            className="font-black leading-[0.78] tracking-[-0.04em] text-primary/[0.08] text-center"
             style={{ fontSize: 'clamp(120px, 46vw, 720px)' }}
             aria-hidden
           >

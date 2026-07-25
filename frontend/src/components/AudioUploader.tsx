@@ -153,10 +153,24 @@ export default function AudioUploader({ sessionId, onTranscript, onAutoProcess, 
         if (ws.readyState === WebSocket.OPEN) ws.send('END');
         ws.close();
         const blob = new Blob(chunksRef.current, { type: 'audio/webm' });
+        stream.getTracks().forEach(track => track.stop());
+
+        // A real spoken recording of even a few seconds is normally tens of
+        // KB. A blob this small almost always means the mic captured
+        // silence (wrong input device, muted mic, or permission granted but
+        // no actual signal) — catch that here instead of round-tripping to
+        // Sarvam and finding out a stub came back a minute later.
+        if (blob.size < 2000) {
+          setError(
+            `Recording captured almost no audio (${blob.size} bytes). Check that the correct microphone is selected in your browser/OS and isn't muted, then try again.`
+          );
+          setFromRecording(false);
+          return;
+        }
+
         const recordedFile = new File([blob], 'live_recording.webm', { type: 'audio/webm' });
         setFromRecording(true);
         setFile(recordedFile);
-        stream.getTracks().forEach(track => track.stop());
       };
 
       mediaRecorder.start(1000);
@@ -394,7 +408,7 @@ export default function AudioUploader({ sessionId, onTranscript, onAutoProcess, 
             <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/>
             <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
           </svg>
-          <span className="font-medium">{mode === 'text' ? 'Processing…' : 'Transcribing + diarizing…'}</span>
+          <span className="font-medium">{mode === 'text' ? 'Processing…' : 'Transcribing…'}</span>
         </div>
       )}
 

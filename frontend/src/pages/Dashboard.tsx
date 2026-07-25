@@ -84,6 +84,7 @@ export default function Dashboard() {
   const [sessionPatientName, setSessionPatientName] = useState('');
   const [sessionDoctorName, setSessionDoctorName] = useState('');
   const [sessionPatientPhone, setSessionPatientPhone] = useState('');
+  const [sessionAbhaNumber, setSessionAbhaNumber] = useState('');
   const [inviteCode, setInviteCode] = useState<string | null>(null);
   const [inviteCopied, setInviteCopied] = useState(false);
   const [timelinePatient, setTimelinePatient] = useState<string | null>(null);
@@ -165,6 +166,7 @@ export default function Dashboard() {
         patient_name: sessionPatientName.trim() || undefined,
         doctor_name: sessionDoctorName.trim() || undefined,
         patient_phone: sessionPatientPhone.trim() || undefined,
+        abha_number: sessionAbhaNumber.trim() || undefined,
       });
       // Refresh billing counter after creating session
       api.get('/billing/status').then(r => setBilling(r.data)).catch(() => {});
@@ -957,6 +959,18 @@ export default function Dashboard() {
                       value={sessionPatientPhone}
                       onChange={e => setSessionPatientPhone(e.target.value)}
                       placeholder="+91 98765 43210"
+                      className="w-full border border-slate-200 rounded-lg px-3 py-2.5 text-sm text-slate-800 outline-none focus:border-primary focus:ring-2 focus:ring-primary/15 transition-all"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-semibold text-slate-600 mb-1.5">
+                      ABHA number <span className="font-normal text-slate-400">(optional)</span>
+                    </label>
+                    <input
+                      type="text"
+                      value={sessionAbhaNumber}
+                      onChange={e => setSessionAbhaNumber(e.target.value)}
+                      placeholder="14-digit Ayushman Bharat Health Account id"
                       className="w-full border border-slate-200 rounded-lg px-3 py-2.5 text-sm text-slate-800 outline-none focus:border-primary focus:ring-2 focus:ring-primary/15 transition-all"
                     />
                   </div>

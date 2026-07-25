@@ -23,7 +23,7 @@ export const RESEARCH_POSTS: ResearchPost[] = [
     intro:
       'Most drug interaction databases were built on studies from European and North American populations. They miss two things that matter in Indian OPD: the brand-name combinations that confuse Indian prescribers, and the allele frequencies that determine how individual patients actually metabolize common drugs.',
     pullQuote: {
-      text: 'Eight of those 15 rules are deployable in OPD settings today without genomic testing — they flag elevated population-level risk from clinical signals the doctor already has.',
+      text: 'Eight of those 15 rules are deployable in OPD settings today without genomic testing. They flag elevated population-level risk from clinical signals the doctor already has.',
       afterSection: 1,
     },
     sections: [
@@ -33,7 +33,7 @@ export const RESEARCH_POSTS: ResearchPost[] = [
       },
       {
         heading: 'The interaction dataset',
-        body: "We started with 182 candidate drug-drug interaction pairs identified across three independent sources: openFDA adverse event reports, PubMed clinical studies, and India's National List of Essential Medicines. Each candidate was cross-verified against all three sources; 33 pairs were rejected where the evidence did not hold across sources. The remaining 80 pairs carry explicit severity ratings (major, moderate, minor), mechanism descriptions, and clinical management notes grounded in primary literature - not copied from a single aggregated database.",
+        body: "We started with 182 candidate drug-drug interaction pairs drawn from openFDA structured product labels and PubMed clinical studies, filtered to require both drugs in India's National List of Essential Medicines or the NPPA formulary. Every one of the 182 was checked by an LLM verification pass for a known openFDA failure mode: fixed-dose-combination product labels whose warning text actually describes the *other* co-formulated ingredient, not the drug it's naively attributed to. 33 pairs were rejected on this basis, leaving 149 verified pairs; those were scored by severity and formulary coverage, and the top 80 carry the explicit severity ratings, mechanism descriptions, and clinical management notes in the published dataset - not copied from a single aggregated database.",
       },
       {
         heading: 'Pharmacogenomics without a genomics lab',
@@ -65,7 +65,7 @@ export const RESEARCH_POSTS: ResearchPost[] = [
         '~80% of antibiotic consumption happens in primary care. 0% of ICMR AMRSN and NCDC NARS-Net specimens come from primary-care settings.',
     },
     pullQuote: {
-      text: 'In 12 site-years examined, 0% of specimens came from primary-care settings. The surveillance network has grown — but never toward primary care.',
+      text: 'In 12 site-years examined, 0% of specimens came from primary-care settings. The surveillance network has grown, but never toward primary care.',
       afterSection: 0,
     },
     sections: [

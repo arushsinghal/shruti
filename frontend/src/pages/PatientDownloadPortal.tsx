@@ -1,6 +1,7 @@
 import { useRef, useState } from 'react';
 import type { FormEvent } from 'react';
 import { useParams } from 'react-router-dom';
+import { ShieldCheck, AlertCircle, Loader2, Printer } from 'lucide-react';
 import { getPublicPrescriptionHtml, verifyPublicAccess } from '../lib/api';
 
 export default function PatientDownloadPortal() {
@@ -46,20 +47,27 @@ export default function PatientDownloadPortal() {
     iframeRef.current?.contentWindow?.print();
   };
 
+  const inputCls =
+    'block w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-[14px] text-text-dark placeholder-slate-400 focus:outline-none focus:border-primary/50 focus:ring-2 focus:ring-primary/15 focus:bg-white transition-all';
+
   if (html) {
     return (
-      <div className="min-h-screen bg-slate-100 text-slate-900">
-        <header className="sticky top-0 z-10 border-b border-slate-200 bg-white/95 backdrop-blur">
+      <div className="min-h-screen bg-bg-warm font-sans text-text-dark antialiased">
+        <header className="sticky top-0 z-10 border-b border-slate-200/80 bg-white/95 backdrop-blur">
           <div className="mx-auto flex h-14 max-w-5xl items-center justify-between px-4">
-            <div>
-              <p className="text-sm font-bold text-teal-700">Lipi Prescription</p>
-              <p className="text-[11px] text-slate-500">Verified patient download</p>
+            <div className="flex items-center gap-2.5">
+              <span className="grid place-items-center w-8 h-8 rounded-xl bg-primary text-white font-bold text-sm shadow-sm">श</span>
+              <div>
+                <p className="text-[14px] font-bold tracking-tight text-text-dark leading-tight">Lipi prescription</p>
+                <p className="text-[11px] text-slate-500 leading-tight">Verified patient download</p>
+              </div>
             </div>
             <button
               onClick={handlePrint}
-              className="rounded-md bg-teal-700 px-4 py-2 text-xs font-bold text-white hover:bg-teal-600"
+              className="flex items-center gap-1.5 rounded-full bg-primary hover:bg-primary-dark px-4 py-2 text-[12.5px] font-semibold text-white transition-colors cursor-pointer"
             >
-              Print / Save PDF
+              <Printer className="w-3.5 h-3.5" />
+              Print / save PDF
             </button>
           </div>
         </header>
@@ -68,7 +76,7 @@ export default function PatientDownloadPortal() {
             ref={iframeRef}
             title="Prescription"
             srcDoc={html}
-            className="h-[calc(100vh-96px)] w-full rounded-lg border border-slate-200 bg-white shadow-sm"
+            className="h-[calc(100vh-96px)] w-full rounded-2xl border border-slate-200/80 bg-white"
           />
         </main>
       </div>
@@ -76,53 +84,48 @@ export default function PatientDownloadPortal() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-950 text-white">
+    <div className="min-h-screen bg-bg-warm font-sans text-text-dark antialiased">
       <main className="mx-auto flex min-h-screen max-w-md flex-col justify-center px-5 py-10">
         <div className="mb-7">
-          <div className="mb-4 flex h-11 w-11 items-center justify-center rounded-lg bg-teal-500/15 text-xl font-black text-teal-300">
-            L
+          <div className="mb-4 flex items-center gap-2.5">
+            <span className="grid place-items-center w-10 h-10 rounded-xl bg-primary text-white font-bold text-lg shadow-sm">श</span>
+            <span className="text-[18px] font-bold tracking-tight text-text-dark">Lipi</span>
           </div>
-          <h1 className="text-2xl font-bold tracking-tight">Verify prescription access</h1>
-          <p className="mt-2 text-sm leading-6 text-slate-300">
+          <h1 className="text-[1.6rem] font-bold tracking-tight leading-snug">Verify prescription access</h1>
+          <p className="mt-2 text-[14px] leading-relaxed text-slate-500">
             This secure link opens only after matching the patient details held by the clinic.
           </p>
         </div>
 
-        <form onSubmit={handleVerify} className="space-y-4 rounded-lg border border-white/10 bg-white/[0.04] p-5 shadow-2xl">
+        <form onSubmit={handleVerify} className="space-y-4 rounded-2xl bg-white border border-slate-200/80 p-5">
           <div>
-            <label className="mb-1.5 block text-xs font-bold uppercase tracking-wide text-slate-300">
-              Patient initials
-            </label>
+            <label className="block text-[12px] font-semibold text-slate-600 mb-1.5">Patient initials</label>
             <input
               value={initials}
               onChange={(event) => setInitials(event.target.value)}
-              className="w-full rounded-md border border-white/10 bg-slate-900 px-3 py-2.5 text-sm text-white outline-none focus:border-teal-400"
+              className={inputCls}
               placeholder="S.V."
               autoCapitalize="characters"
             />
           </div>
 
           <div>
-            <label className="mb-1.5 block text-xs font-bold uppercase tracking-wide text-slate-300">
-              Full name
-            </label>
+            <label className="block text-[12px] font-semibold text-slate-600 mb-1.5">Full name</label>
             <input
               value={patientName}
               onChange={(event) => setPatientName(event.target.value)}
-              className="w-full rounded-md border border-white/10 bg-slate-900 px-3 py-2.5 text-sm text-white outline-none focus:border-teal-400"
+              className={inputCls}
               placeholder="Sita Verma"
               autoComplete="name"
             />
           </div>
 
           <div>
-            <label className="mb-1.5 block text-xs font-bold uppercase tracking-wide text-slate-300">
-              Year of birth
-            </label>
+            <label className="block text-[12px] font-semibold text-slate-600 mb-1.5">Year of birth</label>
             <input
               value={yearOfBirth}
               onChange={(event) => setYearOfBirth(event.target.value.replace(/\D/g, '').slice(0, 4))}
-              className="w-full rounded-md border border-white/10 bg-slate-900 px-3 py-2.5 text-sm text-white outline-none focus:border-teal-400"
+              className={inputCls}
               placeholder="1984"
               inputMode="numeric"
               maxLength={4}
@@ -130,7 +133,8 @@ export default function PatientDownloadPortal() {
           </div>
 
           {error && (
-            <div className="rounded-md border border-red-400/30 bg-red-500/10 px-3 py-2 text-xs font-semibold text-red-200">
+            <div className="flex items-center gap-2 bg-red-50 border border-red-100 text-alert-critical px-4 py-3 rounded-xl text-[13px]">
+              <AlertCircle className="w-4 h-4 shrink-0" />
               {error}
             </div>
           )}
@@ -138,15 +142,17 @@ export default function PatientDownloadPortal() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full rounded-md bg-teal-500 px-4 py-2.5 text-sm font-bold text-slate-950 transition hover:bg-teal-400 disabled:cursor-not-allowed disabled:opacity-60"
+            className="w-full flex justify-center items-center gap-1.5 py-3.5 px-4 rounded-full text-[14px] font-semibold text-white bg-primary hover:bg-primary-dark active:scale-[0.98] transition-all disabled:opacity-70 cursor-pointer"
           >
-            {loading ? 'Verifying...' : 'Continue'}
+            {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : null}
+            {loading ? 'Verifying' : 'Continue'}
           </button>
         </form>
 
-        <p className="mt-4 text-center text-[11px] leading-5 text-slate-500">
+        <div className="mt-5 flex items-center justify-center gap-2 text-[12px] text-slate-400">
+          <ShieldCheck className="w-3.5 h-3.5" />
           Link access expires automatically. The doctor remains the final authority on all clinical details.
-        </p>
+        </div>
       </main>
     </div>
   );

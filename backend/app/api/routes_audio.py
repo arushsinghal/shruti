@@ -9,7 +9,6 @@ from pydantic import BaseModel
 from app.schemas.consultation import StatusEnum
 from app.services.phi_scrubber import PHIScrubberService
 from app.services.sarvam_asr import SarvamASRService
-from app.services.sarvam_batch_asr import SarvamBatchASRService
 from app.services.local_asr import LocalASRService
 from app.storage.repository import SessionRepository
 from app.utils.config import settings
@@ -20,7 +19,6 @@ logger = logging.getLogger(__name__)
 router = APIRouter()
 repo = SessionRepository()
 realtime_asr = SarvamASRService()
-batch_asr = SarvamBatchASRService()
 local_asr = LocalASRService()
 phi_scrubber = PHIScrubberService()
 
@@ -161,16 +159,9 @@ async def transcribe_audio(
     request: Request,
     session_id: str,
     language_code: str = Query(default="hi-IN", description="BCP-47 language hint. Default hi-IN for best Hindi/Hinglish accuracy."),
-    diarize: bool = Query(default=False, description="Enable speaker diarization (slower, ~60s). Default off for live dictation."),
-    num_speakers: int = Query(default=2, ge=1, le=10, description="Expected number of speakers. Only used when diarize=true."),
-    professional_speaker_id: Optional[str] = Query(default=None),
     current_user: dict = Depends(get_current_user),
 ) -> TranscribeResponse:
-    """Transcribe uploaded audio.
-
-    Default: real-time Sarvam STT (saarika:v2) — returns in 2-5 seconds.
-    With diarize=true: Sarvam Batch API with speaker separation — returns in ~60 seconds.
-    """
+    """Transcribe uploaded audio via real-time Sarvam STT (saarika:v2) — returns in 2-5 seconds."""
     session = await repo.get_session(session_id, str(current_user["id"]))
     if session is None:
         raise HTTPException(status_code=404, detail="Session not found")
@@ -191,21 +182,7 @@ async def transcribe_audio(
             language_detected = result["language_code"]
             is_stub = result.get("is_stub", False)
 
-        elif diarize:
-            # Batch mode: speaker diarization, ~60s
-            result = await batch_asr.transcribe_with_diarization(
-                audio_path=session.audio_file_path,
-                language_code=language_code,
-                num_speakers=num_speakers,
-                professional_speaker_id=professional_speaker_id,
-            )
-            segments = result["diarized_segments"]
-            plain_transcript = result["transcript"]
-            language_detected = result["language_code"]
-            is_stub = result["is_stub"]
-
         else:
-            # Real-time mode: fast, high accuracy, no diarization — best for live dictation
             result = await realtime_asr.transcribe(session.audio_file_path, language_code)
             plain_transcript = result["transcript"]
             language_detected = result["language_code"]

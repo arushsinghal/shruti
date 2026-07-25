@@ -36,6 +36,24 @@ async def _get_session_or_404(session_id: str, user_id: str):
     return session
 
 
+def _require_facts_confirmed(session) -> None:
+    """Block clinical PDF generation until every extracted fact has been
+    reviewed. Same gate FHIR/investigation-order exports already use — a
+    doctor must accept or reject every candidate before a prescription,
+    referral, or TPA claim can be generated from this session."""
+    if not session.memory_state:
+        return
+    extracted = session.memory_state.get("_extracted_facts")
+    if extracted is None:
+        return
+    unconfirmed = [f for f in extracted if f.get("review_status") == "candidate"]
+    if unconfirmed:
+        raise HTTPException(
+            status_code=409,
+            detail=f"{len(unconfirmed)} fact(s) pending doctor review. Confirm or reject all facts before generating this document.",
+        )
+
+
 async def _get_doctor_profile(user_id: str) -> dict:
     param = int(user_id) if str(user_id).isdigit() else user_id
     async with db_connect() as db:
@@ -105,6 +123,7 @@ async def download_prescription(
     """Generate a formatted prescription PDF from the completed session."""
     user_id = str(current_user["id"])
     session = await _get_session_or_404(session_id, user_id)
+    _require_facts_confirmed(session)
     doctor = await _get_doctor_profile(user_id)
     clinic = await _get_clinic_info(user_id)
 
@@ -147,6 +166,7 @@ async def generate_referral(
     """Generate a referral letter PDF for the session."""
     user_id = str(current_user["id"])
     session = await _get_session_or_404(session_id, user_id)
+    _require_facts_confirmed(session)
     doctor = await _get_doctor_profile(user_id)
     clinic = await _get_clinic_info(user_id)
 
@@ -260,6 +280,7 @@ async def generate_tpa_claim(
     """Generate a pre-filled TPA insurance claim PDF for the session."""
     user_id = str(current_user["id"])
     session = await _get_session_or_404(session_id, user_id)
+    _require_facts_confirmed(session)
     doctor = await _get_doctor_profile(user_id)
     clinic = await _get_clinic_info(user_id)
 

@@ -143,11 +143,11 @@ export async function uploadAudio(
   return res.data;
 }
 
-export async function transcribeAudio(sessionId: string, diarize = true): Promise<TranscribeResponse> {
+export async function transcribeAudio(sessionId: string): Promise<TranscribeResponse> {
   const res = await client.post<TranscribeResponse>(
-    `/sessions/${sessionId}/transcribe?language_code=hi-IN&diarize=${diarize}&num_speakers=2`,
+    `/sessions/${sessionId}/transcribe?language_code=hi-IN`,
     null,
-    { timeout: 120000 },
+    { timeout: 30000 },
   );
   return res.data;
 }
@@ -346,9 +346,65 @@ export async function createIntakeSession(data: {
   patient_age?: string;
   patient_sex?: string;
   chief_complaint?: string;
+  abha_number?: string;
 }): Promise<ConsultationSession> {
   const res = await client.post<ConsultationSession>('/sessions/intake', data);
   return res.data;
+}
+
+export interface PatientGraphPreview {
+  patient_id: string | null;
+  total_visits_visible: number;
+  own_clinic_visits: number;
+  other_clinic_visits: number;
+  cross_clinic_consent: boolean;
+  cross_clinic_history_available: boolean;
+  active_medications: Array<{ name: string; frequency?: string; from_other_clinic: boolean }>;
+  allergies: Array<{ text: string; from_other_clinic: boolean }>;
+  chronic_conditions: Array<{ text: string; from_other_clinic: boolean }>;
+}
+
+export async function getPatientGraphByPhone(phone: string): Promise<PatientGraphPreview> {
+  const res = await client.get<PatientGraphPreview>(`/patients/by-phone/${encodeURIComponent(phone)}/graph`);
+  return res.data;
+}
+
+export async function setPatientCrossClinicConsent(patientId: string, consent: boolean): Promise<void> {
+  await client.post(`/patients/${patientId}/consent`, { consent });
+}
+
+export interface ExtractionMedication {
+  name: string;
+  dosage?: string;
+  frequency?: string;
+  duration?: string;
+  status?: string;
+}
+
+export interface ExtractionDemoResult {
+  symptoms: string[];
+  medications: ExtractionMedication[];
+  vitals: string[];
+  allergies: string[];
+  investigations: string[];
+  diagnoses: string[];
+  follow_up: string[];
+  contexts: Record<string, string>;
+}
+
+export async function runExtractionDemo(text: string): Promise<ExtractionDemoResult> {
+  const res = await client.post<ExtractionDemoResult>('/public/research/extract-demo', { text });
+  return res.data;
+}
+
+export interface LandingChatTurn {
+  role: 'user' | 'assistant';
+  text: string;
+}
+
+export async function sendLandingChatMessage(message: string, history: LandingChatTurn[]): Promise<string> {
+  const res = await client.post<{ answer: string }>('/public/landing-chat', { message, history });
+  return res.data.answer;
 }
 
 export interface VoiceExtractResult {

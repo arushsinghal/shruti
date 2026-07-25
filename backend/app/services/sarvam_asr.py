@@ -105,8 +105,12 @@ class SarvamASRService:
                         logger.warning("All chunks failed — falling back to stub")
                         return self._stub_response(language_code)
 
+                    joined = " ".join(transcripts)
+                    if _DEVANAGARI_RE.search(joined):
+                        joined = await self._transliterate(joined, detected_lang)
+
                     return {
-                        "transcript": " ".join(transcripts),
+                        "transcript": joined,
                         "language_code": detected_lang,
                         "is_stub": False,
                     }

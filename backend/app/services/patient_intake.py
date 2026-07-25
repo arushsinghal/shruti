@@ -47,17 +47,49 @@ async def get_active_intake(from_phone: str) -> Optional[dict]:
     }
 
 
-async def _lookup_clinic_by_code(code: str) -> Optional[dict]:
-    """Find the doctor whose clinic code matches."""
+async def get_last_intake(from_phone: str) -> Optional[dict]:
+    """Return the most recent intake session for this phone, complete or not.
+
+    Used for appointment booking: a patient's clinic link should stay usable
+    even after their intake conversation reaches 'complete'.
+    """
     async with db_connect() as db:
         async with db.execute(
-            "SELECT id, full_name FROM users WHERE clinic_invite_code=?",
-            (code.upper().strip(),),
+            "SELECT id, step, clinic_code, clinic_user_id, patient_name, patient_age, chief_complaint, current_medications FROM patient_intake_sessions WHERE from_phone=? ORDER BY created_at DESC LIMIT 1",
+            (from_phone,),
         ) as cur:
             row = await cur.fetchone()
     if not row:
         return None
-    return {"user_id": str(row[0]), "name": row[1] or ""}
+    return {
+        "id": row[0], "step": row[1], "clinic_code": row[2],
+        "clinic_user_id": row[3], "patient_name": row[4],
+        "patient_age": row[5], "chief_complaint": row[6],
+        "current_medications": row[7],
+    }
+
+
+async def _lookup_clinic_by_code(code: str) -> Optional[dict]:
+    """Find the clinic (and its owner doctor) whose 6-char invite code matches."""
+    normalized = code.upper().replace("-", "").replace(" ", "").strip()
+    async with db_connect() as db:
+        async with db.execute(
+            "SELECT id, name, owner_user_id FROM clinics WHERE UPPER(REPLACE(id, '-', '')) LIKE ?",
+            (normalized + "%",),
+        ) as cur:
+            rows = await cur.fetchall()
+    if len(rows) != 1:
+        return None
+    clinic_id, clinic_name, owner_user_id = rows[0]
+    if not owner_user_id:
+        return None
+    async with db_connect() as db:
+        async with db.execute(
+            "SELECT full_name FROM users WHERE id=?", (int(owner_user_id),)
+        ) as cur:
+            owner_row = await cur.fetchone()
+    doctor_name = (owner_row[0] if owner_row else None) or clinic_name or ""
+    return {"user_id": str(owner_user_id), "name": doctor_name}
 
 
 async def _get_doctor_whatsapp(user_id: str) -> Optional[str]:
@@ -100,7 +132,13 @@ async def advance_intake(intake: dict, body: str, from_phone: str) -> str:
                 (body.strip().upper(), clinic["user_id"], intake_id),
             )
             await db.commit()
-            return f"✅ Dr. {clinic['name'].split()[0] if clinic['name'] else 'Doctor'} ki clinic mili!\n\nAapka *poora naam* kya hai?"
+            raw_name = (clinic["name"] or "").strip()
+            for prefix in ("Dr. ", "Dr "):
+                if raw_name.startswith(prefix):
+                    raw_name = raw_name[len(prefix):]
+                    break
+            doctor_first_name = raw_name.split()[0] if raw_name else "Doctor"
+            return f"✅ Dr. {doctor_first_name} ki clinic mili!\n\nAapka *poora naam* kya hai?"
 
         elif step == "awaiting_name":
             await db.execute(

@@ -1,22 +1,79 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import api, { getSession } from '../lib/api';
 import type { ConsultationSession } from '../types/clinical';
 import { MODE_LABELS, MODE_COLORS } from '../types/clinical';
 import { motion } from 'framer-motion';
 import { useAuth } from '../context/AuthContext';
+import ClinicalActionAssistant from '../components/ClinicalActionAssistant';
 
-function ReferralModal({ sessionId }: { sessionId: string }) {
+// axios blobs error response bodies too when responseType is 'blob', so
+// e.response.data is a Blob instead of parsed JSON — read it back out to
+// recover the real backend .detail message (e.g. "N facts pending review")
+// instead of falling through to a generic fallback string.
+async function extractErrorDetail(e: any, fallback: string): Promise<string> {
+  const data = e?.response?.data;
+  if (data instanceof Blob) {
+    try {
+      const parsed = JSON.parse(await data.text());
+      if (typeof parsed?.detail === 'string') return parsed.detail;
+    } catch {
+      // not JSON (e.g. empty body or HTML error page) — use fallback
+    }
+    return fallback;
+  }
+  if (typeof data?.detail === 'string') return data.detail;
+  return fallback;
+}
+
+export interface ReferralTrigger {
+  toDoctor?: string;
+  specialty?: string;
+  reason?: string;
+  urgency?: 'routine' | 'urgent';
+}
+
+function ReferralModal({ sessionId, externalTrigger, onExternalHandled, onClose, queuedCount, onClearQueue }: {
+  sessionId: string;
+  externalTrigger?: ReferralTrigger | null;
+  onExternalHandled?: () => void;
+  onClose?: () => void;
+  queuedCount?: number;
+  onClearQueue?: () => void;
+}) {
   const [open, setOpen] = useState(false);
   const [toDoctor, setToDoctor] = useState('');
   const [specialty, setSpecialty] = useState('');
   const [reason, setReason] = useState('');
   const [urgency, setUrgency] = useState<'routine' | 'urgent'>('routine');
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+
+  // Closing for any reason (cancel, the header ✕, or a successful download)
+  // signals the queue in ReviewNote to open the next gated action, if any.
+  function close() {
+    setOpen(false);
+    onClose?.();
+  }
+
+  // Lets the in-session assistant open this modal pre-filled from a natural-
+  // language request — the doctor still reviews and confirms before download,
+  // the confirmation gate is never bypassed.
+  useEffect(() => {
+    if (!externalTrigger) return;
+    setToDoctor(externalTrigger.toDoctor || '');
+    setSpecialty(externalTrigger.specialty || '');
+    setReason(externalTrigger.reason || '');
+    setUrgency(externalTrigger.urgency || 'routine');
+    setError('');
+    setOpen(true);
+    onExternalHandled?.();
+  }, [externalTrigger]);
 
   async function generate() {
     if (!toDoctor.trim()) return;
     setLoading(true);
+    setError('');
     try {
       const resp = await api.post(`/sessions/${sessionId}/referral`,
         { to_doctor: toDoctor, to_specialty: specialty, reason, urgency },
@@ -26,9 +83,10 @@ function ReferralModal({ sessionId }: { sessionId: string }) {
       const a = document.createElement('a');
       a.href = url; a.download = `referral-${sessionId.slice(0, 8)}.pdf`; a.click();
       URL.revokeObjectURL(url);
-      setOpen(false);
-    } catch { alert('Could not generate referral letter.'); }
-    finally { setLoading(false); }
+      close();
+    } catch (e) {
+      setError(await extractErrorDetail(e, 'Could not generate referral letter.'));
+    } finally { setLoading(false); }
   }
 
   return (
@@ -45,8 +103,18 @@ function ReferralModal({ sessionId }: { sessionId: string }) {
           <div className="bg-white rounded-2xl shadow-xl border border-slate-200 w-full max-w-md max-h-[calc(100dvh-2rem)] overflow-y-auto p-6">
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-[14px] font-bold text-slate-900">Referral Letter</h3>
-              <button onClick={() => setOpen(false)} className="text-slate-400 hover:text-slate-600">✕</button>
+              <button onClick={close} className="text-slate-400 hover:text-slate-600">✕</button>
             </div>
+            {!!queuedCount && (
+              <div className="mb-3 flex items-center justify-between gap-3 rounded-lg bg-amber-50 border border-amber-200 px-3 py-2">
+                <span className="text-[11.5px] text-amber-700">
+                  {queuedCount} more action{queuedCount > 1 ? 's' : ''} queued after this one.
+                </span>
+                <button onClick={onClearQueue} className="text-[11px] font-semibold text-amber-700 hover:text-amber-900 underline shrink-0 cursor-pointer">
+                  Clear queue
+                </button>
+              </div>
+            )}
             <div className="space-y-3">
               <div>
                 <label className="block text-[11px] font-semibold text-slate-500 mb-1">Refer to Doctor *</label>
@@ -75,8 +143,11 @@ function ReferralModal({ sessionId }: { sessionId: string }) {
                 ))}
               </div>
             </div>
+            {error && (
+              <p className="mt-3 text-[12px] text-alert-critical bg-red-50 border border-red-100 rounded-lg px-3 py-2">{error}</p>
+            )}
             <div className="flex gap-2 mt-5">
-              <button onClick={() => setOpen(false)} className="flex-1 border border-slate-200 text-slate-600 text-sm font-semibold py-2 rounded-lg hover:bg-slate-50">Cancel</button>
+              <button onClick={close} className="flex-1 border border-slate-200 text-slate-600 text-sm font-semibold py-2 rounded-lg hover:bg-slate-50">Cancel</button>
               <button onClick={generate} disabled={loading || !toDoctor.trim()}
                 className="flex-1 bg-primary hover:bg-primary-dark disabled:opacity-40 text-white text-sm font-semibold py-2 rounded-lg transition-all">
                 {loading ? 'Generating…' : 'Download PDF'}
@@ -89,15 +160,54 @@ function ReferralModal({ sessionId }: { sessionId: string }) {
   );
 }
 
-function TpaClaimModal({ sessionId }: { sessionId: string }) {
+export interface TpaClaimTrigger {
+  policyNumber?: string;
+  insurerName?: string;
+  tpaName?: string;
+}
+
+// A single chat message can request more than one gated (modal-confirmed)
+// action — e.g. a referral and a TPA claim together. Only one modal is ever
+// shown at a time; ReviewNote holds a small FIFO queue and advances it
+// whenever the open modal closes, whether by cancel or by a completed
+// download (see ReferralModal/TpaClaimModal's onClose prop).
+export type GatedAction =
+  | { type: 'referral'; trigger: ReferralTrigger }
+  | { type: 'tpa_claim'; trigger: TpaClaimTrigger };
+
+function TpaClaimModal({ sessionId, externalTrigger, onExternalHandled, onClose, queuedCount, onClearQueue }: {
+  sessionId: string;
+  externalTrigger?: TpaClaimTrigger | null;
+  onExternalHandled?: () => void;
+  onClose?: () => void;
+  queuedCount?: number;
+  onClearQueue?: () => void;
+}) {
   const [open, setOpen] = useState(false);
   const [policy, setPolicy] = useState('');
   const [insurer, setInsurer] = useState('');
   const [tpa, setTpa] = useState('');
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+
+  function close() {
+    setOpen(false);
+    onClose?.();
+  }
+
+  useEffect(() => {
+    if (!externalTrigger) return;
+    setPolicy(externalTrigger.policyNumber || '');
+    setInsurer(externalTrigger.insurerName || '');
+    setTpa(externalTrigger.tpaName || '');
+    setError('');
+    setOpen(true);
+    onExternalHandled?.();
+  }, [externalTrigger]);
 
   async function generate() {
     setLoading(true);
+    setError('');
     try {
       const resp = await api.post(`/sessions/${sessionId}/tpa-claim`,
         { policy_number: policy, insurer_name: insurer, tpa_name: tpa },
@@ -107,9 +217,10 @@ function TpaClaimModal({ sessionId }: { sessionId: string }) {
       const a = document.createElement('a');
       a.href = url; a.download = `tpa-claim-${sessionId.slice(0, 8)}.pdf`; a.click();
       URL.revokeObjectURL(url);
-      setOpen(false);
-    } catch { alert('Could not generate TPA claim.'); }
-    finally { setLoading(false); }
+      close();
+    } catch (e) {
+      setError(await extractErrorDetail(e, 'Could not generate TPA claim.'));
+    } finally { setLoading(false); }
   }
 
   return (
@@ -126,8 +237,18 @@ function TpaClaimModal({ sessionId }: { sessionId: string }) {
           <div className="bg-white rounded-2xl shadow-xl border border-slate-200 w-full max-w-md mx-4 p-6">
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-[14px] font-bold text-slate-900">Insurance / TPA Claim</h3>
-              <button onClick={() => setOpen(false)} className="text-slate-400 hover:text-slate-600">✕</button>
+              <button onClick={close} className="text-slate-400 hover:text-slate-600">✕</button>
             </div>
+            {!!queuedCount && (
+              <div className="mb-3 flex items-center justify-between gap-3 rounded-lg bg-amber-50 border border-amber-200 px-3 py-2">
+                <span className="text-[11.5px] text-amber-700">
+                  {queuedCount} more action{queuedCount > 1 ? 's' : ''} queued after this one.
+                </span>
+                <button onClick={onClearQueue} className="text-[11px] font-semibold text-amber-700 hover:text-amber-900 underline shrink-0 cursor-pointer">
+                  Clear queue
+                </button>
+              </div>
+            )}
             <p className="text-[12px] text-slate-500 mb-4">Fill patient's insurance details. Leave blank if unknown — PDF will have fields for manual entry.</p>
             <div className="space-y-3">
               <div>
@@ -149,8 +270,11 @@ function TpaClaimModal({ sessionId }: { sessionId: string }) {
                   className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-400" />
               </div>
             </div>
+            {error && (
+              <p className="mt-3 text-[12px] text-alert-critical bg-red-50 border border-red-100 rounded-lg px-3 py-2">{error}</p>
+            )}
             <div className="flex gap-2 mt-5">
-              <button onClick={() => setOpen(false)} className="flex-1 border border-slate-200 text-slate-600 text-sm font-semibold py-2 rounded-lg hover:bg-slate-50">Cancel</button>
+              <button onClick={close} className="flex-1 border border-slate-200 text-slate-600 text-sm font-semibold py-2 rounded-lg hover:bg-slate-50">Cancel</button>
               <button onClick={generate} disabled={loading}
                 className="flex-1 bg-blue-600 hover:bg-blue-700 disabled:opacity-40 text-white text-sm font-semibold py-2 rounded-lg transition-all">
                 {loading ? 'Generating…' : 'Download Claim PDF'}
@@ -476,6 +600,48 @@ export default function ReviewNote() {
   const [addingFact, setAddingFact] = useState(false);
   const [showTranscript, setShowTranscript] = useState(false);
   const [inlineError, setInlineError] = useState<string | null>(null);
+  const [prescriptionCache, setPrescriptionCache] = useState<Blob | null>(null);
+  const [investigationOrderCache, setInvestigationOrderCache] = useState<string | null>(null);
+  const [referralTrigger, setReferralTrigger] = useState<ReferralTrigger | null>(null);
+  const [tpaTrigger, setTpaTrigger] = useState<TpaClaimTrigger | null>(null);
+  const gatedQueueRef = useRef<GatedAction[]>([]);
+  const [queuedCount, setQueuedCount] = useState(0);
+
+  function dispatchGatedAction(action: GatedAction) {
+    if (action.type === 'referral') setReferralTrigger(action.trigger);
+    else setTpaTrigger(action.trigger);
+  }
+
+  // Called by the assistant when it classifies one or more referral/tpa_claim
+  // actions from a single message. If nothing is currently open, the first
+  // one opens immediately; the rest wait in gatedQueueRef. queuedCount tracks
+  // what's left *after* the one currently on screen, for the "N more queued"
+  // notice inside the open modal.
+  function enqueueGatedActions(items: GatedAction[]) {
+    if (items.length === 0) return;
+    const wasEmpty = gatedQueueRef.current.length === 0;
+    gatedQueueRef.current.push(...items);
+    if (wasEmpty) {
+      const next = gatedQueueRef.current.shift();
+      if (next) dispatchGatedAction(next);
+    }
+    setQueuedCount(gatedQueueRef.current.length);
+  }
+
+  // Fires from ReferralModal/TpaClaimModal's onClose — whether the doctor
+  // cancelled or completed the download, advance to the next queued action.
+  function handleGatedModalClosed() {
+    const next = gatedQueueRef.current.shift();
+    if (next) dispatchGatedAction(next);
+    setQueuedCount(gatedQueueRef.current.length);
+  }
+
+  // Lets the doctor dismiss the rest of a queued sequence instead of being
+  // walked through every action the assistant classified.
+  function clearGatedQueue() {
+    gatedQueueRef.current = [];
+    setQueuedCount(0);
+  }
 
   const loadSession = async () => {
     if (!id) return;
@@ -493,6 +659,30 @@ export default function ReviewNote() {
     loadSession().catch(() => setError('Session not found'));
   }, [id]);
 
+  // Fire-and-forget: pull the prescription PDF and investigation-order HTML
+  // in the background the instant signing succeeds, so the Prescription/
+  // Investigation Order buttons are instant instead of a second wait. Both
+  // failure paths are expected states (no investigations ordered, etc.), not
+  // errors — nothing is surfaced to the doctor here. The visible buttons
+  // still do a live fetch as a fallback if the cache isn't populated yet.
+  async function prefetchArtifacts(sessionId: string) {
+    try {
+      const resp = await api.get(`/sessions/${sessionId}/prescription`, { responseType: 'blob' });
+      setPrescriptionCache(new Blob([resp.data], { type: 'application/pdf' }));
+    } catch {
+      // ignore — visible button falls back to a live fetch on click
+    }
+    try {
+      const resp = await api.get(`/sessions/${sessionId}/investigation-order`, {
+        responseType: 'text',
+        headers: { Accept: 'text/html' },
+      });
+      setInvestigationOrderCache(resp.data as string);
+    } catch {
+      // ignore — most sessions have no investigations ordered at all
+    }
+  }
+
   const handleAccept = async () => {
     if (!id || !session) return;
     try {
@@ -502,8 +692,13 @@ export default function ReviewNote() {
         final_soap: session.soap_note,
         categories: []
       });
+      // Signing is the doctor's confirmation of every extracted fact — without this,
+      // prescription/investigation-order generation stays blocked (they require at
+      // least one confirmed fact; see routes_public.py render_prescription_html).
+      await api.post(`/sessions/${id}/facts/finalize`);
       setFeedbackSubmitted(true);
       setFeedbackMessage('Feedback saved for pilot evaluation.');
+      prefetchArtifacts(id);
     } catch (e) {
       console.error(e);
       alert('Failed to submit feedback');
@@ -592,11 +787,15 @@ export default function ReviewNote() {
   const handleViewInvestigationOrder = async () => {
     if (!id) return;
     try {
-      const resp = await api.get(`/sessions/${id}/investigation-order`, {
-        responseType: 'text',
-        headers: { Accept: 'text/html' },
-      });
-      const blob = new Blob([resp.data as string], { type: 'text/html' });
+      let html = investigationOrderCache;
+      if (html == null) {
+        const resp = await api.get(`/sessions/${id}/investigation-order`, {
+          responseType: 'text',
+          headers: { Accept: 'text/html' },
+        });
+        html = resp.data as string;
+      }
+      const blob = new Blob([html], { type: 'text/html' });
       const url = URL.createObjectURL(blob);
       const win = window.open(url, '_blank');
       if (win) setTimeout(() => URL.revokeObjectURL(url), 60000);
@@ -611,6 +810,26 @@ export default function ReviewNote() {
         setInlineError('Failed to generate investigation order.');
         setTimeout(() => setInlineError(null), 4000);
       }
+    }
+  };
+
+  const handleDownloadPrescription = async () => {
+    if (!id) return;
+    try {
+      let blob = prescriptionCache;
+      if (!blob) {
+        const resp = await api.get(`/sessions/${id}/prescription`, { responseType: 'blob' });
+        blob = new Blob([resp.data], { type: 'application/pdf' });
+      }
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `prescription-${(id || '').slice(0, 8)}.pdf`;
+      a.click();
+      URL.revokeObjectURL(url);
+    } catch (e: any) {
+      setInlineError(await extractErrorDetail(e, 'Could not generate prescription.'));
+      setTimeout(() => setInlineError(null), 5000);
     }
   };
 
@@ -729,6 +948,9 @@ export default function ReviewNote() {
                 className="border border-slate-300 hover:bg-slate-50 text-slate-700 text-xs font-semibold px-3 py-1.5 rounded transition-all flex items-center gap-1.5 cursor-pointer"
               >
                 Investigation Order
+                {investigationOrderCache != null && (
+                  <span className="w-1.5 h-1.5 rounded-full bg-primary" title="Ready" />
+                )}
               </button>
             )}
             {doc && (
@@ -754,8 +976,7 @@ export default function ReviewNote() {
                     a.click();
                     URL.revokeObjectURL(url);
                   } catch (e: any) {
-                    const detail = e.response?.data?.detail;
-                    setInlineError(typeof detail === 'string' ? detail : 'Legal export failed. Review the note, then try again.');
+                    setInlineError(await extractErrorDetail(e, 'Legal export failed. Review the note, then try again.'));
                     setTimeout(() => setInlineError(null), 5000);
                   }
                 }}
@@ -769,32 +990,35 @@ export default function ReviewNote() {
             )}
             {session?.status === 'complete' && (
               <button
-                onClick={async () => {
-                  try {
-                    const resp = await api.get(`/sessions/${id}/prescription`, { responseType: 'blob' });
-                    const url = URL.createObjectURL(new Blob([resp.data], { type: 'application/pdf' }));
-                    const a = document.createElement('a');
-                    a.href = url;
-                    a.download = `prescription-${(id || '').slice(0, 8)}.pdf`;
-                    a.click();
-                    URL.revokeObjectURL(url);
-                  } catch {
-                    alert('Could not generate prescription.');
-                  }
-                }}
+                onClick={handleDownloadPrescription}
                 className="border border-primary/30 hover:bg-primary/[0.06] text-primary text-xs font-semibold px-3 py-1.5 rounded transition-all flex items-center gap-1.5 cursor-pointer print:hidden"
               >
                 <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                 </svg>
                 Prescription
+                {prescriptionCache && <span className="w-1.5 h-1.5 rounded-full bg-primary" title="Ready" />}
               </button>
             )}
             {session?.status === 'complete' && (
-              <ReferralModal sessionId={id || ''} />
+              <ReferralModal
+                sessionId={id || ''}
+                externalTrigger={referralTrigger}
+                onExternalHandled={() => setReferralTrigger(null)}
+                onClose={handleGatedModalClosed}
+                queuedCount={queuedCount}
+                onClearQueue={clearGatedQueue}
+              />
             )}
             {session?.status === 'complete' && (
-              <TpaClaimModal sessionId={id || ''} />
+              <TpaClaimModal
+                sessionId={id || ''}
+                externalTrigger={tpaTrigger}
+                onExternalHandled={() => setTpaTrigger(null)}
+                onClose={handleGatedModalClosed}
+                queuedCount={queuedCount}
+                onClearQueue={clearGatedQueue}
+              />
             )}
             {session?.status === 'complete' && (
               <a
@@ -902,6 +1126,17 @@ export default function ReviewNote() {
                 <div>
                   <h1 className="text-xl font-bold text-slate-800">Clinical Fact Review</h1>
                   <p className="text-xs text-slate-400 mt-0.5">Review and verify information extracted from the consultation.</p>
+                  {extractedFacts.length > 0 && (() => {
+                    const traced = extractedFacts.filter((f: any) => (f.source_sentence || '').trim().length > 0).length;
+                    return (
+                      <p className="text-[11px] font-semibold text-primary mt-1.5 flex items-center gap-1.5">
+                        <svg className="w-3 h-3 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        {traced}/{extractedFacts.length} facts traced to an exact transcript sentence — nothing here was inferred
+                      </p>
+                    );
+                  })()}
                 </div>
                 {extractedFacts.length > 0 && (
                   <span className="shrink-0 ml-4 mt-1 border border-amber-300 text-amber-700 bg-amber-50 px-3 py-1 rounded text-[11px] font-bold uppercase tracking-wider">
@@ -1178,6 +1413,15 @@ export default function ReviewNote() {
                     Print
                   </button>
                 </div>
+              )}
+
+              {session?.status === 'complete' && (
+                <ClinicalActionAssistant
+                  sessionId={id || ''}
+                  onPrescription={handleDownloadPrescription}
+                  onInvestigationOrder={handleViewInvestigationOrder}
+                  onGatedActions={enqueueGatedActions}
+                />
               )}
             </div>
 

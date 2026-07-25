@@ -281,6 +281,42 @@ class SessionRepository:
                 rows = await cursor.fetchall()
         return [_row_to_session(row) for row in rows]
 
+    async def get_sessions_for_patient(self, patient_id: str) -> list[ConsultationSession]:
+        """All complete sessions for a patient across EVERY clinic on the platform,
+        keyed on the stable patient_id (not the fragile name string). This is the
+        cross-provider read that a single-clinic HMIS structurally cannot do — the
+        spine of the longitudinal patient graph. Callers MUST apply the consent
+        gate (see patient_history_service.get_patient_graph); this method itself is
+        deliberately unscoped so the graph layer owns the policy."""
+        async with db_connect() as db:
+            async with db.execute(
+                f"{_SELECT} WHERE patient_id = ? ORDER BY created_at DESC", (patient_id,)
+            ) as cursor:
+                rows = await cursor.fetchall()
+        return [_row_to_session(row) for row in rows]
+
+    async def patient_has_cross_clinic_consent(self, patient_id: str) -> bool:
+        """Whether this patient has consented to sharing their record across
+        clinics on Lipi. Gate for every cross-provider graph read."""
+        async with db_connect() as db:
+            async with db.execute(
+                "SELECT consent_on_file FROM patients WHERE id = ?", (patient_id,)
+            ) as cursor:
+                row = await cursor.fetchone()
+        return bool(row and row[0])
+
+    async def resolve_patient_id_by_phone(self, phone: str) -> Optional[str]:
+        """Resolve a phone number to the canonical patient_id, if one exists."""
+        normalized = normalize_phone(phone)
+        if not normalized:
+            return None
+        async with db_connect() as db:
+            async with db.execute(
+                "SELECT id FROM patients WHERE phone_number = ?", (normalized,)
+            ) as cursor:
+                row = await cursor.fetchone()
+        return row[0] if row else None
+
     async def get_all_sessions(self) -> list[ConsultationSession]:
         async with db_connect() as db:
             async with db.execute(f"{_SELECT} ORDER BY created_at DESC") as cursor:

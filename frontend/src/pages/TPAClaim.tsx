@@ -58,6 +58,17 @@ export default function TPAClaim() {
     window.open(`/api/internal/tpa-claim/${sessionId}/print`, '_blank');
   }
 
+  async function downloadFhirClaim() {
+    const res = await api.get(`/internal/tpa-claim/${sessionId}/fhir`);
+    const blob = new Blob([JSON.stringify(res.data, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `claim-fhir-${sessionId}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+  }
+
   if (loading) return <div className="flex items-center justify-center h-64 text-slate-400 text-sm">Loading claim...</div>;
   if (error) return <div className="p-6 text-red-600 text-sm">{error}</div>;
   if (!data) return null;
@@ -76,6 +87,13 @@ export default function TPAClaim() {
           <span className={`text-xs font-semibold rounded-full px-3 py-1 border ${consultation.signed ? 'bg-primary/[0.06] border-primary/20 text-primary' : 'bg-amber-50 border-amber-200 text-amber-700'}`}>
             {consultation.signed ? '✓ Doctor Signed' : '⚠ Awaiting Signature'}
           </span>
+          <button
+            onClick={downloadFhirClaim}
+            className="bg-white border border-slate-200 hover:border-primary/30 text-slate-700 text-sm font-semibold px-4 py-2 rounded-lg"
+            title="Export as an HL7 FHIR Claim resource, shaped for NHCX pre-authorization"
+          >
+            Export FHIR Claim
+          </button>
           <button
             onClick={openPrint}
             className="bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold px-4 py-2 rounded-lg"

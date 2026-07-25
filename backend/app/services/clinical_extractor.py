@@ -1343,10 +1343,10 @@ _DX_PROCEDURE_PRE_RE = re.compile(
 )
 
 # Pre-keyword HISTORY markers ("known case of", "k/c/o", "h/o", "history of").
-# These DO denote a real diagnosis the patient carries — common in Indian
-# cardiology dictation ("k/c/o CAD/DM/HTN, now NYHA III"). We capture these as
-# diagnoses rather than dropping them. Kept separate so the SOAP layer can flag
-# them as established/chronic if needed.
+# A chronic condition mentioned only as background ("known case of diabetes on
+# metformin") is medication/history context, not a new assessment being made
+# this visit — must NOT surface as a diagnosis (see eval case T3). Treated as
+# a suppression signal in _is_context_mention, same as procedure/medication context.
 _DX_HISTORY_PRE_RE = re.compile(
     r'\b(?:known(?:\s+case\s+of)?|h/o|k/c/o|history\s+of)\b',
     re.IGNORECASE,
@@ -1370,6 +1370,7 @@ def _is_context_mention(text: str, match_start: int, match_end: int, window: int
     return bool(
         _DX_CONTEXT_PRE_RE.search(preceding)
         or _DX_PROCEDURE_PRE_RE.search(preceding)
+        or _DX_HISTORY_PRE_RE.search(preceding)
         or _DX_CONTEXT_POST_RE.search(following)
     )
 
@@ -2559,8 +2560,10 @@ class ClinicalExtractorService:
     def _extract_diagnoses(sent_text: str, result: dict) -> None:
         lower = sent_text.lower()
 
-        # Bare "sugar" → Diabetes Mellitus ONLY when NOT followed by a number
-        # (to avoid "sugar 320 aaya" producing a spurious DM diagnosis)
+        # Bare "sugar" → Diabetes Mellitus ONLY when the sentence carries no
+        # numeric value at all (to avoid "sugar 320 aaya" or "fasting sugar
+        # today is 140 mg/dL" producing a spurious DM diagnosis from what is
+        # really a lab-value reading, already captured separately as a vital).
         _sugar_bare = re.search(r'(?:^|\b)sugar(?!\s*\d)(?:\b|$)', lower)
         if _sugar_bare and not _is_negated(lower, _sugar_bare.start(), _sugar_bare.end()):
             # Only fire if the sentence doesn't already contain a longer sugar phrase
@@ -2570,7 +2573,8 @@ class ClinicalExtractorService:
                     "sugar ki problem", "sugar hai", "sugar control", "sugar badhna",
                 )
             )
-            if not _already_phrase and "Diabetes Mellitus" not in result["diagnoses"]:
+            _has_numeric_value = bool(re.search(r'\d', lower))
+            if not _already_phrase and not _has_numeric_value and "Diabetes Mellitus" not in result["diagnoses"]:
                 result["diagnoses"].append("Diabetes Mellitus")
                 result["contexts"]["dx:Diabetes Mellitus"] = sent_text
 

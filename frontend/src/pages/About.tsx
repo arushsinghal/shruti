@@ -235,7 +235,7 @@ export default function About() {
                 href="mailto:arushsinghal98@gmail.com?subject=Working%20at%20Lipi"
                 className="group inline-flex items-center gap-2 text-[13.5px] font-semibold text-primary cursor-pointer"
               >
-                We're hiring — write to us
+                We're hiring, write to us
                 <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" strokeWidth={2} />
               </a>
             </div>

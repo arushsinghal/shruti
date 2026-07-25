@@ -9,8 +9,10 @@ import {
   Pill,
   Radar,
   ShieldCheck,
+  Download,
 } from 'lucide-react';
 import { RESEARCH_POSTS } from '../data/researchPosts';
+import ExtractionDemo from '../components/ExtractionDemo';
 
 const fadeUp = {
   hidden: { opacity: 0, y: 32 },
@@ -26,8 +28,8 @@ const SECONDARY_STATS = [
 const CORE_RESEARCH_TRACKS = [
   {
     icon: Activity,
-    title: 'Continual learning for healthcare services',
-    body: 'How an AI-native OPD assistant improves from doctor corrections, task completion, follow-up responses, and signed workflows without silently changing clinical facts.',
+    title: 'Context engineering, not weight updates',
+    body: 'Doctor corrections and patient history are assembled as context at inference time, not used to retrain any model. The system improves the same way continual learning would, without fine-tuning and without silent drift.',
   },
   {
     icon: Network,
@@ -167,6 +169,16 @@ export default function Research() {
               </div>
             ))}
           </div>
+          <a
+            href="https://github.com/Lipi-Research/lipi-research-datasets"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="mt-4 inline-flex items-center gap-2 text-[13px] font-semibold text-primary hover:text-primary-dark transition-colors cursor-pointer"
+          >
+            <Download className="w-4 h-4" strokeWidth={1.8} />
+            Download the benchmark and DDI dataset
+            <ArrowRight className="w-3.5 h-3.5" strokeWidth={2} />
+          </a>
         </motion.section>
 
         {/* ── Research thesis ──────────────────────────────────────── */}
@@ -241,7 +253,7 @@ export default function Research() {
                 Most AI medical scribes draft the clinical note with a generative model, which means
                 the note can contain plausible content that was never actually said. Lipi's extraction
                 pipeline does not work this way. Every clinical fact is pulled through deterministic,
-                rule and evidence-based extraction — not invented by a model guessing at what a
+                rule and evidence-based extraction, not invented by a model guessing at what a
                 typical note should contain.
               </p>
               <p className="text-[15px] text-slate-600 leading-relaxed">
@@ -252,6 +264,8 @@ export default function Research() {
             </div>
           </div>
         </motion.section>
+
+        <ExtractionDemo />
 
         {/* ── Research outcomes ────────────────────────────────────── */}
         <section className="py-16 border-t border-slate-200/60">

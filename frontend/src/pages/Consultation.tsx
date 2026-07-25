@@ -7,7 +7,6 @@ import type { EntityHighlight } from '../components/TranscriptViewer';
 import ClinicalResults from '../components/ClinicalResults';
 import { getSession, grantConsent, processClinical, submitTranscriptText } from '../lib/api';
 import type { ConsultationSession, TranscribeResponse, ProcessClinicalResponse } from '../types/clinical';
-import type { SessionMode } from '../types/clinical';
 import { MODE_COLORS } from '../types/clinical';
 
 // Realistic Hinglish demo consultation — showcases full extraction pipeline
@@ -188,13 +187,25 @@ export default function Consultation() {
             is_stub: false,
           });
         }
+        // Some legacy/seeded sessions stored clinical_facts and soap_note as a
+        // raw string wrapped in {value: "..."} instead of a parsed object —
+        // rendering that shape crashes the SOAP/facts views with no error
+        // boundary (blank page). Detect it and skip populating results rather
+        // than passing garbage deeper into the tree.
+        const isMalformed = (v: unknown) =>
+          !!v && typeof v === 'object' && 'value' in (v as object) && Object.keys(v as object).length === 1;
+
         if (s.clinical_facts && s.soap_note) {
-          setClinicalResults({
-            facts: s.clinical_facts,
-            state: s.memory_state ?? {},
-            soap: s.soap_note,
-            cds: s.cds_suggestions ?? {},
-          } as unknown as ProcessClinicalResponse);
+          if (isMalformed(s.clinical_facts) || isMalformed(s.soap_note)) {
+            setProcessError('This session’s clinical data is in an old, unsupported format and cannot be displayed. Please start a new consultation.');
+          } else {
+            setClinicalResults({
+              facts: s.clinical_facts,
+              state: s.memory_state ?? {},
+              soap: s.soap_note,
+              cds: s.cds_suggestions ?? {},
+            } as unknown as ProcessClinicalResponse);
+          }
         }
       })
       .catch(() => setLoadError('Consultation session not found'));

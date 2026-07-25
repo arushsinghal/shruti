@@ -38,7 +38,7 @@ COPY backend/app ./app
 COPY backend/main.py ./
 
 # Copy compiled frontend assets from Stage 1 into the backend's dist folder
-COPY --from=frontend-builder /frontend/dist ./dist
+COPY --from=frontend-builder /backend/dist ./dist
 
 # Create persistent data directories (for SQLite & uploads)
 RUN mkdir -p /app/data /app/uploads /app/audio_uploads
@@ -46,9 +46,16 @@ RUN mkdir -p /app/data /app/uploads /app/audio_uploads
 # Set PATH to use the virtual environment built by uv
 ENV PATH="/app/.venv/bin:$PATH"
 ENV PYTHONUNBUFFERED=1
+# python:3.12-slim has no locale configured, so Python falls back to ASCII
+# for any implicit text encoding (e.g. when a library writes a non-ASCII
+# character, like Gemini responses that contain an em dash or curly quote,
+# through a stream that doesn't specify UTF-8 explicitly). Force UTF-8.
+ENV PYTHONIOENCODING=utf-8
+ENV LANG=C.UTF-8
+ENV LC_ALL=C.UTF-8
 
 # Expose server port
 EXPOSE 8000
 
 # Start server
-CMD ["sh", "-c", "uvicorn app.main:app --host 0.0.0.0 --port ${PORT:-8000}"]
+CMD ["sh", "-c", "uvicorn app.main:app --host 0.0.0.0 --port ${PORT:-8000} --proxy-headers --forwarded-allow-ips='*'"]

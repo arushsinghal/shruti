@@ -7,7 +7,7 @@ from pydantic import BaseModel
 from app.schemas.consultation import ConsultationSession, CreateSessionRequest, ModeEnum, StatusEnum
 from app.storage.repository import SessionRepository
 from app.api.routes_auth import get_current_user
-from app.services.patient_history_service import build_patient_timeline
+from app.services.patient_history_service import build_patient_timeline, get_patient_graph
 from app.services import legacy_record_import
 
 router = APIRouter()
@@ -117,6 +117,7 @@ class IntakeRequest(BaseModel):
     patient_sex: str = ""
     chief_complaint: str = ""
     whatsapp_number: str = ""  # Often differs from patient_phone in India; falls back to patient_phone if blank.
+    abha_number: str = ""  # Ayushman Bharat Health Account id, if the patient already has one.
 
 
 @router.post("/sessions/intake", response_model=ConsultationSession, status_code=201)
@@ -150,12 +151,21 @@ async def assistant_intake(
     clinic_id = str(row[1])
     notes = body.chief_complaint.strip() or None
 
+    async with _db_connect() as db:
+        async with db.execute(
+            "SELECT full_name FROM users WHERE id = ?", (int(doctor_user_id),)
+        ) as cursor:
+            doctor_row = await cursor.fetchone()
+    doctor_name = doctor_row[0] if doctor_row and doctor_row[0] else None
+
     session = await repo.create_session(
         user_id=doctor_user_id,
         patient_name=body.patient_name.strip(),
+        doctor_name=doctor_name,
         patient_phone=body.patient_phone.strip(),
         patient_age=body.patient_age.strip() or None,
         patient_sex=body.patient_sex.strip() or None,
+        abha_number=body.abha_number.strip() or None,
         cloud_ai_consent=False,
         mode="health",
         clinic_id=clinic_id,
@@ -172,6 +182,75 @@ async def assistant_intake(
             await db.commit()
         session.transcript = f"[Chief complaint: {notes}]"
     return session
+
+
+class PatientConsentRequest(BaseModel):
+    consent: bool
+
+
+@router.get("/patients/by-phone/{phone}/graph")
+async def get_patient_graph_by_phone(
+    phone: str,
+    current_user: dict = Depends(get_current_user),
+) -> dict:
+    """Patient-carried records preview (Phase 3): resolve a phone number to its
+    patient and return the consent-gated cross-clinic graph. If the patient
+    hasn't consented yet, allergies/medications/conditions from OTHER clinics
+    stay hidden and only `cross_clinic_history_available` signals that there is
+    something to unlock — the intake UI uses this to prompt for consent.
+    Returns an empty graph (not 404) for a brand-new phone number."""
+    from app.storage.db import db_connect as _db_connect
+
+    user_id = str(current_user["id"])
+    async with _db_connect() as db:
+        async with db.execute(
+            "SELECT id FROM patients WHERE phone_number = ?", (phone.strip(),)
+        ) as cursor:
+            row = await cursor.fetchone()
+
+    if not row:
+        return {
+            "patient_id": None,
+            "total_visits_visible": 0,
+            "own_clinic_visits": 0,
+            "other_clinic_visits": 0,
+            "cross_clinic_consent": False,
+            "cross_clinic_history_available": False,
+            "active_medications": [],
+            "allergies": [],
+            "chronic_conditions": [],
+        }
+
+    return await get_patient_graph(row[0], user_id)
+
+
+@router.post("/patients/{patient_id}/consent")
+async def set_patient_cross_clinic_consent(
+    patient_id: str,
+    body: PatientConsentRequest,
+    current_user: dict = Depends(get_current_user),
+) -> dict:
+    """Grant or revoke the patient's consent to share their history across every
+    clinic on Lipi (not just the current doctor's own sessions). This is the
+    write side of Phase 3 — captured verbally at intake, same trust model as
+    the existing audio-recording consent gate."""
+    from app.storage.db import db_connect as _db_connect
+
+    async with _db_connect() as db:
+        async with db.execute("SELECT id FROM patients WHERE id = ?", (patient_id,)) as cursor:
+            if not await cursor.fetchone():
+                raise HTTPException(status_code=404, detail="Patient not found")
+        await db.execute(
+            "UPDATE patients SET consent_on_file = ? WHERE id = ?",
+            (1 if body.consent else 0, patient_id),
+        )
+        await db.commit()
+
+    await repo.log_audit(
+        patient_id, str(current_user["id"]), "consent_change",
+        "cross_clinic_consent_granted" if body.consent else "cross_clinic_consent_revoked",
+    )
+    return {"patient_id": patient_id, "cross_clinic_consent": body.consent}
 
 
 @router.get("/sessions", response_model=list[ConsultationSession])
@@ -332,6 +411,18 @@ async def legal_export(
     session = await repo.get_session(session_id, user_id)
     if session is None:
         raise HTTPException(status_code=404, detail="Session not found")
+
+    # Confirmation gate: a court-admissible export must not include facts still
+    # pending doctor review. Same gate FHIR/investigation-order exports use.
+    if session.memory_state:
+        extracted = session.memory_state.get("_extracted_facts")
+        if extracted is not None:
+            unconfirmed = [f for f in extracted if f.get("review_status") == "candidate"]
+            if unconfirmed:
+                raise HTTPException(
+                    status_code=409,
+                    detail=f"{len(unconfirmed)} fact(s) pending doctor review. Confirm or reject all facts before generating this document.",
+                )
 
     transcript = session.transcript or ""
     transcript_hash = hashlib.sha256(transcript.encode("utf-8")).hexdigest()

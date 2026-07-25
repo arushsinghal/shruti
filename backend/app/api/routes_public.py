@@ -19,10 +19,28 @@ from app.services.pdf_generator import build_prescription_pdf
 from app.services.whatsapp_service import WhatsAppService
 from app.services.icd10_map import annotate_diagnoses
 from app.services.investigation_order_renderer import render_investigation_order_html
+from app.services.clinical_extractor import ClinicalExtractorService
+from app.services.landing_chat_service import LandingChatService
 
 logger = logging.getLogger(__name__)
 router = APIRouter()
 repo = SessionRepository()
+_extractor = ClinicalExtractorService()
+_landing_chat = LandingChatService()
+
+
+class ExtractDemoRequest(BaseModel):
+    text: str = ""
+
+
+class LandingChatMessage(BaseModel):
+    role: str = "user"
+    text: str = ""
+
+
+class LandingChatRequest(BaseModel):
+    message: str = ""
+    history: list[LandingChatMessage] = []
 
 
 class VerifyAccessRequest(BaseModel):
@@ -421,7 +439,15 @@ async def get_patient_records(token: str, request: Request) -> dict:
     visits = []
     for session_id, doctor_name, status, created_at, facts_json, clinic_id in rows:
         facts = _json_loads(facts_json)
-        diagnosis = (facts.get("diagnosis") or facts.get("provisional_diagnosis")) if isinstance(facts, dict) else None
+        diagnosis = None
+        diagnoses_list = facts.get("diagnoses") if isinstance(facts, dict) else None
+        if isinstance(diagnoses_list, list) and diagnoses_list:
+            seen: list[str] = []
+            for d in diagnoses_list:
+                base = str(d).replace(" (uncertain)", "").strip()
+                if base and base not in seen:
+                    seen.append(base)
+            diagnosis = ", ".join(seen) or None
         medications = facts.get("medications", []) if isinstance(facts, dict) else []
         visits.append({
             "session_id": session_id,
@@ -849,3 +875,39 @@ async def submit_pre_visit_form(
         await db.commit()
 
     return {"success": True}
+
+
+@router.post("/public/research/extract-demo")
+async def research_extract_demo(body: ExtractDemoRequest, request: Request):
+    """Public, unauthenticated, read-only demo of the deterministic clinical NLP
+    pipeline. Runs the real extractor on visitor-submitted text and returns
+    structured facts. No session is created, nothing is persisted, no patient
+    data is touched — this is the same engine used in production consultations."""
+    check_rate_limit(request, "research_extract_demo", max_attempts=30, window_seconds=600)
+
+    text = (body.text or "").strip()[:600]
+    if not text:
+        return {
+            "symptoms": [], "medications": [], "vitals": [], "allergies": [],
+            "investigations": [], "diagnoses": [], "follow_up": [], "contexts": {},
+        }
+
+    result = _extractor.extract(text)
+    return {k: v for k, v in result.items()}
+
+
+@router.post("/public/landing-chat")
+async def landing_chat(body: LandingChatRequest, request: Request):
+    """Public, unauthenticated chatbot answering visitor questions about the
+    Lipi product, research, and pricing only. Retrieval-grounded (small
+    curated knowledge base) and explicitly scoped away from medical advice.
+    Nothing is persisted server-side beyond the request/response cycle."""
+    check_rate_limit(request, "landing_chat", max_attempts=20, window_seconds=600)
+
+    message = (body.message or "").strip()[:500]
+    if not message:
+        raise HTTPException(status_code=400, detail="Message is required")
+
+    history = [{"role": h.role, "text": h.text[:500]} for h in (body.history or [])[-6:]]
+    answer = _landing_chat.answer(message, history)
+    return {"answer": answer}
